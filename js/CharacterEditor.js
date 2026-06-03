@@ -178,8 +178,7 @@ var CharacterEditor = {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         CharacterClasses.applyPreset(p.config.characters[this.currentCharIndex], classKey);
-        ProjectManager.saveToStorage();
-        this.open(this.currentCharIndex); // Refresh
+        this.open(this.currentCharIndex);
         LeftPanel.render();
     },
 
@@ -293,7 +292,6 @@ var CharacterEditor = {
         char.name = document.getElementById('ceName').value.trim() || 'Character';
         char.role = document.getElementById('ceRole').value;
         char.defaultState = document.getElementById('ceDefaultState').value;
-        // No save call — data is in memory
         UI.closeModal();
         LeftPanel.render();
         if (typeof Sidebar !== 'undefined') Sidebar.render();

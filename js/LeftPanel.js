@@ -62,30 +62,28 @@ var LeftPanel = {
 
     addCharacter: function() {
         var p = ProjectManager.getActive(); if (!p) return;
-        p.config.characters.push(ProjectManager.createCharacter('New Character', 'standardGirl', 'neutral'));
-        ProjectManager.saveToStorage();
-        this.render();
-        // Open the new character in editor
+        p.config.characters.push(ProjectManager._createCharacter('New Character', 'standardGirl', 'neutral'));        this.render();
         CharacterEditor.open(p.config.characters.length - 1);
     },
 
     updateStat: function(i, key, value) {
         var p = ProjectManager.getActive(); if (!p || !p.config.stats[i]) return;
-        p.config.stats[i][key] = value; ProjectManager.saveToStorage();
+        p.config.stats[i][key] = value;
     },
     addStat: function() {
         var p = ProjectManager.getActive(); if (!p) return;
         p.config.stats.push({ id:'stat_'+Date.now(), name:'New Stat', emoji:'📊', start:0, min:0, max:100, color:'#8090e0' });
-        ProjectManager.saveToStorage(); this.render();
+        this.render();
     },
     removeStat: function(i) {
         var p = ProjectManager.getActive(); if (!p) return;
-        p.config.stats.splice(i, 1); ProjectManager.saveToStorage(); this.render();
+        p.config.stats.splice(i, 1);
+        this.render();
     },
     updateSetting: function(key, value) {
         var p = ProjectManager.getActive(); if (!p) return;
         if (!p.config.extraSettings) p.config.extraSettings = {};
-        p.config.extraSettings[key] = value; ProjectManager.saveToStorage();
+        p.config.extraSettings[key] = value;
     },
     openClassEditor: function(editKey) {
         // Same modal class editor as before — kept for toolbar access
@@ -139,7 +137,7 @@ var LeftPanel = {
         if (key==='standardGirl'||key==='standardBoy') { alert('Cannot delete built-ins.'); return; }
         if (!confirm('Delete preset "'+key+'"?')) return;
         var p = ProjectManager.getActive();
-        if (p) { (p.config.characters||[]).forEach(function(c) { if (c.classPreset===key) c.classPreset='custom'; }); ProjectManager.saveToStorage(); }
+        if (p) { (p.config.characters||[]).forEach(function(c) { if (c.classPreset===key) c.classPreset='custom'; }); }
         CharacterClasses.deletePreset(key);
         UI.closeModal(); this.render();
         if (typeof Sidebar !== 'undefined') Sidebar.render();

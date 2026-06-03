@@ -72,10 +72,8 @@ var App = {
         }
     },
 
-    // Sync canvas state into the active project (does NOT save to disk)
     _syncCanvasToProject: function() {
-        var p = ProjectManager.getActive();
-        if (!p) return;
+        var p = ProjectManager.getActive(); if (!p) return;
         p.scenes = Canvas.nodes.filter(function(n){return n.type==='scene';}).map(function(n){
             return { id:n.id, x:n.x, y:n.y, title:n.title, subtitle:n.subtitle, text:n.text, choices:n.choices, extraTags:n.extraTags };
         });
@@ -88,13 +86,7 @@ var App = {
     },
 
     save: function() {
-        this._syncCanvasToProject();
         ProjectManager.saveActiveProject().catch(function(err){ console.error('Save failed:', err); });
-    },
-
-    saveAs: function() {
-        this._syncCanvasToProject();
-        ProjectManager.saveActiveProjectAs().catch(function(err){ console.error('Save As failed:', err); });
     },
 
     createProject: function() {
@@ -112,17 +104,9 @@ var App = {
     bindKeyboard: function() {
         var self = this;
         window.addEventListener('keydown', function(e) {
-            // Ctrl+Alt+S = Save As (avoids Edge screenshot conflict)
-            if ((e.ctrlKey || e.metaKey) && e.altKey && (e.key === 's' || e.key === 'S')) {
-                e.preventDefault();
-                self.saveAs();
-                return;
-            }
-            // Ctrl+S = Save
-            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && (e.key === 's' || e.key === 'S')) {
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 's') {
                 e.preventDefault();
                 self.save();
-                return;
             }
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
