@@ -1,2 +1,2 @@
 # Savida
-a HTML based game engine.
+an opensourse HTML based game engine.
