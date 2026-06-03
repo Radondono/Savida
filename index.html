@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Story Engine Maker</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/nodes.css">
+    <link rel="stylesheet" href="css/panels.css">
+    <link rel="stylesheet" href="css/emoji-picker.css">
+</head>
+<body>
+
+<div id="tab-bar">
+    <div class="add-tab" title="New Project" onclick="App.createProject()">+</div>
+</div>
+
+<div id="toolbar">
+    <!-- Node buttons -->
+    <button class="btn-scene" id="btnAddScene" disabled onclick="NodeEditor.addNode('scene')">+ Scene</button>
+    <button class="btn-ending" id="btnAddEnding" disabled onclick="NodeEditor.addNode('ending')">+ Ending</button>
+    <span class="sep">|</span>
+
+    <!-- Save -->
+    <button class="btn-save" id="btnSave" disabled onclick="App.save()">💾 Save</button>
+    <span class="sep">|</span>
+
+    <!-- File operations dropdown -->
+    <div class="toolbar-dropdown" id="ddFile">
+        <button class="dropdown-btn btn-load" onclick="UI.toggleDropdown('ddFile')">📁 File ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.setSaveFolder()">📂 Set Save Folder</button>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.saveActiveProjectAs()">💾 Save As (New Folder)</button>
+            <div class="dropdown-sep"></div>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.downloadProjectFile()">📥 Download .story.json</button>
+            <button onclick="UI.toggleDropdown('ddFile');document.getElementById('importProjectFile').click()">📤 Import .story.json</button>
+            <input type="file" id="importProjectFile" accept=".story.json" onchange="ProjectManager.importProjectFile(event)" style="display:none;">
+        </div>
+    </div>
+
+    <!-- Zoom controls -->
+    <button class="btn-zoom btn-icon" title="Zoom Out" onclick="Canvas.zoomOut()">🔍−</button>
+    <span id="zoom-level">100%</span>
+    <button class="btn-zoom btn-icon" title="Zoom In" onclick="Canvas.zoomIn()">🔍+</button>
+    <button class="btn-zoom" title="Fit All" onclick="Canvas.zoomToFit()">⊞ Fit</button>
+    <span class="sep">|</span>
+
+    <!-- Class Editor dropdown -->
+    <div class="toolbar-dropdown" id="ddClass">
+        <button class="dropdown-btn btn-dd-class" onclick="UI.toggleDropdown('ddClass')">🏗️ Classes ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor()">📝 Manage Presets</button>
+            <div class="dropdown-sep"></div>
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor('standardGirl')">👩 Standard Girl</button>
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor('standardBoy')">🧑 Standard Boy</button>
+        </div>
+    </div>
+
+    <!-- Export dropdown -->
+    <div class="toolbar-dropdown" id="ddExport">
+        <button class="dropdown-btn btn-dd-export" id="btnExport" disabled onclick="UI.toggleDropdown('ddExport')">⬇ Export ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddExport');Export.exportJS()">📄 story.js (engine data)</button>
+            <button onclick="UI.toggleDropdown('ddExport');Export.exportHTML()">🌐 Engine HTML (playable)</button>
+        </div>
+    </div>
+
+    <!-- Import story.js -->
+    <button class="btn-load" onclick="document.getElementById('loadFile').click()">📂 Import .js</button>
+    <input type="file" id="loadFile" accept=".js" onchange="Import.importJS(event)">
+
+    <span class="sep">|</span>
+    <button class="btn-clear" id="btnClear" disabled onclick="Canvas.clearAll()">Clear</button>
+
+    <span style="flex:1;"></span>
+    <span id="save-indicator">Saved ✓</span>
+</div>
+
+<div id="main-area">
+    <div id="left-panel"><div id="left-content" class="no-project-msg">📁<br>Create a project<br>to get started</div></div>
+    <div id="canvas-wrap"><canvas id="lineCanvas"></canvas><div id="nodes-layer"></div></div>
+    <div id="sidebar"><div style="color:var(--dim);text-align:center;padding:20px;">👈 Select a node</div></div>
+</div>
+
+<div id="emoji-picker"></div>
+
+<div id="modal-overlay">
+    <div id="modal">
+        <h3 id="modal-title"></h3>
+        <pre id="modal-content"></pre>
+        <button class="btn-close" onclick="UI.closeModal()">Close</button>
+        <button class="btn-download" id="modal-dl-btn" onclick="UI.downloadModal()">Download</button>
+    </div>
+</div>
+
+<div class="hint-bar">🖱 Drag nodes · 🔴 Drag sockets to connect · 🖐 Drag canvas to pan · 🔍 Scroll wheel to zoom · Ctrl+S to save</div>
+
+<script src="js/Utils.js"></script>
+<script src="js/CharacterClasses.js"></script>
+<script src="js/ProjectManager.js"></script>
+<script src="js/EmojiPicker.js"></script>
+<script src="js/Canvas.js"></script>
+<script src="js/NodeEditor.js"></script>
+<script src="js/CharacterEditor.js"></script>
+<script src="js/Sidebar.js"></script>
+<script src="js/LeftPanel.js"></script>
+<script src="js/Export.js"></script>
+<script src="js/Import.js"></script>
+<script src="js/app.js"></script>
+<link rel="stylesheet" href="css/character-editor.css">
+
+
+</body>
+</html>
