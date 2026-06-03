@@ -41,12 +41,12 @@ var ProjectManager = {
             timestamp: new Date().toISOString()
         };
         if (this.saveDirectory) session.folderName = this.saveDirectory.name;
-        try { localStorage.setItem('story_engine_last_session', JSON.stringify(session)); } catch(e) {}
+        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
     },
 
     _restoreLastSession: async function() {
         try {
-            var data = localStorage.getItem('story_engine_last_session');
+            var data = localStorage.getItem('savida_last_session');
             if (!data) { this._showWelcomePrompt(); return; }
             var session = JSON.parse(data);
             await new Promise(function(r) { setTimeout(r, 100); });
@@ -62,11 +62,11 @@ var ProjectManager = {
             if (reopen) {
                 await this._reopenFolder(session);
             } else {
-                localStorage.removeItem('story_engine_last_session');
+                localStorage.removeItem('savida_last_session');
                 this._showWelcomePrompt();
             }
         } catch(e) {
-            localStorage.removeItem('story_engine_last_session');
+            localStorage.removeItem('savida_last_session');
             this._showWelcomePrompt();
         }
     },
@@ -142,15 +142,18 @@ var ProjectManager = {
     // ---- SAVE ----
     saveActiveProject: async function() {
         if (!this.saveDirectory) {
-            // Auto-prompt for folder
             await this.pickSaveFolder();
-            if (!this.saveDirectory) return; // User cancelled
+            if (!this.saveDirectory) return;
         }
         var project = this.getActive();
         if (!project) return;
         
-        // Sync canvas state
         App._syncCanvasToProject();
+        
+        // EMBED IMAGES INTO PROJECT DATA
+        if (typeof ImageManager !== 'undefined') {
+            project.images = ImageManager.exportForProject(project.id);
+        }
         
         project.updatedAt = new Date().toISOString();
         try {
@@ -224,7 +227,10 @@ var ProjectManager = {
                             project.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
                             if (project.name) project.name = project.name + ' (Imported)';
                         }
-                        project._sourceFileName = jsonFiles[j].name;
+                        // RESTORE IMAGES FROM DROPPED FILE
+                        if (project.images && typeof ImageManager !== 'undefined') {
+                            ImageManager.importForProject(project.id, project.images);
+                        }
                         self.projects.push(project);
                         self.activeProjectId = project.id;
                         imported++;
@@ -285,6 +291,10 @@ var ProjectManager = {
                     var text = await file.text();
                     var project = JSON.parse(text);
                     if (project.id && project.config && project.scenes !== undefined) {
+                        // RESTORE IMAGES WHEN LOADING FROM FOLDER
+                        if (project.images && typeof ImageManager !== 'undefined') {
+                            ImageManager.importForProject(project.id, project.images);
+                        }
                         this.projects.push(project);
                     }
                 } catch(e) {}
@@ -318,6 +328,7 @@ var ProjectManager = {
                 extraSettings:{enableSexActs:true,enableEnslavement:true}
             },
             scenes:[],endings:{},connections:[],nodeIdCounter:0,
+            images:{},
             createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
         };
         this.projects.push(project);
@@ -387,6 +398,11 @@ var ProjectManager = {
 
     downloadProjectFile: function() {
         var project = this.getActive(); if (!project) return;
+        App._syncCanvasToProject();
+        // Embed images
+        if (typeof ImageManager !== 'undefined') {
+            project.images = ImageManager.exportForProject(project.id);
+        }
         project.updatedAt = new Date().toISOString();
         var content = JSON.stringify(project, null, 2);
         var blob = new Blob([content], {type:'application/json'});
@@ -412,6 +428,10 @@ var ProjectManager = {
                     } else {
                         self.projects = self.projects.filter(function(p){return p.id!==project.id;});
                     }
+                }
+                // RESTORE IMAGES
+                if (project.images && typeof ImageManager !== 'undefined') {
+                    ImageManager.importForProject(project.id, project.images);
                 }
                 self.projects.push(project); self.activeProjectId = project.id;
                 self.renderTabs(); self._saveSession();

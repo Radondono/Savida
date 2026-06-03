@@ -13,9 +13,9 @@ var Utils = {
         setTimeout(function() { el.classList.remove('show'); }, 1500);
     },
     updateToolbarButtons: function(hasProject) {
-        ['btnAddScene','btnAddEnding','btnSave','btnExport','btnExportHTML','btnClear'].forEach(function(id) {
+        ['btnAddScene','btnAddEnding','btnSave','btnExport','btnExportHTML','btnClear','btnPreview'].forEach(function(id) {
             var btn = document.getElementById(id);
             if (btn) btn.disabled = !hasProject;
         });
-    }
+    },
 };

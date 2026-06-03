@@ -23,6 +23,7 @@ var LeftPanel = {
             var bpCount = char.bodyParts ? Object.keys(char.bodyParts).length : 0;
             var enabledBpCount = char.bodyParts ?
                 Object.keys(char.bodyParts).filter(function(k) { return char.bodyParts[k].enabled; }).length : 0;
+            var hasImgs = ImageManager.hasImages(char.id);
             html += '<div class="char-summary-card" onclick="CharacterEditor.open(' + i + ')">';
             html += '<div class="char-avatar">' + (char.icon || '🧑') + '</div>';
             html += '<div class="char-info">';
@@ -33,6 +34,7 @@ var LeftPanel = {
             html += '<span>' + (char.clothing || []).length + ' 👔</span>';
             html += '<span>' + (char.states || []).length + ' 📊</span>';
             html += '<span>' + enabledBpCount + '/' + bpCount + ' 🫦</span>';
+            if (hasImgs) html += '<span style="background:rgba(52,152,219,0.2);color:#3498db;">🖼️</span>';
             html += '</div></div>';
             html += '<div class="char-arrow">▶</div>';
             html += '</div>';
@@ -62,7 +64,8 @@ var LeftPanel = {
 
     addCharacter: function() {
         var p = ProjectManager.getActive(); if (!p) return;
-        p.config.characters.push(ProjectManager._createCharacter('New Character', 'standardGirl', 'neutral'));        this.render();
+        p.config.characters.push(ProjectManager._createCharacter('New Character', 'standardGirl', 'neutral'));
+        this.render();
         CharacterEditor.open(p.config.characters.length - 1);
     },
 
@@ -86,7 +89,6 @@ var LeftPanel = {
         p.config.extraSettings[key] = value;
     },
     openClassEditor: function(editKey) {
-        // Same modal class editor as before — kept for toolbar access
         var overlay = document.getElementById('modal-overlay');
         var modalTitle = document.getElementById('modal-title');
         var modalContent = document.getElementById('modal-content');

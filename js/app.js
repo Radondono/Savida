@@ -1,5 +1,8 @@
 var UI = {
-    modalContent: '', modalFilename: 'export.js', modalType: 'text/javascript',
+    modalContent: '',
+    modalFilename: 'export.js',
+    modalType: 'text/javascript',
+
     showModal: function(title, content, filename, type) {
         document.getElementById('modal-title').textContent = title;
         document.getElementById('modal-content').textContent = content;
@@ -7,13 +10,35 @@ var UI = {
         this.modalContent = content;
         this.modalFilename = filename || 'export.js';
         this.modalType = type || 'text/javascript';
+        
+        // Update download button
+        var dlBtn = document.getElementById('modal-dl-btn');
+        if (dlBtn) {
+            dlBtn.style.display = 'inline-block';
+            dlBtn.textContent = '📥 Download ' + (filename || 'file');
+        }
     },
-    closeModal: function() { document.getElementById('modal-overlay').classList.remove('show'); },
+
+    closeModal: function() {
+        document.getElementById('modal-overlay').classList.remove('show');
+    },
+
     downloadModal: function() {
+        if (!this.modalContent) {
+            alert('Nothing to download.');
+            return;
+        }
         var blob = new Blob([this.modalContent], { type: this.modalType });
+        var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = this.modalFilename; a.click();
+        a.href = url;
+        a.download = this.modalFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 100);
     },
+
     toggleDropdown: function(ddId) {
         var dd = document.getElementById(ddId); if (!dd) return;
         var isOpen = dd.classList.contains('open');
@@ -111,6 +136,12 @@ var App = {
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); Canvas.setZoom(1); }
+            // Ctrl+P = Preview
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 'p') {
+                e.preventDefault();
+                Export.previewHTML();
+                return;
+            }
         });
     },
 

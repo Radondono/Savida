@@ -7,9 +7,11 @@ var Import = {
                 var code = e.target.result;
                 var scenesMatch = code.match(/STORY_SCENES\s*=\s*(\[[\s\S]*?\]);/);
                 var endingsMatch = code.match(/STORY_ENDINGS\s*=\s*(\{[\s\S]*?\});/);
+                var imagesMatch = code.match(/STORY_IMAGES\s*=\s*(\{[\s\S]*?\});/);
                 if (!scenesMatch) { alert('Could not find STORY_SCENES in file.'); return; }
                 var scenes = JSON.parse(scenesMatch[1]);
                 var endings = endingsMatch ? JSON.parse(endingsMatch[1]) : {};
+                var images = imagesMatch ? JSON.parse(imagesMatch[1]) : {};
                 var p = ProjectManager.createProject('Imported Story');
                 var chars = p.config.characters || [];
                 Canvas.nodes = []; Canvas.connections = []; Canvas.nodeIdCounter = 0;
@@ -21,14 +23,12 @@ var Import = {
                             var choice = { text: ch.text || '' };
                             (p.config.stats || []).forEach(function(st) { choice[st.id] = ch[st.id] || 0; });
                             choice.sex = ch.sex || false; choice.corrupt = ch.corrupt || false;
-                            // Import legacy fields into new character format
                             if (chars[0]) {
                                 if (ch.sis) choice['strip_' + chars[0].id] = ch.sis;
                                 if (ch.mayaOral) choice['act_oral_' + chars[0].id] = ch.mayaOral;
                                 if (ch.mayaVaginal) choice['act_vaginal_' + chars[0].id] = ch.mayaVaginal;
                                 if (ch.mayaAnal) choice['act_anal_' + chars[0].id] = ch.mayaAnal;
                                 if (ch.enslaveSis) choice['enslave_' + chars[0].id] = true;
-                                // Generic body parts
                                 chars.forEach(function(c) {
                                     Object.keys(ch).forEach(function(k) {
                                         if (k.startsWith('act_') && k.endsWith('_' + c.id)) choice[k] = ch[k];
@@ -64,6 +64,10 @@ var Import = {
                         }
                     });
                 });
+                // Import images
+                if (Object.keys(images).length > 0) {
+                    ImageManager.importForProject(p.id, images);
+                }
                 Canvas.nodes.forEach(function(n) { Canvas.renderNode(n); });
                 Canvas.drawConnections(); Canvas.saveState();
                 App.loadProjectToEditor(); Utils.showSaveIndicator();

@@ -118,7 +118,7 @@ var CharacterClasses = {
             }
         });
         try {
-            localStorage.setItem('story_engine_class_presets_v2', JSON.stringify(userPresets));
+            localStorage.setItem('savida_class_presets', JSON.stringify(userPresets));
         } catch(e) {
             console.warn('Could not save class presets.');
         }
@@ -126,7 +126,7 @@ var CharacterClasses = {
 
     loadFromStorage: function() {
         try {
-            var data = localStorage.getItem('story_engine_class_presets_v2');
+            var data = localStorage.getItem('savida_class_presets');
             if (data) {
                 var userPresets = JSON.parse(data);
                 var self = this;

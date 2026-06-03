@@ -60,17 +60,39 @@ var Sidebar = {
                         });
                     }
 
-                    // Per-character: strip + state
+                    // Per-character: clothing toggle (strip / wear)
                     chars.forEach(function(c) {
-                        html += '<div class="stat-row">';
-                        html += '<label>' + Utils.escHtml(c.name) + ' strip</label>';
-                        html += '<select onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'strip_' + c.id + '\',this.value===\'none\'?null:this.value)">';
-                        html += '<option value="none">-</option>';
-                        (c.clothing || ['top','bottom']).forEach(function(l) {
-                            html += '<option value="' + l + '"' + (ch['strip_'+c.id]===l?' selected':'') + '>' + l + '</option>';
+                        html += '<div style="margin-top:4px;">';
+                        html += '<label style="min-width:100%;margin-bottom:2px;">' + Utils.escHtml(c.name) + ' clothing</label>';
+                        html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+                        (c.clothing || []).forEach(function(l) {
+                            var strippedItems = ch['strip_' + c.id] ? ch['strip_' + c.id].split(',') : [];
+                            var wornItems = ch['wear_' + c.id] ? ch['wear_' + c.id].split(',') : [];
+                            var isStripped = strippedItems.indexOf(l) >= 0;
+                            var isWorn = wornItems.indexOf(l) >= 0;
+
+                            html += '<div style="display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 6px;border-radius:4px;">';
+                            html += '<span style="font-size:9px;min-width:40px;">' + l + '</span>';
+
+                            // Strip button
+                            html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'strip\')" ';
+                            html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isStripped ? '#ff3050' : '#3a3a55') + ';background:' + (isStripped ? 'rgba(255,48,80,0.3)' : 'transparent') + ';color:' + (isStripped ? '#ff6080' : 'var(--dim)') + ';" ';
+                            html += 'title="Remove this clothing">− Strip</button>';
+
+                            // Wear button
+                            html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'wear\')" ';
+                            html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isWorn ? '#2ecc71' : '#3a3a55') + ';background:' + (isWorn ? 'rgba(46,204,113,0.3)' : 'transparent') + ';color:' + (isWorn ? '#2ecc71' : 'var(--dim)') + ';" ';
+                            html += 'title="Put this clothing back on">+ Wear</button>';
+
+                            html += '</div>';
                         });
-                        html += '</select>';
-                        html += '<label>State</label>';
+                        html += '</div></div>';
+                    });
+
+                    // Per-character: state
+                    chars.forEach(function(c) {
+                        html += '<div class="stat-row" style="margin-top:4px;">';
+                        html += '<label>' + Utils.escHtml(c.name) + ' state</label>';
                         html += '<select onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'state_' + c.id + '\',this.value)">';
                         (c.states||['Normal']).forEach(function(s) {
                             html += '<option value="' + s + '"' + (ch['state_'+c.id]===s?' selected':'') + '>' + s + '</option>';
@@ -81,7 +103,7 @@ var Sidebar = {
 
                     // Enslavement
                     if (p && p.config.extraSettings && p.config.extraSettings.enableEnslavement) {
-                        html += '<div class="checkbox-row">';
+                        html += '<div class="checkbox-row" style="margin-top:4px;">';
                         chars.forEach(function(c) {
                             html += '<label><input type="checkbox" ' + (ch['enslave_'+c.id]?'checked':'') + ' onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'enslave_'+c.id+'\',this.checked)">⛓️'+Utils.escHtml(c.name)+'</label>';
                         });
@@ -99,5 +121,44 @@ var Sidebar = {
         }
 
         sidebar.innerHTML = html;
+    },
+
+    toggleClothingAction: function(nodeId, choiceIndex, charId, clothItem, action) {
+        var node = Canvas.getNode(nodeId);
+        if (!node || !node.choices || !node.choices[choiceIndex]) return;
+        var ch = node.choices[choiceIndex];
+
+        var stripKey = 'strip_' + charId;
+        var wearKey = 'wear_' + charId;
+
+        var strippedItems = ch[stripKey] ? ch[stripKey].split(',') : [];
+        var wornItems = ch[wearKey] ? ch[wearKey].split(',') : [];
+
+        if (action === 'strip') {
+            var idx = strippedItems.indexOf(clothItem);
+            if (idx >= 0) {
+                strippedItems.splice(idx, 1);
+            } else {
+                strippedItems.push(clothItem);
+                var wearIdx = wornItems.indexOf(clothItem);
+                if (wearIdx >= 0) wornItems.splice(wearIdx, 1);
+            }
+        } else if (action === 'wear') {
+            var idx = wornItems.indexOf(clothItem);
+            if (idx >= 0) {
+                wornItems.splice(idx, 1);
+            } else {
+                wornItems.push(clothItem);
+                var stripIdx = strippedItems.indexOf(clothItem);
+                if (stripIdx >= 0) strippedItems.splice(stripIdx, 1);
+            }
+        }
+
+        ch[stripKey] = strippedItems.length > 0 ? strippedItems.join(',') : null;
+        ch[wearKey] = wornItems.length > 0 ? wornItems.join(',') : null;
+
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
     }
 };

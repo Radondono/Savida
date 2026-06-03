@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Story Engine Maker</title>
+    <title>Savida — Story Engine Maker</title>
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/nodes.css">
     <link rel="stylesheet" href="css/panels.css">
     <link rel="stylesheet" href="css/emoji-picker.css">
+    <link rel="stylesheet" href="css/character-editor.css">
 </head>
 <body>
 
@@ -28,8 +29,8 @@
     <div class="toolbar-dropdown" id="ddFile">
         <button class="dropdown-btn btn-load" onclick="UI.toggleDropdown('ddFile')">📁 File ▾</button>
         <div class="dropdown-menu">
-            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.setSaveFolder()">📂 Set Save Folder</button>
-            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.saveActiveProjectAs()">💾 Save As (New Folder)</button>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.pickSaveFolder()">📂 Set Save Folder</button>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.loadFromFolder()">📥 Load from Folder</button>
             <div class="dropdown-sep"></div>
             <button onclick="UI.toggleDropdown('ddFile');ProjectManager.downloadProjectFile()">📥 Download .story.json</button>
             <button onclick="UI.toggleDropdown('ddFile');document.getElementById('importProjectFile').click()">📤 Import .story.json</button>
@@ -64,6 +65,9 @@
         </div>
     </div>
 
+    <!-- Preview button -->
+    <button class="btn-zoom" id="btnPreview" disabled onclick="Export.previewHTML()" style="background:#f0c040;color:#1a1a00;">🔍 Preview</button>
+
     <!-- Import story.js -->
     <button class="btn-load" onclick="document.getElementById('loadFile').click()">📂 Import .js</button>
     <input type="file" id="loadFile" accept=".js" onchange="Import.importJS(event)">
@@ -92,10 +96,11 @@
     </div>
 </div>
 
-<div class="hint-bar">🖱 Drag nodes · 🔴 Drag sockets to connect · 🖐 Drag canvas to pan · 🔍 Scroll wheel to zoom · Ctrl+S to save</div>
+<div class="hint-bar">🖱 Drag nodes · 🔴 Drag sockets · 🖐 Pan · 🔍 Scroll zoom · Ctrl+S Save · Ctrl+P Preview</div>
 
 <script src="js/Utils.js"></script>
 <script src="js/CharacterClasses.js"></script>
+<script src="js/ImageManager.js"></script>
 <script src="js/ProjectManager.js"></script>
 <script src="js/EmojiPicker.js"></script>
 <script src="js/Canvas.js"></script>
@@ -106,8 +111,6 @@
 <script src="js/Export.js"></script>
 <script src="js/Import.js"></script>
 <script src="js/app.js"></script>
-<link rel="stylesheet" href="css/character-editor.css">
-
 
 </body>
 </html>

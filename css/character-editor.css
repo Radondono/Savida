@@ -39,6 +39,10 @@
     font-size:11px;margin-left:auto;
 }
 .char-editor-panel h3 .back-btn:hover{background:#555;}
+.char-editor-panel h4{
+    color:var(--accent);font-size:12px;margin:12px 0 4px;
+    padding-bottom:4px;border-bottom:1px solid var(--border);
+}
 .char-editor-panel label{
     color:var(--dim);font-size:10px;display:block;margin-top:8px;
 }
@@ -100,3 +104,16 @@
 .btn-save-char{background:var(--green);}
 .btn-delete-char{background:var(--danger);}
 .btn-apply-preset{background:var(--accent2);}
+
+/* ---- CLOTHING DRAG ITEMS ---- */
+.cloth-drag-item {
+    user-select: none;
+    transition: all 0.15s;
+}
+.cloth-drag-item:hover {
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: var(--accent2) !important;
+}
+.cloth-drag-item:active {
+    cursor: grabbing !important;
+}
