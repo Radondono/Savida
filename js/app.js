@@ -44,7 +44,8 @@ var App = {
         Canvas.init();
         this.bindKeyboard();
         this.bindModalClose();
-        this.loadProjectToEditor();
+        // Don't call LeftPanel.render() or Sidebar.render() here —
+        // ProjectManager.init() handles the startup flow
     },
 
     loadProjectToEditor: function() {

@@ -20,7 +20,14 @@ var ProjectManager = {
             return;
         }
         
-        this.createProject('My First Story');
+        var recentSessions = this._getRecentSessions();
+        if (recentSessions.length > 0) {
+            this._showStartupScreen(recentSessions);
+        } else {
+            this.createProject('My First Story');
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+        }
     },
 
     _showBrowserWarning: function() {
@@ -33,15 +40,137 @@ var ProjectManager = {
         }
     },
 
+    _getRecentSessions: function() {
+        var sessions = [];
+        try {
+            var data = localStorage.getItem('savida_last_session');
+            if (data) {
+                var session = JSON.parse(data);
+                if (session.folderName) sessions.push(session);
+            }
+        } catch(e) {}
+        return sessions;
+    },
+
+    _saveRecentSession: function() {
+        if (!this.saveDirectory) return;
+        var session = {
+            folderName: this.saveDirectory.name,
+            projectNames: this.projects.map(function(p) { return p.name; }),
+            activeProjectId: this.activeProjectId,
+            timestamp: new Date().toISOString()
+        };
+        try {
+            localStorage.setItem('savida_last_session', JSON.stringify(session));
+        } catch(e) {}
+    },
+
+    _showStartupScreen: function(recentSessions) {
+        var container = document.getElementById('left-content');
+        if (!container) return;
+        
+        var html = '<div style="padding:10px;text-align:center;">';
+        html += '<h3 style="color:var(--accent);margin-bottom:12px;">🚀 Savida</h3>';
+        
+        html += '<button onclick="ProjectManager.startNewProject()" style="width:100%;padding:12px;margin:6px 0;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">✨ New Project</button>';
+        
+        html += '<h4 style="color:var(--dim);margin:14px 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:1px;">📁 Recent</h4>';
+        html += '<div style="display:flex;flex-direction:column;gap:5px;">';
+        
+        recentSessions.forEach(function(session, index) {
+            var timeAgo = Utils.timeAgo(new Date(session.timestamp));
+            var projectNames = session.projectNames || [];
+            
+            html += '<div onclick="ProjectManager.openRecentSession(' + index + ')" style="background:rgba(0,0,0,0.3);padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);transition:all 0.15s;text-align:left;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.background=\'rgba(139,92,246,0.1)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'rgba(0,0,0,0.3)\'">';
+            html += '<div style="font-size:12px;font-weight:700;color:var(--text);">📂 ' + Utils.escHtml(session.folderName || 'Unknown Folder') + '</div>';
+            if (projectNames.length > 0) {
+                html += '<div style="font-size:9px;color:var(--dim);margin-top:3px;">' + Utils.escHtml(projectNames.join(', ')) + '</div>';
+            }
+            html += '<div style="font-size:8px;color:var(--dim);margin-top:2px;">' + timeAgo + '</div>';
+            html += '</div>';
+        });
+        
+        html += '</div>';
+        
+        html += '<button onclick="ProjectManager.pickSaveFolder()" style="width:100%;padding:10px;margin:10px 0;background:rgba(0,0,0,0.3);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:11px;">📂 Browse Folders</button>';
+        
+        html += '<button onclick="document.getElementById(\'importProjectFile\').click()" style="width:100%;padding:8px;background:transparent;color:var(--dim);border:1px dashed var(--border);border-radius:8px;cursor:pointer;font-size:10px;">📤 Import .story.json</button>';
+        
+        html += '<div style="margin-top:8px;font-size:8px;color:var(--dim);">or drag & drop a .story.json file anywhere</div>';
+        html += '</div>';
+        
+        container.innerHTML = html;
+        
+        var cw = document.getElementById('canvas-wrap');
+        if (cw) {
+            var ex = cw.querySelector('.welcome-msg'); if (ex) ex.remove();
+            var m = document.createElement('div');
+            m.className = 'welcome-msg';
+            m.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:24px;pointer-events:none;z-index:5;';
+            m.innerHTML = '🚀<br><span style="font-size:16px;">Savida Story Engine</span>';
+            cw.appendChild(m);
+        }
+    },
+
     _hideWelcomeMessage: function() {
         var cw = document.getElementById('canvas-wrap');
         if (cw) { var m = cw.querySelector('.welcome-msg'); if (m) m.remove(); }
     },
 
+    startNewProject: function() {
+        this.createProject('My First Story');
+        this._hideWelcomeMessage();
+        App.loadProjectToEditor();
+        Utils.updateToolbarButtons(true);
+    },
+
+    openRecentSession: async function(index) {
+        var sessions = this._getRecentSessions();
+        if (index < 0 || index >= sessions.length) return;
+        var session = sessions[index];
+        
+        var ok = confirm(
+            '📁 Reopen: ' + session.folderName + '\n\n' +
+            'Projects: ' + (session.projectNames || []).join(', ') + '\n\n' +
+            'Click OK, then click "Select Folder" in the next window.'
+        );
+        if (!ok) return;
+        
+        try {
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite',
+                startIn: 'documents'
+            });
+            await this._loadProjectsFromDirectory(this.saveDirectory);
+            this.renderTabs();
+            
+            if (this.projects.length > 0) {
+                if (session.activeProjectId) {
+                    var found = this.projects.find(function(p) { return p.id === session.activeProjectId; });
+                    this.activeProjectId = found ? found.id : this.projects[0].id;
+                } else {
+                    this.activeProjectId = this.projects[0].id;
+                }
+            } else {
+                this.createProject('My First Story');
+            }
+            
+            this._saveRecentSession();
+            this._hideWelcomeMessage();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+        } catch(e) {
+            if (e.name !== 'AbortError') console.error(e);
+        }
+    },
+
     pickSaveFolder: async function() {
         if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
         try {
-            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite', 
+                startIn: 'documents'
+            });
             await this._loadProjectsFromDirectory(this.saveDirectory);
             this.renderTabs();
             if (this.projects.length > 0) {
@@ -49,7 +178,7 @@ var ProjectManager = {
             } else {
                 this.createProject('My First Story');
             }
-            this._saveSession();
+            this._saveRecentSession();
             this._hideWelcomeMessage();
             App.loadProjectToEditor();
             Utils.updateToolbarButtons(true);
@@ -60,31 +189,23 @@ var ProjectManager = {
     loadFromFolder: async function() {
         if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
         try {
-            var dir = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
-            this.saveDirectory = dir;
-            await this._loadProjectsFromDirectory(dir);
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite', 
+                startIn: 'documents'
+            });
+            await this._loadProjectsFromDirectory(this.saveDirectory);
             this.renderTabs();
             if (this.projects.length > 0) {
                 this.activeProjectId = this.projects[0].id;
             } else {
                 this.createProject('My First Story');
             }
-            this._saveSession();
+            this._saveRecentSession();
             this._hideWelcomeMessage();
             App.loadProjectToEditor();
             Utils.updateToolbarButtons(true);
             Utils.showSaveIndicator();
         } catch(e) { if (e.name !== 'AbortError') console.error(e); }
-    },
-
-    _saveSession: function() {
-        var session = {
-            activeProjectId: this.activeProjectId,
-            projectNames: this.projects.map(function(p) { return p.name; }),
-            timestamp: new Date().toISOString()
-        };
-        if (this.saveDirectory) session.folderName = this.saveDirectory.name;
-        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
     },
 
     saveActiveProject: async function() {
@@ -104,7 +225,7 @@ var ProjectManager = {
         project.updatedAt = new Date().toISOString();
         try {
             await this._writeProjectFile(project);
-            this._saveSession();
+            this._saveRecentSession();
             Utils.showSaveIndicator();
         } catch(e) {
             console.error('Save error:', e);
@@ -276,9 +397,8 @@ var ProjectManager = {
         this.projects.push(project);
         this.activeProjectId = project.id;
         this.renderTabs();
-        this._saveSession();
+        this._saveRecentSession();
         if (this.saveDirectory) this._writeProjectFile(project);
-        console.log('Project created:', project.id, project.name, 'activeId:', this.activeProjectId); // DEBUG
         return project;
     },
 
@@ -300,7 +420,7 @@ var ProjectManager = {
     },
 
     setActive: function(id) {
-        this.activeProjectId = id; this.renderTabs(); this._saveSession();
+        this.activeProjectId = id; this.renderTabs(); this._saveRecentSession();
         if (typeof App !== 'undefined') App.loadProjectToEditor();
     },
 
@@ -310,7 +430,7 @@ var ProjectManager = {
         this.projects = this.projects.filter(function(p){return p.id!==id;});
         if (this.activeProjectId === id) this.activeProjectId = this.projects[0] ? this.projects[0].id : null;
         if (this.saveDirectory && project) this._deleteProjectFile(project);
-        this._saveSession(); this.renderTabs();
+        this._saveRecentSession(); this.renderTabs();
         if (this.activeProjectId && typeof App !== 'undefined') App.loadProjectToEditor();
     },
 
@@ -319,7 +439,7 @@ var ProjectManager = {
         if (!p) return;
         var oldName = p.name; p.name = newName; p.config.title = newName;
         p.updatedAt = new Date().toISOString();
-        this.renderTabs(); this._saveSession();
+        this.renderTabs(); this._saveRecentSession();
         if (this.saveDirectory) {
             var self = this;
             this._deleteProjectFile({name:oldName}).then(function(){self._writeProjectFile(p);});
@@ -375,7 +495,7 @@ var ProjectManager = {
                     ImageManager.importForProject(project.id, project.images);
                 }
                 self.projects.push(project); self.activeProjectId = project.id;
-                self.renderTabs(); self._saveSession();
+                self.renderTabs(); self._saveRecentSession();
                 App.loadProjectToEditor();
                 if (self.saveDirectory) self._writeProjectFile(project);
                 Utils.showSaveIndicator();
