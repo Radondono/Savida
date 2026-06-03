@@ -11,7 +11,6 @@ var UI = {
         this.modalFilename = filename || 'export.js';
         this.modalType = type || 'text/javascript';
         
-        // Update download button
         var dlBtn = document.getElementById('modal-dl-btn');
         if (dlBtn) {
             dlBtn.style.display = 'inline-block';
@@ -55,6 +54,7 @@ var UI = {
 
 var App = {
     init: function() {
+        ImageManager.init();
         ProjectManager.init();
         Canvas.init();
         this.bindKeyboard();
@@ -75,11 +75,18 @@ var App = {
             return;
         }
         Canvas.nodes = (p.scenes || []).map(function(s) {
-            return { id:s.id, type:'scene', x:s.x||200, y:s.y||200, title:s.title||s.id, subtitle:s.subtitle||'', text:s.text||'', choices:s.choices||[], extraTags:s.extraTags||{} };
+            return {
+                id: s.id, type: 'scene', x: s.x || 200, y: s.y || 200,
+                title: s.title || s.id, subtitle: s.subtitle || '', text: s.text || '',
+                choices: s.choices || [], hiddenChars: s.hiddenChars || null, extraTags: s.extraTags || {}
+            };
         });
-        Object.keys(p.endings||{}).forEach(function(id) {
+        Object.keys(p.endings || {}).forEach(function(id) {
             var e = p.endings[id];
-            Canvas.nodes.push({ id:id, type:'ending', x:e.x||600, y:e.y||200, title:e.title||id, emoji:e.emoji||'⭐', text:e.desc||'', color:e.color||'#880030' });
+            Canvas.nodes.push({
+                id: id, type: 'ending', x: e.x || 600, y: e.y || 200,
+                title: e.title || id, emoji: e.emoji || '⭐', text: e.desc || '', color: e.color || '#880030'
+            });
         });
         Canvas.connections = p.connections || [];
         Canvas.nodeIdCounter = p.nodeIdCounter || Canvas.nodes.length;
@@ -91,7 +98,11 @@ var App = {
         if (Canvas.nodes.length === 0) {
             Canvas.addNode('scene'); Canvas.addNode('ending');
             if (Canvas.nodes.length >= 2) {
-                Canvas.connections.push({ fromNodeId:Canvas.nodes[0].id, fromChoiceIndex:0, toNodeId:Canvas.nodes[1].id });
+                Canvas.connections.push({
+                    fromNodeId: Canvas.nodes[0].id,
+                    fromChoiceIndex: 0,
+                    toNodeId: Canvas.nodes[1].id
+                });
                 Canvas.renderNode(Canvas.nodes[0]); Canvas.drawConnections();
             }
         }
@@ -100,11 +111,14 @@ var App = {
     _syncCanvasToProject: function() {
         var p = ProjectManager.getActive(); if (!p) return;
         p.scenes = Canvas.nodes.filter(function(n){return n.type==='scene';}).map(function(n){
-            return { id:n.id, x:n.x, y:n.y, title:n.title, subtitle:n.subtitle, text:n.text, choices:n.choices, extraTags:n.extraTags };
+            return {
+                id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
+                text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
+            };
         });
         p.endings = {};
         Canvas.nodes.filter(function(n){return n.type==='ending';}).forEach(function(n){
-            p.endings[n.id] = { x:n.x, y:n.y, emoji:n.emoji, title:n.title, desc:n.text, color:n.color };
+            p.endings[n.id] = { x: n.x, y: n.y, emoji: n.emoji, title: n.title, desc: n.text, color: n.color };
         });
         p.connections = Canvas.connections;
         p.nodeIdCounter = Canvas.nodeIdCounter;
@@ -116,7 +130,7 @@ var App = {
 
     createProject: function() {
         var name = prompt('Project name:', 'New Story');
-        if (name) { ProjectManager.createProject(name.trim()||'Untitled'); this.loadProjectToEditor(); }
+        if (name) { ProjectManager.createProject(name.trim() || 'Untitled'); this.loadProjectToEditor(); }
     },
 
     renameProjectPrompt: function(id) {
@@ -136,7 +150,6 @@ var App = {
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); Canvas.setZoom(1); }
-            // Ctrl+P = Preview
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 'p') {
                 e.preventDefault();
                 Export.previewHTML();

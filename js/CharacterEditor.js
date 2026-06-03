@@ -61,9 +61,53 @@ var CharacterEditor = {
             html += '</div>';
         }
 
+        // ---- Character Image ----
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🖼️ Character Images</h4>';
+        html += '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;">';
+
+        // Base image
+        html += '<label>Base Image (naked character)</label>';
+        var baseImg = ImageManager.getBaseImage(char.id);
+        html += '<div style="display:flex;gap:8px;align-items:start;">';
+        if (baseImg) {
+            html += '<img src="' + baseImg + '" style="max-width:120px;max-height:160px;border-radius:4px;border:1px solid var(--border);">';
+            html += '<div style="flex:1;display:flex;flex-direction:column;gap:4px;">';
+            html += '<button class="btn-sm-remove" onclick="ImageManager.removeBaseImage(\'' + char.id + '\');CharacterEditor.renderPreview();">Remove Base</button>';
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;">';
+            html += '</div>';
+        } else {
+            html += '<div style="flex:1;color:var(--dim);font-size:10px;">No base image set.<br>Upload a PNG, WebP, or JPEG.</div>';
+        }
+        html += '</div>';
+        if (!baseImg) {
+            html += '<div style="margin-top:4px;">';
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;width:100%;">';
+            html += '</div>';
+        }
+
+        // Clothing images
+        html += '<label style="margin-top:8px;">Clothing Layers</label>';
+        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Upload an image for each clothing item. Order matters — first items are drawn first (bottom layer).</div>';
+
+        var clothingImgs = ImageManager.getClothingImages(char.id);
+        (char.clothing || []).forEach(function(clothName, ci) {
+            html += '<div style="display:flex;align-items:center;gap:6px;margin:4px 0;padding:4px;background:rgba(0,0,0,0.2);border-radius:4px;">';
+            html += '<span style="font-size:10px;min-width:60px;">' + (ci + 1) + '. ' + Utils.escHtml(clothName) + '</span>';
+            if (clothingImgs[clothName]) {
+                html += '<img src="' + clothingImgs[clothName] + '" style="max-width:50px;max-height:50px;border-radius:3px;border:1px solid var(--border);">';
+                html += '<button class="btn-sm-remove" onclick="ImageManager.removeClothingImage(\'' + char.id + '\',\'' + clothName + '\');CharacterEditor.renderPreview();">✕</button>';
+            } else {
+                html += '<span style="color:var(--dim);font-size:9px;flex:1;">No image</span>';
+            }
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadClothingImage(\'' + char.id + '\',\'' + clothName + '\',this)" style="font-size:9px;width:120px;">';
+            html += '</div>';
+        });
+
+        html += '</div>'; // close image section
+
         // Clothing
         html += '<h4 style="color:var(--accent);margin:12px 0 4px;">👔 Clothing Items</h4>';
-        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Drag to reorder. First = innermost layer. Check which items to strip per choice in the sidebar.</div>';
+        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Drag to reorder. First = innermost layer.</div>';
         html += '<div id="ceClothingList" style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px;">';
         (char.clothing || []).forEach(function(item, ci) {
             html += '<div class="cloth-drag-item" draggable="true" data-cloth-index="' + ci + '" style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.3);padding:5px 8px;border-radius:4px;cursor:grab;font-size:10px;border:1px solid transparent;">';
@@ -153,12 +197,10 @@ var CharacterEditor = {
         html += '<div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;position:sticky;top:0;">';
         html += '<h4 style="color:var(--accent);margin:0;">🔍 Live Preview</h4>';
         
-        // Character preview image
         html += '<div id="cePreviewContainer" style="position:relative;width:180px;height:260px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid var(--border);">';
         html += '<div id="cePreviewNoImage" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;">' + (char.icon || '🧑') + '</div>';
         html += '</div>';
 
-        // Clothing layers display
         html += '<div id="cePreviewClothing" style="width:100%;font-size:9px;">';
         html += '<div style="color:var(--dim);text-align:center;margin-bottom:4px;">Clothing Layers:</div>';
         (char.clothing || []).forEach(function(item, ci) {
@@ -170,7 +212,6 @@ var CharacterEditor = {
         });
         html += '</div>';
 
-        // Stats summary
         html += '<div style="width:100%;font-size:9px;color:var(--dim);text-align:center;">';
         html += (char.clothing || []).length + ' clothing · ' + (char.states || []).length + ' states · ' + Object.keys(bodyParts).length + ' body parts';
         html += '</div>';
@@ -190,7 +231,6 @@ var CharacterEditor = {
         modalContent.innerHTML = html;
         overlay.classList.add('show');
         
-        // Initialize drag-drop and preview
         var self = this;
         setTimeout(function() {
             self.initClothingDragDrop();
@@ -205,19 +245,15 @@ var CharacterEditor = {
         var char = p.config.characters[this.currentCharIndex];
         
         var container = document.getElementById('cePreviewContainer');
-        var noImg = document.getElementById('cePreviewNoImage');
         if (!container) return;
 
-        // Get current base image
         var baseImg = ImageManager.getBaseImage(char.id);
         var clothingImgs = ImageManager.getClothingImages(char.id);
         
-        // Clear container
         container.innerHTML = '';
         
         var hasAny = false;
         
-        // Base image
         if (baseImg) {
             var img = document.createElement('img');
             img.src = baseImg;
@@ -226,7 +262,6 @@ var CharacterEditor = {
             hasAny = true;
         }
         
-        // Clothing layers in order
         (char.clothing || []).forEach(function(clothName, ci) {
             if (clothingImgs[clothName]) {
                 var cimg = document.createElement('img');
@@ -237,7 +272,6 @@ var CharacterEditor = {
             }
         });
         
-        // No image fallback
         if (!hasAny) {
             var fallback = document.createElement('div');
             fallback.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;';
@@ -247,7 +281,6 @@ var CharacterEditor = {
     },
 
     updatePreview: function() {
-        // Update preview when name/icon changes (without full refresh)
         var nameEl = document.getElementById('ceName');
         var iconEl = document.getElementById('ceIcon');
         if (nameEl && iconEl) {
@@ -261,22 +294,48 @@ var CharacterEditor = {
     },
 
     // ---- Image Uploads ----
-    uploadBaseImage: async function(charId, input) {
+    uploadBaseImage: function(charId, input) {
         var file = input.files[0];
         if (!file) return;
-        var dataUrl = await ImageManager.readFileAsDataURL(file);
-        var compressed = await ImageManager.compressImage(dataUrl);
-        ImageManager.setBaseImage(charId, compressed);
-        this.renderPreview();
+        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
+            alert('Please select a PNG, WebP, or JPEG image.');
+            input.value = '';
+            return;
+        }
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setBaseImage(charId, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) {
+            console.error('Upload failed:', err);
+            alert('Could not upload image. Try a smaller file.');
+            input.value = '';
+        });
     },
 
-    uploadClothingImage: async function(charId, clothName, input) {
+    uploadClothingImage: function(charId, clothName, input) {
         var file = input.files[0];
         if (!file) return;
-        var dataUrl = await ImageManager.readFileAsDataURL(file);
-        var compressed = await ImageManager.compressImage(dataUrl);
-        ImageManager.setClothingImage(charId, clothName, compressed);
-        this.renderPreview();
+        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
+            alert('Please select a PNG, WebP, or JPEG image.');
+            input.value = '';
+            return;
+        }
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setClothingImage(charId, clothName, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) {
+            console.error('Upload failed:', err);
+            alert('Could not upload image. Try a smaller file.');
+            input.value = '';
+        });
     },
 
     // ---- Class ----

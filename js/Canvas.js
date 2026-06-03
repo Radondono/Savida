@@ -89,7 +89,6 @@ var Canvas = {
     bindEvents: function() {
         var self = this;
 
-        // Mouse wheel zoom
         this.canvasWrap.addEventListener('wheel', function(e) {
             e.preventDefault();
             if (e.ctrlKey || e.metaKey) {
@@ -99,7 +98,6 @@ var Canvas = {
         }, { passive: false });
 
         this.canvasWrap.addEventListener('mousedown', function(e) {
-            // Middle mouse button = pan
             if (e.button === 1) {
                 e.preventDefault();
                 self.panning = true;
@@ -154,7 +152,6 @@ var Canvas = {
             }
         });
 
-        // Prevent middle-click default
         this.canvasWrap.addEventListener('auxclick', function(e) { e.preventDefault(); });
     },
 
@@ -170,6 +167,7 @@ var Canvas = {
             subtitle: '',
             text: type === 'scene' ? 'Describe this scene...' : 'What happens in this ending...',
             choices: type === 'scene' ? [this.makeDefaultChoice()] : [],
+            hiddenChars: null,
             emoji: '⭐',
             color: '#880030',
             extraTags: {}
@@ -194,6 +192,7 @@ var Canvas = {
             (p.config.stats || []).forEach(function(s) { ch[s.id] = 0; });
             (p.config.characters || []).forEach(function(c) {
                 ch['strip_' + c.id] = null;
+                ch['wear_' + c.id] = null;
                 ch['state_' + c.id] = c.defaultState || 'Normal';
             });
         }
@@ -244,7 +243,18 @@ var Canvas = {
                 if (ch.sex) badges += '<span class="choice-badge badge-sex">🔞</span>';
                 if (ch.corrupt) badges += '<span class="choice-badge badge-corrupt">corrupt</span>';
                 chars.forEach(function(c) {
-                    if (ch['strip_' + c.id]) badges += '<span class="choice-badge badge-strip">' + c.name + ':' + ch['strip_' + c.id] + '</span>';
+                    if (ch['strip_' + c.id]) {
+                        var stripItems = ch['strip_' + c.id].split(',');
+                        stripItems.forEach(function(item) {
+                            badges += '<span class="choice-badge badge-strip">' + c.name + ':−' + item + '</span>';
+                        });
+                    }
+                    if (ch['wear_' + c.id]) {
+                        var wearItems = ch['wear_' + c.id].split(',');
+                        wearItems.forEach(function(item) {
+                            badges += '<span class="choice-badge" style="background:rgba(46,204,113,0.2);color:#2ecc71;">' + c.name + ':+' + item + '</span>';
+                        });
+                    }
                 });
                 var nextLabel = nextNode ? '→ ' + nextNode.title : '';
                 choicesHTML += '<div class="choice-item" data-choice="' + i + '">' +
@@ -256,10 +266,15 @@ var Canvas = {
         }
 
         var connCount = this.connections.filter(function(c) { return c.fromNodeId === node.id || c.toNodeId === node.id; }).length;
+        var hiddenCount = node.hiddenChars ? node.hiddenChars.split(',').length : 0;
+        var hiddenBadge = '';
+        if (hiddenCount > 0) {
+            hiddenBadge = '<span style="font-size:8px;color:var(--dim);margin-left:4px;">👁️−' + hiddenCount + '</span>';
+        }
         var preview = node.text ? (node.text.length > 70 ? node.text.substring(0, 70) + '...' : node.text) : '';
 
         el.innerHTML = '<div class="node-header"><span>' + (node.type === 'scene' ? '🎬' : '🏁') + ' ' + Utils.escHtml(node.title) +
-            '</span><span style="font-size:8px;color:var(--dim);">' + connCount + '🔗</span>' +
+            '</span><span style="font-size:8px;color:var(--dim);">' + connCount + '🔗' + hiddenBadge + '</span>' +
             '<button class="btn-del" onclick="event.stopPropagation();Canvas.deleteNode(\'' + node.id + '\')">✕</button></div>' +
             '<div class="node-body">' + (node.type === 'ending' ? '<div style="font-size:18px;">' + (node.emoji || '⭐') + '</div>' : '') +
             '<div class="preview-text">' + Utils.escHtml(preview) + '</div>' + choicesHTML + '</div>';
@@ -417,14 +432,13 @@ var Canvas = {
         var scenes = this.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
             return {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
-                text: n.text, choices: n.choices, extraTags: n.extraTags
+                text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
         });
         var endings = {};
         this.nodes.filter(function(n) { return n.type === 'ending'; }).forEach(function(n) {
             endings[n.id] = { x: n.x, y: n.y, emoji: n.emoji, title: n.title, desc: n.text, color: n.color };
         });
-        // Update project data in memory (don't write to disk yet)
         p.scenes = scenes;
         p.endings = endings;
         p.connections = this.connections;

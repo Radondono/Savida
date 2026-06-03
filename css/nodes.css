@@ -20,7 +20,8 @@ canvas{display:block;position:absolute;top:0;left:0;pointer-events:none;z-index:
     transition:box-shadow .15s,border-color .15s;
 }
 .node.selected{
-    box-shadow:0 0 0 3px rgba(3, 171, 255, 0.866);border-color:1 1 1 3px rgb(12, 243, 255);
+    box-shadow:0 0 0 3px rgba(3, 171, 255, 0.451);
+    border-color: rgb(12, 200, 255);
 }
 .node.scene{border-top:3px solid var(--node-scene);}
 .node.ending{border-top:3px solid var(--node-ending);}

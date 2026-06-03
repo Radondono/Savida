@@ -23,6 +23,7 @@ var Export = {
         var scenes = Canvas.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
             var scene = {
                 id: n.id, subtitle: n.subtitle || '', text: n.text || '',
+                hiddenChars: n.hiddenChars || null,
                 choices: (n.choices || []).map(function(ch, i) {
                     var conn = Canvas.connections.find(function(c) { return c.fromNodeId === n.id && c.fromChoiceIndex === i; });
                     var obj = { text: ch.text || '', next: conn ? conn.toNodeId : '' };
@@ -104,22 +105,21 @@ var Export = {
             ':root{--bg:#0a0a14;--surface:#14142a;--text:#c8c8e0;--dim:#8888aa;--accent:#e04080;}\n' +
             '*{margin:0;padding:0;box-sizing:border-box;}\n' +
             'body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:10px;}\n' +
-            '#game{max-width:700px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:10px;}\n' +
+            '#game{max-width:1000px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:10px;}\n' +
             'h1{color:var(--accent);text-align:center;font-size:1.3em;}\n' +
             '#sub{color:var(--dim);font-style:italic;text-align:center;font-size:0.85em;margin-bottom:10px;}\n' +
             '#main-row{display:flex;gap:15px;flex-wrap:wrap;}\n' +
-            '#image-panel{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:8px;}\n' +
-            '#char-selector{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}\n' +
-            '#char-selector button{padding:4px 10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:4px;cursor:pointer;font-size:0.75em;}\n' +
-            '#char-selector button.active{background:var(--accent);border-color:var(--accent);}\n' +
-            '#image-container{position:relative;width:200px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
-            '#image-container img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;}\n' +
-            '#image-container .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;}\n' +
-            '#clothing-indicator{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;font-size:0.7em;color:var(--dim);}\n' +
-            '#clothing-indicator .cloth-tag{padding:2px 6px;border-radius:3px;font-size:0.7em;}\n' +
-            '#clothing-indicator .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
-            '#clothing-indicator .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
-            '#story-panel{flex:1;min-width:250px;}\n' +
+            '#chars-panel{flex:0 0 auto;display:flex;gap:12px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}\n' +
+            '.char-card{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:100px;}\n' +
+            '.char-card .char-label{font-size:0.75em;font-weight:700;color:var(--text);text-align:center;}\n' +
+            '.char-card .char-image{position:relative;width:180px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
+            '.char-card .char-image img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:bottom center;}\n' +
+            '.char-card .char-image .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:2.5em;}\n' +
+            '.char-card .cloth-list{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;font-size:0.6em;}\n' +
+            '.char-card .cloth-list .cloth-dot{padding:1px 4px;border-radius:2px;}\n' +
+            '.char-card .cloth-list .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
+            '.char-card .cloth-list .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
+            '#story-panel{flex:1;min-width:280px;}\n' +
             '#txt{line-height:1.6;margin:10px 0;font-style:italic;font-size:0.9em;}\n' +
             '#choices-area{display:flex;flex-direction:column;gap:6px;}\n' +
             '#choices-area button{display:block;width:100%;padding:10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:6px;cursor:pointer;text-align:left;font-size:0.85em;transition:all 0.15s;}\n' +
@@ -128,30 +128,28 @@ var Export = {
             '#endScreen h2{color:var(--accent);}\n' +
             '#endScreen p{color:var(--text);line-height:1.6;margin:10px 0;}\n' +
             '#endScreen button{text-align:center;background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1em;margin-top:10px;}\n' +
-            '@media(max-width:500px){#main-row{flex-direction:column;}#image-panel{flex:0 0 auto;}#image-container{width:150px;height:225px;}}\n' +
+            '@media(max-width:700px){.char-card .char-image{width:120px;height:200px;}}\n' +
             '</style>\n</head><body>\n' +
             '<div id="game"><h1>' + Utils.escHtml(data.config.title) + '</h1><p id="sub">' + Utils.escHtml(data.config.subtitle) + '</p>\n' +
             '<div id="main-row">\n' +
-            '<div id="image-panel">\n' +
-            '<div id="char-selector"></div>\n' +
-            '<div id="image-container"><div class="no-image">🧑</div></div>\n' +
-            '<div id="clothing-indicator"></div>\n' +
-            '</div>\n' +
+            '<div id="chars-panel"></div>\n' +
             '<div id="story-panel"><p id="txt"></p><div id="choices-area"></div></div>\n' +
             '</div></div>\n' +
             '<div id="endScreen"><h2 id="endTitle"></h2><p id="endDesc"></p><button onclick="location.reload()">Play Again</button></div>\n';
 
         engineHTML += '<script>\n' + jsContent + '\n' +
-            'var currentCharIndex=0;\n' +
             'var characterClothing={};\n' +
             'var characters=STORY_CONFIG.characters||[];\n' +
             'var images=STORY_IMAGES||{};\n' +
             'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
-            'function buildCharSelector(){var sel=document.getElementById("char-selector");sel.innerHTML="";characters.forEach(function(c,i){var btn=document.createElement("button");btn.textContent=(c.icon||"🧑")+" "+c.name;if(i===currentCharIndex)btn.classList.add("active");btn.onclick=function(){currentCharIndex=i;updateImage();};sel.appendChild(btn);});}\n' +
-            'function updateImage(){var c=characters[currentCharIndex];var ic=document.getElementById("image-container");var ci=document.getElementById("clothing-indicator");if(!c){ic.innerHTML=\'<div class="no-image">🧑</div>\';ci.innerHTML="";return;}var cimgs=(images&&images[c.id])||{base:null,clothing:{}};ic.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";ic.appendChild(img);has=true;}var cs=characterClothing[c.id]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);ic.appendChild(cimg);has=true;}});if(!has)ic.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';ci.innerHTML="";(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-tag "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✅":"❌")+" "+cn;ci.appendChild(tag);});}\n' +
-            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateImage();}\n' +
-            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
-            'initClothing();buildCharSelector();updateImage();show(STORY_SCENES[0].id);\n' +
+            'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
+            'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
+            'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
+            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
             '<' + '/script></body></html>';
 
         var blob = new Blob([engineHTML], { type: 'text/html' });
@@ -178,22 +176,21 @@ var Export = {
             '*{margin:0;padding:0;box-sizing:border-box;}\n' +
             'body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:10px;}\n' +
             '#preview-banner{position:fixed;top:0;left:0;right:0;background:rgba(240,192,64,0.95);color:#1a1a00;text-align:center;padding:4px;font-size:0.7em;font-weight:700;z-index:999;}\n' +
-            '#game{max-width:700px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:25px;}\n' +
+            '#game{max-width:1000px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:25px;}\n' +
             'h1{color:var(--accent);text-align:center;font-size:1.3em;}\n' +
             '#sub{color:var(--dim);font-style:italic;text-align:center;font-size:0.85em;margin-bottom:10px;}\n' +
             '#main-row{display:flex;gap:15px;flex-wrap:wrap;}\n' +
-            '#image-panel{flex:0 0 200px;display:flex;flex-direction:column;align-items:center;gap:8px;}\n' +
-            '#char-selector{display:flex;gap:4px;flex-wrap:wrap;justify-content:center;}\n' +
-            '#char-selector button{padding:4px 10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:4px;cursor:pointer;font-size:0.75em;}\n' +
-            '#char-selector button.active{background:var(--accent);border-color:var(--accent);}\n' +
-            '#image-container{position:relative;width:200px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
-            '#image-container img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;}\n' +
-            '#image-container .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;}\n' +
-            '#clothing-indicator{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;font-size:0.7em;color:var(--dim);}\n' +
-            '#clothing-indicator .cloth-tag{padding:2px 6px;border-radius:3px;font-size:0.7em;}\n' +
-            '#clothing-indicator .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
-            '#clothing-indicator .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
-            '#story-panel{flex:1;min-width:250px;}\n' +
+            '#chars-panel{flex:0 0 auto;display:flex;gap:12px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}\n' +
+            '.char-card{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:100px;}\n' +
+            '.char-card .char-label{font-size:0.75em;font-weight:700;color:var(--text);text-align:center;}\n' +
+            '.char-card .char-image{position:relative;width:180px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
+            '.char-card .char-image img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:bottom center;}\n' +
+            '.char-card .char-image .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:2.5em;}\n' +
+            '.char-card .cloth-list{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;font-size:0.6em;}\n' +
+            '.char-card .cloth-list .cloth-dot{padding:1px 4px;border-radius:2px;}\n' +
+            '.char-card .cloth-list .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
+            '.char-card .cloth-list .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
+            '#story-panel{flex:1;min-width:280px;}\n' +
             '#txt{line-height:1.6;margin:10px 0;font-style:italic;font-size:0.9em;}\n' +
             '#choices-area{display:flex;flex-direction:column;gap:6px;}\n' +
             '#choices-area button{display:block;width:100%;padding:10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:6px;cursor:pointer;text-align:left;font-size:0.85em;transition:all 0.15s;}\n' +
@@ -202,31 +199,29 @@ var Export = {
             '#endScreen h2{color:var(--accent);}\n' +
             '#endScreen p{color:var(--text);line-height:1.6;margin:10px 0;}\n' +
             '#endScreen button{text-align:center;background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1em;margin-top:10px;}\n' +
-            '@media(max-width:500px){#main-row{flex-direction:column;}#image-panel{flex:0 0 auto;}#image-container{width:150px;height:225px;}}\n' +
+            '@media(max-width:700px){.char-card .char-image{width:120px;height:200px;}}\n' +
             '</style>\n</head><body>\n' +
             '<div id="preview-banner">🔍 PREVIEW MODE — Close this tab to return to the editor</div>\n' +
             '<div id="game"><h1>' + Utils.escHtml(data.config.title) + '</h1><p id="sub">' + Utils.escHtml(data.config.subtitle) + '</p>\n' +
             '<div id="main-row">\n' +
-            '<div id="image-panel">\n' +
-            '<div id="char-selector"></div>\n' +
-            '<div id="image-container"><div class="no-image">🧑</div></div>\n' +
-            '<div id="clothing-indicator"></div>\n' +
-            '</div>\n' +
+            '<div id="chars-panel"></div>\n' +
             '<div id="story-panel"><p id="txt"></p><div id="choices-area"></div></div>\n' +
             '</div></div>\n' +
             '<div id="endScreen"><h2 id="endTitle"></h2><p id="endDesc"></p><button onclick="location.reload()">Play Again</button></div>\n';
 
         engineHTML += '<script>\n' + jsContent + '\n' +
-            'var currentCharIndex=0;\n' +
             'var characterClothing={};\n' +
             'var characters=STORY_CONFIG.characters||[];\n' +
             'var images=STORY_IMAGES||{};\n' +
             'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
-            'function buildCharSelector(){var sel=document.getElementById("char-selector");sel.innerHTML="";characters.forEach(function(c,i){var btn=document.createElement("button");btn.textContent=(c.icon||"🧑")+" "+c.name;if(i===currentCharIndex)btn.classList.add("active");btn.onclick=function(){currentCharIndex=i;updateImage();};sel.appendChild(btn);});}\n' +
-            'function updateImage(){var c=characters[currentCharIndex];var ic=document.getElementById("image-container");var ci=document.getElementById("clothing-indicator");if(!c){ic.innerHTML=\'<div class="no-image">🧑</div>\';ci.innerHTML="";return;}var cimgs=(images&&images[c.id])||{base:null,clothing:{}};ic.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";ic.appendChild(img);has=true;}var cs=characterClothing[c.id]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);ic.appendChild(cimg);has=true;}});if(!has)ic.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';ci.innerHTML="";(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-tag "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✅":"❌")+" "+cn;ci.appendChild(tag);});}\n' +
-            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateImage();}\n' +
-            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
-            'initClothing();buildCharSelector();updateImage();show(STORY_SCENES[0].id);\n' +
+            'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
+            'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
+            'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
+            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
             '<' + '/script></body></html>';
 
         var blob = new Blob([engineHTML], { type: 'text/html' });

@@ -19,7 +19,22 @@ var Sidebar = {
         if (node.type === 'scene') {
             html += '<label>Subtitle</label><input value="' + Utils.escHtml(node.subtitle || '') + '" onchange="NodeEditor.updateNodeProp(\'subtitle\',this.value)">';
             html += '<label>Text</label><textarea onchange="NodeEditor.updateNodeProp(\'text\',this.value)">' + Utils.escHtml(node.text || '') + '</textarea>';
+            // Character visibility toggle for this scene
+            html += '<h3>👁️ Visible Characters</h3>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
+            var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
+            chars.forEach(function(c) {
+                var isVisible = hiddenChars.indexOf(c.id) < 0;
+                html += '<label style="font-size:9px;display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 8px;border-radius:4px;cursor:pointer;">';
+                html += '<input type="checkbox" ' + (isVisible ? 'checked' : '') + ' onchange="Sidebar.toggleCharVisibility(\'' + node.id + '\',\'' + c.id + '\',this.checked)" style="width:auto;">';
+                html += (c.icon || '🧑') + ' ' + Utils.escHtml(c.name);
+                html += '</label>';
+            });
+            html += '</div>';
             html += '<h3>Choices <button class="btn-sm-add" onclick="NodeEditor.addChoice(\'' + node.id + '\');Sidebar.render();">+</button></h3>';
+            
+            
+            
 
             if (node.choices) {
                 node.choices.forEach(function(ch, i) {
@@ -160,5 +175,24 @@ var Sidebar = {
         Canvas.renderNode(node);
         Canvas.drawConnections();
         Canvas.saveState();
-    }
+        
+        // Re-render sidebar immediately for real-time button color update
+        this.render();
+    },
+    toggleCharVisibility: function(nodeId, charId, visible) {
+        var node = Canvas.getNode(nodeId);
+        if (!node) return;
+        var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
+        if (visible) {
+            hiddenChars = hiddenChars.filter(function(id) { return id !== charId; });
+        } else {
+            if (hiddenChars.indexOf(charId) < 0) hiddenChars.push(charId);
+        }
+        node.hiddenChars = hiddenChars.length > 0 ? hiddenChars.join(',') : null;
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
+        // Update the sidebar to reflect changes
+        this.render();
+    },
 };
