@@ -1,13 +1,10 @@
 var ImageManager = {
-    // Store images as base64 data URIs
-    // Structure: { projectId: { charId: { base: "data:image/png;base64,...", clothing: { clothName: "data:image/png;base64,..." } } } }
     _imageStore: {},
 
     init: function() {
         this._loadFromStorage();
     },
 
-    // Get or create image store for a character
     _getCharStore: function(charId) {
         var p = ProjectManager.getActive();
         if (!p) return null;
@@ -16,7 +13,6 @@ var ImageManager = {
         return this._imageStore[p.id][charId];
     },
 
-    // Set base image (naked character)
     setBaseImage: function(charId, dataUrl) {
         var store = this._getCharStore(charId);
         if (store) {
@@ -25,13 +21,11 @@ var ImageManager = {
         }
     },
 
-    // Get base image
     getBaseImage: function(charId) {
         var store = this._getCharStore(charId);
         return store ? store.base : null;
     },
 
-    // Set clothing image
     setClothingImage: function(charId, clothName, dataUrl) {
         var store = this._getCharStore(charId);
         if (store) {
@@ -40,22 +34,19 @@ var ImageManager = {
         }
     },
 
-    // Get clothing image
     getClothingImage: function(charId, clothName) {
         var store = this._getCharStore(charId);
-        return (store && store.clothing[clothName]) ? store.clothing[clothName] : null;
+        return (store && store.clothing && store.clothing[clothName]) ? store.clothing[clothName] : null;
     },
 
-    // Remove clothing image
     removeClothingImage: function(charId, clothName) {
         var store = this._getCharStore(charId);
-        if (store && store.clothing[clothName]) {
+        if (store && store.clothing && store.clothing[clothName]) {
             delete store.clothing[clothName];
             this._saveToStorage();
         }
     },
 
-    // Remove base image
     removeBaseImage: function(charId) {
         var store = this._getCharStore(charId);
         if (store) {
@@ -64,37 +55,19 @@ var ImageManager = {
         }
     },
 
-    // Get all clothing images for a character
     getClothingImages: function(charId) {
         var store = this._getCharStore(charId);
-        return store ? store.clothing : {};
+        return (store && store.clothing) ? store.clothing : {};
     },
 
-    // Get ordered clothing layers (matching character's clothing array order)
-    getOrderedClothingLayers: function(charId) {
-        var p = ProjectManager.getActive();
-        if (!p) return [];
-        var char = (p.config.characters || []).find(function(c) { return c.id === charId; });
-        if (!char) return [];
-        var store = this._getCharStore(charId);
-        if (!store) return [];
-        var layers = [];
-        (char.clothing || []).forEach(function(clothName) {
-            if (store.clothing[clothName]) {
-                layers.push({ name: clothName, dataUrl: store.clothing[clothName] });
-            }
-        });
-        return layers;
-    },
-
-    // Check if a character has any images
     hasImages: function(charId) {
         var store = this._getCharStore(charId);
         if (!store) return false;
-        return !!store.base || Object.keys(store.clothing).length > 0;
+        var hasBase = !!store.base;
+        var hasClothing = store.clothing && Object.keys(store.clothing).length > 0;
+        return hasBase || hasClothing;
     },
 
-    // Clear all images for a character
     clearCharacter: function(charId) {
         var p = ProjectManager.getActive();
         if (!p) return;
@@ -104,7 +77,6 @@ var ImageManager = {
         }
     },
 
-    // Read a file and return as data URL
     readFileAsDataURL: function(file) {
         return new Promise(function(resolve, reject) {
             var reader = new FileReader();
@@ -114,7 +86,6 @@ var ImageManager = {
         });
     },
 
-    // Compress and resize image to save storage space
     compressImage: function(dataUrl, maxWidth, maxHeight, quality) {
         maxWidth = maxWidth || 400;
         maxHeight = maxHeight || 600;
@@ -136,13 +107,22 @@ var ImageManager = {
         });
     },
 
+    exportForProject: function(projectId) {
+        return JSON.parse(JSON.stringify(this._imageStore[projectId] || {}));
+    },
+
+    importForProject: function(projectId, imageData) {
+        if (imageData && Object.keys(imageData).length > 0) {
+            this._imageStore[projectId] = JSON.parse(JSON.stringify(imageData));
+            this._saveToStorage();
+        }
+    },
+
     _saveToStorage: function() {
         try {
             localStorage.setItem('savida_images', JSON.stringify(this._imageStore));
         } catch(e) {
-            console.warn('Image storage full. Some images may not be saved.');
-            // Try to free space by compressing
-            this._compactStorage();
+            console.warn('Image storage full.');
         }
     },
 
@@ -155,30 +135,5 @@ var ImageManager = {
         } catch(e) {
             this._imageStore = {};
         }
-    },
-
-    _compactStorage: function() {
-        // Remove images for deleted projects
-        var self = this;
-        var activeProjects = ProjectManager.projects.map(function(p) { return p.id; });
-        Object.keys(this._imageStore).forEach(function(projId) {
-            if (activeProjects.indexOf(projId) === -1) {
-                delete self._imageStore[projId];
-            }
-        });
-        this._saveToStorage();
-    },
-
-   // Export all images for a project
-    exportForProject: function(projectId) {
-        return JSON.parse(JSON.stringify(this._imageStore[projectId] || {}));
-    },
-
-    // Import images from project data
-    importForProject: function(projectId, imageData) {
-        if (imageData && Object.keys(imageData).length > 0) {
-            this._imageStore[projectId] = JSON.parse(JSON.stringify(imageData));
-            this._saveToStorage();
-        }
-    },
+    }
 };

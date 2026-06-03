@@ -10,34 +10,19 @@ var UI = {
         this.modalContent = content;
         this.modalFilename = filename || 'export.js';
         this.modalType = type || 'text/javascript';
-        
         var dlBtn = document.getElementById('modal-dl-btn');
-        if (dlBtn) {
-            dlBtn.style.display = 'inline-block';
-            dlBtn.textContent = '📥 Download ' + (filename || 'file');
-        }
+        if (dlBtn) { dlBtn.style.display = 'inline-block'; dlBtn.textContent = '📥 Download ' + (filename || 'file'); }
     },
-
-    closeModal: function() {
-        document.getElementById('modal-overlay').classList.remove('show');
-    },
-
+    closeModal: function() { document.getElementById('modal-overlay').classList.remove('show'); },
     downloadModal: function() {
-        if (!this.modalContent) {
-            alert('Nothing to download.');
-            return;
-        }
+        if (!this.modalContent) { alert('Nothing to download.'); return; }
         var blob = new Blob([this.modalContent], { type: this.modalType });
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
-        a.href = url;
-        a.download = this.modalFilename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = url; a.download = this.modalFilename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(function() { URL.revokeObjectURL(url); }, 100);
     },
-
     toggleDropdown: function(ddId) {
         var dd = document.getElementById(ddId); if (!dd) return;
         var isOpen = dd.classList.contains('open');
@@ -59,9 +44,7 @@ var App = {
         Canvas.init();
         this.bindKeyboard();
         this.bindModalClose();
-        LeftPanel.render();
-        Sidebar.render();
-        Utils.updateToolbarButtons(false);
+        this.loadProjectToEditor();
     },
 
     loadProjectToEditor: function() {
@@ -144,16 +127,13 @@ var App = {
         var self = this;
         window.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 's') {
-                e.preventDefault();
-                self.save();
+                e.preventDefault(); self.save();
             }
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); Canvas.setZoom(1); }
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 'p') {
-                e.preventDefault();
-                Export.previewHTML();
-                return;
+                e.preventDefault(); Export.previewHTML();
             }
         });
     },

@@ -1,6 +1,7 @@
 var LeftPanel = {
     render: function() {
         var p = ProjectManager.getActive();
+        console.log('LeftPanel render - active project:', p); // DEBUG
         var container = document.getElementById('left-content');
         if (!container) return;
         if (!p) {

@@ -20,7 +20,7 @@ var ProjectManager = {
             return;
         }
         
-        this._restoreLastSession();
+        this.createProject('My First Story');
     },
 
     _showBrowserWarning: function() {
@@ -33,93 +33,11 @@ var ProjectManager = {
         }
     },
 
-    // ---- SESSION ----
-    _saveSession: function() {
-        var session = {
-            activeProjectId: this.activeProjectId,
-            projectNames: this.projects.map(function(p) { return p.name; }),
-            timestamp: new Date().toISOString()
-        };
-        if (this.saveDirectory) session.folderName = this.saveDirectory.name;
-        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
-    },
-
-    _restoreLastSession: async function() {
-        try {
-            var data = localStorage.getItem('savida_last_session');
-            if (!data) { this._showWelcomePrompt(); return; }
-            var session = JSON.parse(data);
-            await new Promise(function(r) { setTimeout(r, 100); });
-            
-            var reopen = confirm(
-                '📁 Reopen last project folder?\n\n' +
-                'Folder: ' + (session.folderName || 'Unknown') + '\n' +
-                'Projects: ' + (session.projectNames || []).join(', ') + '\n' +
-                'Last saved: ' + new Date(session.timestamp).toLocaleString() + '\n\n' +
-                'OK = reopen | Cancel = start fresh'
-            );
-            
-            if (reopen) {
-                await this._reopenFolder(session);
-            } else {
-                localStorage.removeItem('savida_last_session');
-                this._showWelcomePrompt();
-            }
-        } catch(e) {
-            localStorage.removeItem('savida_last_session');
-            this._showWelcomePrompt();
-        }
-    },
-
-    _showWelcomePrompt: function() {
-        var container = document.getElementById('left-content');
-        if (container) {
-            container.innerHTML = '<div class="no-project-msg">' +
-                '👋<br>Welcome!<br><br>' +
-                'Use <b>📁 File → Select Save Folder</b><br>' +
-                'to open or create a project.<br><br>' +
-                '<button class="btn-sm-add" onclick="ProjectManager.pickSaveFolder()" style="font-size:12px;padding:8px 16px;cursor:pointer;">' +
-                '📂 Select Folder</button></div>';
-        }
-        var cw = document.getElementById('canvas-wrap');
-        if (cw) {
-            var ex = cw.querySelector('.welcome-msg'); if (ex) ex.remove();
-            var m = document.createElement('div');
-            m.className = 'welcome-msg';
-            m.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:18px;pointer-events:none;z-index:5;';
-            m.innerHTML = '📁<br><span style="font-size:14px;">Select a project folder to begin</span>';
-            cw.appendChild(m);
-        }
-    },
-
     _hideWelcomeMessage: function() {
         var cw = document.getElementById('canvas-wrap');
         if (cw) { var m = cw.querySelector('.welcome-msg'); if (m) m.remove(); }
     },
 
-    _reopenFolder: async function(session) {
-        try {
-            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
-            await this._loadProjectsFromDirectory(this.saveDirectory);
-            this.renderTabs();
-            if (session.activeProjectId) {
-                var found = this.projects.find(function(p) { return p.id === session.activeProjectId; });
-                this.activeProjectId = found ? found.id : (this.projects[0] ? this.projects[0].id : null);
-            } else if (this.projects.length > 0) {
-                this.activeProjectId = this.projects[0].id;
-            }
-            if (this.projects.length === 0) this.createProject('My First Story');
-            this._saveSession();
-            this._hideWelcomeMessage();
-            App.loadProjectToEditor();
-            Utils.updateToolbarButtons(true);
-        } catch(e) {
-            if (e.name !== 'AbortError') console.error(e);
-            this._showWelcomePrompt();
-        }
-    },
-
-    // ---- FOLDER SELECTION ----
     pickSaveFolder: async function() {
         if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
         try {
@@ -139,7 +57,36 @@ var ProjectManager = {
         } catch(e) { if (e.name !== 'AbortError') console.error(e); }
     },
 
-    // ---- SAVE ----
+    loadFromFolder: async function() {
+        if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
+        try {
+            var dir = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            this.saveDirectory = dir;
+            await this._loadProjectsFromDirectory(dir);
+            this.renderTabs();
+            if (this.projects.length > 0) {
+                this.activeProjectId = this.projects[0].id;
+            } else {
+                this.createProject('My First Story');
+            }
+            this._saveSession();
+            this._hideWelcomeMessage();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+            Utils.showSaveIndicator();
+        } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+    },
+
+    _saveSession: function() {
+        var session = {
+            activeProjectId: this.activeProjectId,
+            projectNames: this.projects.map(function(p) { return p.name; }),
+            timestamp: new Date().toISOString()
+        };
+        if (this.saveDirectory) session.folderName = this.saveDirectory.name;
+        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
+    },
+
     saveActiveProject: async function() {
         if (!this.saveDirectory) {
             await this.pickSaveFolder();
@@ -150,7 +97,6 @@ var ProjectManager = {
         
         App._syncCanvasToProject();
         
-        // EMBED IMAGES INTO PROJECT DATA
         if (typeof ImageManager !== 'undefined') {
             project.images = ImageManager.exportForProject(project.id);
         }
@@ -176,7 +122,6 @@ var ProjectManager = {
         await writable.close();
     },
 
-    // ---- DRAG AND DROP ----
     _initDragDrop: function() {
         var self = this;
         var body = document.body;
@@ -227,7 +172,6 @@ var ProjectManager = {
                             project.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
                             if (project.name) project.name = project.name + ' (Imported)';
                         }
-                        // RESTORE IMAGES FROM DROPPED FILE
                         if (project.images && typeof ImageManager !== 'undefined') {
                             ImageManager.importForProject(project.id, project.images);
                         }
@@ -291,7 +235,6 @@ var ProjectManager = {
                     var text = await file.text();
                     var project = JSON.parse(text);
                     if (project.id && project.config && project.scenes !== undefined) {
-                        // RESTORE IMAGES WHEN LOADING FROM FOLDER
                         if (project.images && typeof ImageManager !== 'undefined') {
                             ImageManager.importForProject(project.id, project.images);
                         }
@@ -308,7 +251,6 @@ var ProjectManager = {
         try { await this.saveDirectory.removeEntry(this._sanitizeFilename(project.name)+'.story.json'); } catch(e) {}
     },
 
-    // ---- PROJECT CRUD ----
     createProject: function(name) {
         name = name || 'Untitled Story';
         var id = 'proj_' + Date.now();
@@ -336,6 +278,7 @@ var ProjectManager = {
         this.renderTabs();
         this._saveSession();
         if (this.saveDirectory) this._writeProjectFile(project);
+        console.log('Project created:', project.id, project.name, 'activeId:', this.activeProjectId); // DEBUG
         return project;
     },
 
@@ -399,7 +342,6 @@ var ProjectManager = {
     downloadProjectFile: function() {
         var project = this.getActive(); if (!project) return;
         App._syncCanvasToProject();
-        // Embed images
         if (typeof ImageManager !== 'undefined') {
             project.images = ImageManager.exportForProject(project.id);
         }
@@ -429,7 +371,6 @@ var ProjectManager = {
                         self.projects = self.projects.filter(function(p){return p.id!==project.id;});
                     }
                 }
-                // RESTORE IMAGES
                 if (project.images && typeof ImageManager !== 'undefined') {
                     ImageManager.importForProject(project.id, project.images);
                 }

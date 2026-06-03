@@ -1,0 +1,3413 @@
+Project Tree:
+==================================================
+
+Savida/
+  .gitignore
+  LICENSE
+  README.md
+  index.html
+css/
+  character-editor.css
+  emoji-picker.css
+  main.css
+  nodes.css
+  panels.css
+js/
+  Canvas.js
+  CharacterClasses.js
+  CharacterEditor.js
+  EmojiPicker.js
+  Export.js
+  ImageManager.js
+  Import.js
+  LeftPanel.js
+  NodeEditor.js
+  ProjectManager.js
+  Sidebar.js
+  Utils.js
+  app.js
+
+
+==================================================
+FILE CONTENTS
+==================================================
+
+index.html:
+----------
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Savida — Story Engine Maker</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/nodes.css">
+    <link rel="stylesheet" href="css/panels.css">
+    <link rel="stylesheet" href="css/emoji-picker.css">
+    <link rel="stylesheet" href="css/character-editor.css">
+</head>
+<body>
+
+<div id="tab-bar">
+    <div class="add-tab" title="New Project" onclick="App.createProject()">+</div>
+</div>
+
+<div id="toolbar">
+    <!-- Node buttons -->
+    <button class="btn-scene" id="btnAddScene" disabled onclick="NodeEditor.addNode('scene')">+ Scene</button>
+    <button class="btn-ending" id="btnAddEnding" disabled onclick="NodeEditor.addNode('ending')">+ Ending</button>
+    <span class="sep">|</span>
+
+    <!-- Save -->
+    <button class="btn-save" id="btnSave" disabled onclick="App.save()">💾 Save</button>
+    <span class="sep">|</span>
+
+    <!-- File operations dropdown -->
+    <div class="toolbar-dropdown" id="ddFile">
+        <button class="dropdown-btn btn-load" onclick="UI.toggleDropdown('ddFile')">📁 File ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.pickSaveFolder()">📂 Set Save Folder</button>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.loadFromFolder()">📥 Load from Folder</button>
+            <div class="dropdown-sep"></div>
+            <button onclick="UI.toggleDropdown('ddFile');ProjectManager.downloadProjectFile()">📥 Download .story.json</button>
+            <button onclick="UI.toggleDropdown('ddFile');document.getElementById('importProjectFile').click()">📤 Import .story.json</button>
+            <input type="file" id="importProjectFile" accept=".story.json" onchange="ProjectManager.importProjectFile(event)" style="display:none;">
+        </div>
+    </div>
+
+    <!-- Zoom controls -->
+    <button class="btn-zoom btn-icon" title="Zoom Out" onclick="Canvas.zoomOut()">🔍−</button>
+    <span id="zoom-level">100%</span>
+    <button class="btn-zoom btn-icon" title="Zoom In" onclick="Canvas.zoomIn()">🔍+</button>
+    <button class="btn-zoom" title="Fit All" onclick="Canvas.zoomToFit()">⊞ Fit</button>
+    <span class="sep">|</span>
+
+    <!-- Class Editor dropdown -->
+    <div class="toolbar-dropdown" id="ddClass">
+        <button class="dropdown-btn btn-dd-class" onclick="UI.toggleDropdown('ddClass')">🏗️ Classes ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor()">📝 Manage Presets</button>
+            <div class="dropdown-sep"></div>
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor('standardGirl')">👩 Standard Girl</button>
+            <button onclick="UI.toggleDropdown('ddClass');LeftPanel.openClassEditor('standardBoy')">🧑 Standard Boy</button>
+        </div>
+    </div>
+
+    <!-- Export dropdown -->
+    <div class="toolbar-dropdown" id="ddExport">
+        <button class="dropdown-btn btn-dd-export" id="btnExport" disabled onclick="UI.toggleDropdown('ddExport')">⬇ Export ▾</button>
+        <div class="dropdown-menu">
+            <button onclick="UI.toggleDropdown('ddExport');Export.exportJS()">📄 story.js (engine data)</button>
+            <button onclick="UI.toggleDropdown('ddExport');Export.exportHTML()">🌐 Engine HTML (playable)</button>
+        </div>
+    </div>
+
+    <!-- Preview button -->
+    <button class="btn-zoom" id="btnPreview" disabled onclick="Export.previewHTML()" style="background:#f0c040;color:#1a1a00;">🔍 Preview</button>
+
+    <!-- Import story.js -->
+    <button class="btn-load" onclick="document.getElementById('loadFile').click()">📂 Import .js</button>
+    <input type="file" id="loadFile" accept=".js" onchange="Import.importJS(event)">
+
+    <span class="sep">|</span>
+    <button class="btn-clear" id="btnClear" disabled onclick="Canvas.clearAll()">Clear</button>
+
+    <span style="flex:1;"></span>
+    <span id="save-indicator">Saved ✓</span>
+</div>
+
+<div id="main-area">
+    <div id="left-panel"><div id="left-content" class="no-project-msg">📁<br>Create a project<br>to get started</div></div>
+    <div id="canvas-wrap"><canvas id="lineCanvas"></canvas><div id="nodes-layer"></div></div>
+    <div id="sidebar"><div style="color:var(--dim);text-align:center;padding:20px;">👈 Select a node</div></div>
+</div>
+
+<div id="emoji-picker"></div>
+
+<div id="modal-overlay">
+    <div id="modal">
+        <h3 id="modal-title"></h3>
+        <pre id="modal-content"></pre>
+        <button class="btn-close" onclick="UI.closeModal()">Close</button>
+        <button class="btn-download" id="modal-dl-btn" onclick="UI.downloadModal()">Download</button>
+    </div>
+</div>
+
+<div class="hint-bar">🖱 Drag nodes · 🔴 Drag sockets · 🖐 Pan · 🔍 Scroll zoom · Ctrl+S Save · Ctrl+P Preview</div>
+
+<script src="js/Utils.js"></script>
+<script src="js/CharacterClasses.js"></script>
+<script src="js/ImageManager.js"></script>
+<script src="js/ProjectManager.js"></script>
+<script src="js/EmojiPicker.js"></script>
+<script src="js/Canvas.js"></script>
+<script src="js/NodeEditor.js"></script>
+<script src="js/CharacterEditor.js"></script>
+<script src="js/Sidebar.js"></script>
+<script src="js/LeftPanel.js"></script>
+<script src="js/Export.js"></script>
+<script src="js/Import.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
+
+css\character-editor.css:
+------------------------
+
+/* ---- CHARACTER LIST IN LEFT PANEL ---- */
+.char-summary-card{
+    background:rgba(0,0,0,0.25);border-radius:6px;padding:8px;margin:4px 0;
+    cursor:pointer;transition:all .15s;border:1px solid transparent;
+    display:flex;align-items:center;gap:8px;
+}
+.char-summary-card:hover{background:rgba(139,92,246,0.1);border-color:var(--accent2);}
+.char-summary-card .char-avatar{
+    font-size:28px;min-width:36px;text-align:center;
+}
+.char-summary-card .char-info{flex:1;min-width:0;}
+.char-summary-card .char-name{
+    font-weight:700;font-size:12px;color:var(--text);
+}
+.char-summary-card .char-meta{
+    font-size:9px;color:var(--dim);margin-top:1px;
+}
+.char-summary-card .char-meta span{
+    background:rgba(139,92,246,0.15);color:var(--accent2);
+    padding:1px 5px;border-radius:3px;margin-right:3px;
+}
+.char-summary-card .char-arrow{
+    color:var(--dim);font-size:14px;
+}
+
+/* ---- CHARACTER EDITOR PANEL ---- */
+.char-editor-panel{
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:12px;max-height:70vh;overflow-y:auto;
+}
+.char-editor-panel h3{
+    color:var(--accent);font-size:13px;margin-bottom:8px;
+    padding-bottom:6px;border-bottom:1px solid var(--border);
+    display:flex;align-items:center;gap:8px;
+}
+.char-editor-panel h3 .back-btn{
+    background:var(--border);color:var(--text);border:none;
+    padding:4px 10px;border-radius:4px;cursor:pointer;
+    font-size:11px;margin-left:auto;
+}
+.char-editor-panel h3 .back-btn:hover{background:#555;}
+.char-editor-panel h4{
+    color:var(--accent);font-size:12px;margin:12px 0 4px;
+    padding-bottom:4px;border-bottom:1px solid var(--border);
+}
+.char-editor-panel label{
+    color:var(--dim);font-size:10px;display:block;margin-top:8px;
+}
+.char-editor-panel input,.char-editor-panel select,.char-editor-panel textarea{
+    width:100%;background:var(--input-bg);color:var(--text);
+    border:1px solid var(--border);border-radius:4px;
+    padding:5px 7px;font-family:var(--font-mono);font-size:10px;
+    resize:vertical;
+}
+.char-editor-panel textarea{min-height:40px;}
+.char-editor-panel .row{display:flex;gap:6px;align-items:center;}
+.char-editor-panel .row>*{flex:1;}
+
+/* Body parts list */
+.body-parts-list{
+    display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;
+}
+.body-part-tag{
+    display:flex;align-items:center;gap:3px;
+    background:rgba(0,0,0,0.3);padding:3px 8px;border-radius:4px;
+    font-size:10px;
+}
+.body-part-tag .part-name{color:var(--text);}
+.body-part-tag .part-icon{font-size:12px;}
+.body-part-tag .remove-part{
+    cursor:pointer;color:var(--dim);font-size:12px;margin-left:2px;
+}
+.body-part-tag .remove-part:hover{color:var(--danger);}
+
+.add-part-row{
+    display:flex;gap:4px;margin-top:4px;
+}
+.add-part-row input{flex:1;}
+.add-part-row select{width:60px;}
+.add-part-row button{flex:0 0 auto;}
+
+/* Clothing & States editor */
+.tag-list{
+    display:flex;flex-wrap:wrap;gap:3px;margin:3px 0;
+}
+.tag-item{
+    background:rgba(46,204,113,0.15);color:var(--green);
+    padding:2px 7px;border-radius:3px;font-size:10px;
+    display:flex;align-items:center;gap:3px;
+    border:1px solid rgba(46,204,113,0.3);
+}
+.tag-item .remove-tag{
+    cursor:pointer;font-size:12px;color:var(--green);
+}
+.tag-item .remove-tag:hover{color:var(--danger);}
+
+.char-editor-panel .btn-row{
+    display:flex;gap:6px;margin-top:12px;
+}
+.char-editor-panel .btn-row button{
+    padding:6px 14px;border:none;border-radius:5px;
+    cursor:pointer;font-size:11px;font-weight:600;color:#fff;
+}
+.btn-save-char{background:var(--green);}
+.btn-delete-char{background:var(--danger);}
+.btn-apply-preset{background:var(--accent2);}
+
+/* ---- CLOTHING DRAG ITEMS ---- */
+.cloth-drag-item {
+    user-select: none;
+    transition: all 0.15s;
+}
+.cloth-drag-item:hover {
+    background: rgba(139, 92, 246, 0.15) !important;
+    border-color: var(--accent2) !important;
+}
+.cloth-drag-item:active {
+    cursor: grabbing !important;
+}
+
+css\emoji-picker.css:
+--------------------
+
+#emoji-picker{
+    position:fixed;background:var(--surface);border:2px solid var(--border);
+    border-radius:10px;padding:10px;z-index:400;display:none;
+    max-width:320px;max-height:350px;overflow-y:auto;
+    box-shadow:0 8px 30px rgba(0,0,0,0.9);
+}
+#emoji-picker .emoji-btn{
+    font-size:22px;padding:4px 8px;border:none;background:none;
+    cursor:pointer;border-radius:4px;transition:all .1s;
+}
+#emoji-picker .emoji-btn:hover{background:var(--border);transform:scale(1.2);}
+#emoji-picker .emoji-cat{
+    font-size:9px;color:var(--dim);margin:6px 0 2px;
+    padding-bottom:2px;border-bottom:1px solid var(--border);
+}
+
+css\main.css:
+------------
+
+:root {
+    --bg: #0a0a14; --surface: #14142a; --surface2: #1a1a34;
+    --border: #2a2a44; --accent: #e04080; --accent2: #8b5cf6;
+    --green: #2ecc71; --blue: #3498db; --gold: #f0c040;
+    --text: #c8c8e0; --dim: #8888aa; --danger: #ff3050;
+    --node-scene: #e04080; --node-ending: #8b5cf6;
+    --socket: #ff6080; --input-bg: #0a0a18;
+    --font: 'Segoe UI', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{
+    font-family:var(--font);background:var(--bg);color:var(--text);
+    overflow:hidden;height:100vh;display:flex;flex-direction:column;
+}
+#tab-bar{
+    height:36px;background:var(--surface);display:flex;align-items:stretch;
+    border-bottom:1px solid var(--border);overflow-x:auto;flex-shrink:0;
+}
+#tab-bar .tab{
+    padding:0 14px;display:flex;align-items:center;gap:6px;cursor:pointer;
+    font-size:11px;font-weight:600;white-space:nowrap;border-right:1px solid var(--border);
+    color:var(--dim);transition:all .15s;min-width:80px;justify-content:center;
+}
+#tab-bar .tab:hover{background:var(--surface2);color:var(--text);}
+#tab-bar .tab.active{
+    background:var(--bg);color:var(--accent);
+    border-bottom:2px solid var(--accent);margin-bottom:-1px;
+}
+#tab-bar .tab .close-tab{
+    font-size:14px;opacity:0;transition:opacity .15s;cursor:pointer;
+    color:var(--dim);margin-left:2px;line-height:1;
+}
+#tab-bar .tab:hover .close-tab{opacity:1;}
+#tab-bar .tab .close-tab:hover{color:var(--danger);}
+#tab-bar .add-tab{
+    padding:0 12px;cursor:pointer;font-size:18px;color:var(--dim);
+    display:flex;align-items:center;border-right:1px solid var(--border);
+}
+#tab-bar .add-tab:hover{color:var(--accent);background:var(--surface2);}
+
+/* ---- TOOLBAR ---- */
+#toolbar{
+    height:40px;background:var(--surface);border-bottom:1px solid var(--border);
+    display:flex;align-items:center;padding:0 8px;gap:4px;flex-shrink:0;
+    position:relative;z-index:100;
+}
+#toolbar button{
+    padding:5px 10px;border:none;border-radius:5px;cursor:pointer;
+    font-size:11px;font-weight:600;color:#fff;transition:all .15s;white-space:nowrap;
+    display:flex;align-items:center;gap:4px;
+}
+#toolbar button:disabled{opacity:0.3;cursor:not-allowed;}
+#toolbar .btn-icon{padding:5px 8px;font-size:14px;}
+.btn-scene{background:var(--node-scene);}.btn-scene:hover:not(:disabled){background:#ff5088;}
+.btn-ending{background:var(--node-ending);}.btn-ending:hover:not(:disabled){background:#9b6cff;}
+.btn-save{background:var(--gold);color:#1a1a00;}.btn-save:hover:not(:disabled){background:#f5d040;}
+.btn-load{background:var(--blue);}.btn-load:hover:not(:disabled){background:#4aa8eb;}
+.btn-clear{background:#555;}.btn-clear:hover:not(:disabled){background:#777;}
+.btn-zoom{background:#3a3a55;}.btn-zoom:hover:not(:disabled){background:#5a5a75;}
+
+#toolbar span.sep{color:var(--dim);font-size:16px;margin:0 2px;}
+#toolbar input[type=file]{display:none;}
+
+#save-indicator{
+    font-size:10px;color:var(--dim);margin-left:4px;opacity:0;transition:opacity .3s;
+}
+#save-indicator.show{opacity:1;color:var(--green);}
+
+/* ---- DROPDOWN MENUS ---- */
+.toolbar-dropdown{
+    position:relative;display:inline-block;
+}
+.toolbar-dropdown .dropdown-btn{
+    padding:5px 10px;border:none;border-radius:5px;cursor:pointer;
+    font-size:11px;font-weight:600;color:#fff;transition:all .15s;
+    display:flex;align-items:center;gap:4px;white-space:nowrap;
+}
+.toolbar-dropdown .dropdown-btn::after{
+    content:'▾';font-size:9px;margin-left:2px;
+}
+.toolbar-dropdown .dropdown-menu{
+    display:none;position:absolute;top:100%;left:0;margin-top:4px;
+    background:var(--surface);border:1px solid var(--border);border-radius:6px;
+    min-width:180px;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,0.7);
+    padding:4px;flex-direction:column;gap:2px;
+}
+.toolbar-dropdown.open .dropdown-menu{display:flex;}
+.toolbar-dropdown .dropdown-menu button{
+    width:100%;text-align:left;background:transparent;color:var(--text);
+    padding:6px 10px;font-size:11px;border-radius:4px;font-weight:400;
+}
+.toolbar-dropdown .dropdown-menu button:hover{background:var(--surface2);color:#fff;}
+.toolbar-dropdown .dropdown-menu .dropdown-sep{
+    height:1px;background:var(--border);margin:2px 6px;
+}
+
+.btn-dd-class{background:#8b5cf6;}.btn-dd-class:hover{background:#9b6cff;}
+.btn-dd-export{background:#2ecc71;}.btn-dd-export:hover{background:#3cdb80;}
+.btn-dd-export-html{background:#e67e22;}.btn-dd-export-html:hover{background:#f0932b;}
+
+#zoom-level{
+    font-size:10px;color:var(--dim);min-width:40px;text-align:center;
+    user-select:none;
+}
+
+#main-area{display:flex;flex:1;overflow:hidden;}
+
+.hint-bar{
+    position:fixed;bottom:10px;left:50%;transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);color:var(--dim);padding:5px 16px;
+    border-radius:20px;font-size:10px;z-index:50;pointer-events:none;
+    border:1px solid var(--border);
+}
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:#444;}
+
+/* ---- DRAG AND DROP ---- */
+body.drag-over::after {
+    content: '📥 Drop .story.json files here';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(224, 64, 128, 0.95);
+    color: #fff;
+    padding: 20px 40px;
+    border-radius: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+}
+
+body.drag-over {
+    outline: 3px dashed var(--accent);
+    outline-offset: -6px;
+}
+
+@keyframes toastIn {
+    from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+    to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.drop-toast {
+    animation: toastIn 0.3s ease-out;
+}
+
+css\nodes.css:
+-------------
+
+#canvas-wrap{
+    flex:1;position:relative;overflow:hidden;cursor:grab;
+    background:radial-gradient(circle at center,#1a1a30 0%,var(--bg) 100%);
+    background-image:radial-gradient(circle,#2a2a40 1px,transparent 1px);
+    background-size:30px 30px;
+}
+#canvas-wrap:active{cursor:grabbing;}
+#canvas-wrap.panning{cursor:grabbing;}
+canvas{display:block;position:absolute;top:0;left:0;pointer-events:none;z-index:1;}
+#nodes-layer{
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    z-index:2;pointer-events:none;
+}
+
+.node{
+    position:absolute;min-width:200px;max-width:350px;
+    background:var(--surface2);border:2px solid var(--border);border-radius:8px;
+    font-size:10px;z-index:10;user-select:none;pointer-events:auto;
+    box-shadow:0 4px 16px rgba(0,0,0,0.5);
+    transition:box-shadow .15s,border-color .15s;
+}
+.node.selected{
+    box-shadow:0 0 0 3px rgba(3, 171, 255, 0.451);
+    border-color: rgb(12, 200, 255);
+}
+.node.scene{border-top:3px solid var(--node-scene);}
+.node.ending{border-top:3px solid var(--node-ending);}
+
+.node-header{
+    padding:6px 8px;border-radius:5px 5px 0 0;font-weight:700;font-size:11px;
+    display:flex;justify-content:space-between;align-items:center;
+    background:rgba(0,0,0,0.3);cursor:move;
+}
+.scene .node-header{color:var(--node-scene);}
+.ending .node-header{color:var(--node-ending);}
+.node-header .btn-del{
+    background:none;border:none;color:var(--dim);cursor:pointer;
+    font-size:15px;padding:0 3px;line-height:1;
+}
+.node-header .btn-del:hover{color:var(--danger);}
+
+.node-body{
+    padding:4px 6px;max-height:160px;overflow-y:auto;
+    font-size:9px;color:var(--text);
+}
+.node-body .preview-text{
+    max-height:40px;overflow:hidden;color:var(--dim);
+    font-style:italic;line-height:1.3;margin:2px 0;
+}
+
+.choice-item{
+    position:relative;padding:4px 26px 4px 6px;margin:2px 0;
+    background:rgba(0,0,0,0.3);border-radius:4px;font-size:9px;
+    cursor:default;display:flex;align-items:center;gap:3px;min-height:24px;
+}
+.choice-item .choice-text{
+    flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.choice-item .choice-stats{font-size:8px;color:var(--dim);white-space:nowrap;}
+
+.choice-badge{
+    font-size:7px;padding:1px 4px;border-radius:2px;font-weight:700;
+}
+.badge-sex{background:rgba(255,48,80,0.25);color:#ff6080;}
+.badge-strip{background:rgba(200,150,255,0.2);color:#c896ff;}
+.badge-corrupt{background:rgba(240,192,64,0.2);color:var(--gold);}
+.badge-enslave{background:rgba(255,80,80,0.3);color:#ff6060;}
+
+.socket{
+    position:absolute;width:14px;height:14px;background:var(--socket);
+    border-radius:50%;right:-7px;top:50%;transform:translateY(-50%);
+    cursor:crosshair;z-index:20;border:2px solid var(--surface2);
+    transition:all .15s;
+}
+.socket:hover{background:#ff90b0;transform:translateY(-50%) scale(1.35);}
+.socket.connecting{animation:pulse .4s infinite;}
+
+@keyframes pulse{
+    0%,100%{box-shadow:0 0 0 0 rgba(255,96,128,0.6);}
+    50%{box-shadow:0 0 0 8px rgba(255,96,128,0);}
+}
+
+css\panels.css:
+--------------
+
+#left-panel{
+    width:300px;background:var(--surface);border-right:1px solid var(--border);
+    display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;
+    padding:8px;gap:4px;font-size:11px;
+}
+#left-panel h3{
+    color:var(--accent);font-size:12px;margin:8px 0 4px;
+    padding-bottom:4px;border-bottom:1px solid var(--border);cursor:pointer;
+}
+#left-panel h3 + div{display:block;}
+#left-panel label{color:var(--dim);font-size:10px;display:block;margin-top:3px;}
+#left-panel input,#left-panel textarea,#left-panel select{
+    width:100%;background:var(--input-bg);color:var(--text);
+    border:1px solid var(--border);border-radius:4px;padding:5px 7px;
+    font-family:var(--font-mono);font-size:10px;resize:vertical;
+}
+#left-panel textarea{min-height:40px;}
+#left-panel button{
+    padding:4px 8px;border:none;border-radius:4px;cursor:pointer;
+    font-size:10px;font-weight:600;color:#fff;
+}
+.btn-sm-add{background:var(--green);}
+.btn-sm-remove{background:var(--danger);padding:2px 6px;font-size:9px;}
+.btn-sm-edit{background:var(--blue);padding:2px 6px;font-size:9px;}
+.no-project-msg{
+    text-align:center;color:var(--dim);padding:30px 10px;
+    font-style:italic;font-size:12px;
+}
+.char-block{
+    background:rgba(0,0,0,0.25);padding:6px;border-radius:5px;margin:3px 0;
+}
+
+#sidebar{
+    width:340px;background:var(--surface);border-left:1px solid var(--border);
+    display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;
+    padding:8px;gap:4px;font-size:11px;
+}
+#sidebar h3{
+    color:var(--accent);font-size:12px;margin:6px 0 4px;
+    padding-bottom:4px;border-bottom:1px solid var(--border);
+}
+#sidebar label{color:var(--dim);font-size:10px;display:block;margin-top:3px;}
+#sidebar input,#sidebar textarea,#sidebar select{
+    width:100%;background:var(--input-bg);color:var(--text);
+    border:1px solid var(--border);border-radius:4px;padding:4px 6px;
+    font-family:var(--font-mono);font-size:10px;resize:vertical;
+}
+#sidebar textarea{min-height:50px;}
+#sidebar .stat-row{
+    display:flex;gap:3px;align-items:center;flex-wrap:wrap;
+}
+#sidebar .stat-row input{width:45px;text-align:center;}
+#sidebar .stat-row label{flex:1;margin:0;font-size:9px;min-width:40px;}
+#sidebar .checkbox-row{
+    display:flex;gap:4px;align-items:center;flex-wrap:wrap;
+}
+#sidebar .checkbox-row label{
+    font-size:9px;margin:0;display:flex;align-items:center;gap:2px;
+}
+#sidebar .checkbox-row input[type=checkbox]{width:auto;}
+#sidebar button{
+    padding:4px 8px;border:none;border-radius:4px;cursor:pointer;
+    font-size:10px;font-weight:600;color:#fff;
+}
+
+#modal-overlay{
+    display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+    background:rgba(0,0,0,0.7);z-index:300;
+    align-items:center;justify-content:center;
+}
+#modal-overlay.show{display:flex;}
+#modal{
+    background:var(--surface);border:1px solid var(--border);border-radius:10px;
+    padding:16px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;
+    box-shadow:0 8px 40px rgba(0,0,0,0.9);font-size:12px;
+}
+#modal h3{color:var(--accent);margin-bottom:10px;}
+#modal pre{
+    background:var(--input-bg);padding:12px;border-radius:6px;
+    font-size:10px;overflow-x:auto;color:var(--text);
+    max-height:50vh;overflow-y:auto;white-space:pre-wrap;
+}
+#modal button{
+    margin-top:8px;padding:6px 14px;border:none;border-radius:4px;
+    cursor:pointer;font-size:11px;color:#fff;font-weight:600;
+}
+#modal .btn-close{background:var(--border);}
+#modal .btn-download{background:var(--green);}
+
+js\Canvas.js:
+------------
+
+var Canvas = {
+    nodes: [],
+    connections: [],
+    nodeIdCounter: 0,
+    selectedNodeId: null,
+    dragging: null,
+    dragOffset: { x: 0, y: 0 },
+    panning: false,
+    panStart: { x: 0, y: 0 },
+    connecting: null,
+    mousePos: { x: 0, y: 0 },
+    zoomLevel: 1,
+    minZoom: 0.2,
+    maxZoom: 3,
+
+    init: function() {
+        this.canvasWrap = document.getElementById('canvas-wrap');
+        this.nodesLayer = document.getElementById('nodes-layer');
+        this.lineCanvas = document.getElementById('lineCanvas');
+        this.ctx = this.lineCanvas.getContext('2d');
+        this.resize();
+        this.bindEvents();
+        window.addEventListener('resize', this.resize.bind(this));
+        this.animLoop();
+        this.updateZoomDisplay();
+    },
+
+    resize: function() {
+        this.lineCanvas.width = this.canvasWrap.clientWidth;
+        this.lineCanvas.height = this.canvasWrap.clientHeight;
+        this.applyZoomTransform();
+        this.drawConnections();
+    },
+
+    // ---- ZOOM ----
+    setZoom: function(level) {
+        this.zoomLevel = Math.max(this.minZoom, Math.min(this.maxZoom, level));
+        this.applyZoomTransform();
+        this.drawConnections();
+        this.updateZoomDisplay();
+    },
+
+    zoomIn: function() {
+        this.setZoom(this.zoomLevel * 1.2);
+    },
+
+    zoomOut: function() {
+        this.setZoom(this.zoomLevel / 1.2);
+    },
+
+    zoomToFit: function() {
+        if (this.nodes.length === 0) { this.setZoom(1); return; }
+        var minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        this.nodes.forEach(function(n) {
+            if (n.x < minX) minX = n.x;
+            if (n.y < minY) minY = n.y;
+            if (n.x + 250 > maxX) maxX = n.x + 250;
+            if (n.y + 200 > maxY) maxY = n.y + 200;
+        });
+        var w = maxX - minX + 100;
+        var h = maxY - minY + 100;
+        var zx = this.canvasWrap.clientWidth / w;
+        var zy = this.canvasWrap.clientHeight / h;
+        this.setZoom(Math.min(zx, zy, 1.5));
+    },
+
+    applyZoomTransform: function() {
+        this.nodesLayer.style.transformOrigin = '0 0';
+        this.nodesLayer.style.transform = 'scale(' + this.zoomLevel + ')';
+        this.lineCanvas.style.transformOrigin = '0 0';
+        this.lineCanvas.style.transform = 'scale(' + this.zoomLevel + ')';
+    },
+
+    updateZoomDisplay: function() {
+        var el = document.getElementById('zoom-level');
+        if (el) el.textContent = Math.round(this.zoomLevel * 100) + '%';
+    },
+
+    // ---- SCREEN / CANVAS COORDINATES ----
+    screenToCanvas: function(sx, sy) {
+        var rect = this.canvasWrap.getBoundingClientRect();
+        return {
+            x: (sx - rect.left) / this.zoomLevel,
+            y: (sy - rect.top) / this.zoomLevel
+        };
+    },
+
+    // ---- EVENTS ----
+    bindEvents: function() {
+        var self = this;
+
+        this.canvasWrap.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            if (e.ctrlKey || e.metaKey) {
+                var delta = -e.deltaY * 0.005;
+                self.setZoom(self.zoomLevel * (1 + delta));
+            }
+        }, { passive: false });
+
+        this.canvasWrap.addEventListener('mousedown', function(e) {
+            if (e.button === 1) {
+                e.preventDefault();
+                self.panning = true;
+                self.panStart.x = e.clientX;
+                self.panStart.y = e.clientY;
+                self.canvasWrap.classList.add('panning');
+                return;
+            }
+            if (e.target === self.canvasWrap || e.target === self.lineCanvas) {
+                self.panning = true;
+                self.panStart.x = e.clientX;
+                self.panStart.y = e.clientY;
+                self.canvasWrap.classList.add('panning');
+                self.selectedNodeId = null;
+                document.querySelectorAll('.node.selected').forEach(function(el) { el.classList.remove('selected'); });
+                if (typeof Sidebar !== 'undefined') Sidebar.render();
+            }
+        });
+
+        window.addEventListener('mousemove', function(e) {
+            self.mousePos.x = e.clientX;
+            self.mousePos.y = e.clientY;
+            if (self.dragging) {
+                var pos = self.screenToCanvas(e.clientX, e.clientY);
+                self.dragging.x = pos.x - self.dragOffset.x;
+                self.dragging.y = pos.y - self.dragOffset.y;
+                var el = document.getElementById(self.dragging.id);
+                if (el) { el.style.left = self.dragging.x + 'px'; el.style.top = self.dragging.y + 'px'; }
+                self.drawConnections();
+            }
+            if (self.panning) {
+                var dx = (e.clientX - self.panStart.x) / self.zoomLevel;
+                var dy = (e.clientY - self.panStart.y) / self.zoomLevel;
+                self.nodes.forEach(function(n) { n.x += dx; n.y += dy; });
+                document.querySelectorAll('.node').forEach(function(el) {
+                    var n = self.getNode(el.id);
+                    if (n) { el.style.left = n.x + 'px'; el.style.top = n.y + 'px'; }
+                });
+                self.panStart.x = e.clientX;
+                self.panStart.y = e.clientY;
+                self.drawConnections();
+            }
+        });
+
+        window.addEventListener('mouseup', function(e) {
+            if (self.dragging) { self.dragging = null; self.drawConnections(); self.saveState(); }
+            if (self.panning) { self.panning = false; self.canvasWrap.classList.remove('panning'); }
+            if (self.connecting && !(e.target && e.target.closest && e.target.closest('.node'))) {
+                self.connecting = null;
+                document.querySelectorAll('.socket.connecting').forEach(function(s) { s.classList.remove('connecting'); });
+                self.drawConnections();
+            }
+        });
+
+        this.canvasWrap.addEventListener('auxclick', function(e) { e.preventDefault(); });
+    },
+
+    // ---- NODE OPERATIONS ----
+    addNode: function(type) {
+        var id = 'node_' + (this.nodeIdCounter++);
+        var node = {
+            id: id, type: type,
+            x: (150 + this.nodes.length * 25) / this.zoomLevel,
+            y: (120 + this.nodes.length * 20) / this.zoomLevel,
+            title: type === 'scene' ? 'Scene ' + (this.nodes.filter(function(n) { return n.type === 'scene'; }).length + 1) :
+                   'Ending ' + (this.nodes.filter(function(n) { return n.type === 'ending'; }).length + 1),
+            subtitle: '',
+            text: type === 'scene' ? 'Describe this scene...' : 'What happens in this ending...',
+            choices: type === 'scene' ? [this.makeDefaultChoice()] : [],
+            hiddenChars: null,
+            emoji: '⭐',
+            color: '#880030',
+            extraTags: {}
+        };
+        this.nodes.push(node);
+        this.renderNode(node);
+        this.drawConnections();
+        this.selectNode(id);
+        this.saveState();
+        return node;
+    },
+
+    makeDefaultChoice: function() {
+        var ch = {
+            text: 'Option A',
+            sex: false, corrupt: false,
+            mayaOral: 0, leoOral: 0, mayaVaginal: 0, mayaAnal: 0, leoAnal: 0,
+            enslaveSis: false, enslaveBro: false
+        };
+        var p = ProjectManager.getActive();
+        if (p) {
+            (p.config.stats || []).forEach(function(s) { ch[s.id] = 0; });
+            (p.config.characters || []).forEach(function(c) {
+                ch['strip_' + c.id] = null;
+                ch['wear_' + c.id] = null;
+                ch['state_' + c.id] = c.defaultState || 'Normal';
+            });
+        }
+        return ch;
+    },
+
+    getNode: function(id) {
+        return this.nodes.find(function(n) { return n.id === id; });
+    },
+
+    selectNode: function(id) {
+        this.selectedNodeId = id;
+        document.querySelectorAll('.node.selected').forEach(function(el) { el.classList.remove('selected'); });
+        var el = document.getElementById(id);
+        if (el) el.classList.add('selected');
+        if (typeof Sidebar !== 'undefined') Sidebar.render();
+    },
+
+    deleteNode: function(id) {
+        if (!confirm('Delete this node?')) return;
+        this.nodes = this.nodes.filter(function(n) { return n.id !== id; });
+        this.connections = this.connections.filter(function(c) { return c.fromNodeId !== id && c.toNodeId !== id; });
+        var el = document.getElementById(id);
+        if (el) el.remove();
+        if (this.selectedNodeId === id) { this.selectedNodeId = null; if (typeof Sidebar !== 'undefined') Sidebar.render(); }
+        this.drawConnections();
+        this.saveState();
+    },
+
+    renderNode: function(node) {
+        var old = document.getElementById(node.id);
+        if (old) old.remove();
+        var self = this;
+        var p = ProjectManager.getActive();
+        var chars = p ? (p.config.characters || []) : [];
+        var el = document.createElement('div');
+        el.className = 'node ' + node.type;
+        el.id = node.id;
+        el.style.left = node.x + 'px';
+        el.style.top = node.y + 'px';
+
+        var choicesHTML = '';
+        if (node.type === 'scene' && node.choices) {
+            node.choices.forEach(function(ch, i) {
+                var badges = '';
+                var conn = self.connections.find(function(c) { return c.fromNodeId === node.id && c.fromChoiceIndex === i; });
+                var nextNode = conn ? self.getNode(conn.toNodeId) : null;
+                if (ch.sex) badges += '<span class="choice-badge badge-sex">🔞</span>';
+                if (ch.corrupt) badges += '<span class="choice-badge badge-corrupt">corrupt</span>';
+                chars.forEach(function(c) {
+                    if (ch['strip_' + c.id]) {
+                        var stripItems = ch['strip_' + c.id].split(',');
+                        stripItems.forEach(function(item) {
+                            badges += '<span class="choice-badge badge-strip">' + c.name + ':−' + item + '</span>';
+                        });
+                    }
+                    if (ch['wear_' + c.id]) {
+                        var wearItems = ch['wear_' + c.id].split(',');
+                        wearItems.forEach(function(item) {
+                            badges += '<span class="choice-badge" style="background:rgba(46,204,113,0.2);color:#2ecc71;">' + c.name + ':+' + item + '</span>';
+                        });
+                    }
+                });
+                var nextLabel = nextNode ? '→ ' + nextNode.title : '';
+                choicesHTML += '<div class="choice-item" data-choice="' + i + '">' +
+                    '<span class="choice-text">' + (ch.text || '...') + '</span>' + badges +
+                    '<span class="choice-stats">' + nextLabel + '</span>' +
+                    '<div class="socket" data-node="' + node.id + '" data-choice="' + i + '"></div></div>';
+            });
+            choicesHTML += '<button style="background:rgba(46,204,113,0.15);color:var(--green);border:1px solid var(--green);padding:3px;border-radius:4px;cursor:pointer;font-size:9px;width:100%;margin-top:2px;" onclick="event.stopPropagation();Canvas.addChoice(\'' + node.id + '\')">+ Add Choice</button>';
+        }
+
+        var connCount = this.connections.filter(function(c) { return c.fromNodeId === node.id || c.toNodeId === node.id; }).length;
+        var hiddenCount = node.hiddenChars ? node.hiddenChars.split(',').length : 0;
+        var hiddenBadge = '';
+        if (hiddenCount > 0) {
+            hiddenBadge = '<span style="font-size:8px;color:var(--dim);margin-left:4px;">👁️−' + hiddenCount + '</span>';
+        }
+        var preview = node.text ? (node.text.length > 70 ? node.text.substring(0, 70) + '...' : node.text) : '';
+
+        el.innerHTML = '<div class="node-header"><span>' + (node.type === 'scene' ? '🎬' : '🏁') + ' ' + Utils.escHtml(node.title) +
+            '</span><span style="font-size:8px;color:var(--dim);">' + connCount + '🔗' + hiddenBadge + '</span>' +
+            '<button class="btn-del" onclick="event.stopPropagation();Canvas.deleteNode(\'' + node.id + '\')">✕</button></div>' +
+            '<div class="node-body">' + (node.type === 'ending' ? '<div style="font-size:18px;">' + (node.emoji || '⭐') + '</div>' : '') +
+            '<div class="preview-text">' + Utils.escHtml(preview) + '</div>' + choicesHTML + '</div>';
+
+        this.nodesLayer.appendChild(el);
+
+        el.querySelector('.node-header').addEventListener('mousedown', function(e) {
+            e.stopPropagation();
+            self.selectNode(node.id);
+            self.dragging = node;
+            var pos = self.screenToCanvas(e.clientX, e.clientY);
+            self.dragOffset.x = pos.x - node.x;
+            self.dragOffset.y = pos.y - node.y;
+        });
+
+        el.addEventListener('mousedown', function(e) {
+            if (!e.target.closest('.socket') && !e.target.closest('button') && !e.target.closest('.node-header')) {
+                self.selectNode(node.id);
+            }
+        });
+
+        el.querySelectorAll('.socket').forEach(function(socket) {
+            socket.addEventListener('mousedown', function(e) {
+                e.stopPropagation();
+                e.preventDefault();
+                self.connecting = {
+                    nodeId: socket.dataset.node,
+                    choiceIndex: parseInt(socket.dataset.choice),
+                    sx: e.clientX,
+                    sy: e.clientY
+                };
+                socket.classList.add('connecting');
+            });
+        });
+
+        el.addEventListener('mouseup', function(e) {
+            if (self.connecting && self.connecting.nodeId !== node.id && !e.target.closest('.socket')) {
+                self.connections = self.connections.filter(function(c) {
+                    return !(c.fromNodeId === self.connecting.nodeId && c.fromChoiceIndex === self.connecting.choiceIndex);
+                });
+                self.connections.push({
+                    fromNodeId: self.connecting.nodeId,
+                    fromChoiceIndex: self.connecting.choiceIndex,
+                    toNodeId: node.id
+                });
+                self.connecting = null;
+                document.querySelectorAll('.socket.connecting').forEach(function(s) { s.classList.remove('connecting'); });
+                var fn = self.getNode(self.connections[self.connections.length - 1].fromNodeId);
+                if (fn) self.renderNode(fn);
+                self.renderNode(node);
+                self.drawConnections();
+                self.saveState();
+                if (self.selectedNodeId && typeof Sidebar !== 'undefined') Sidebar.render();
+            }
+        });
+    },
+
+    addChoice: function(nodeId) {
+        var node = this.getNode(nodeId);
+        if (!node) return;
+        if (!node.choices) node.choices = [];
+        node.choices.push(this.makeDefaultChoice());
+        this.renderNode(node);
+        this.drawConnections();
+        this.saveState();
+        if (this.selectedNodeId === nodeId && typeof Sidebar !== 'undefined') Sidebar.render();
+    },
+
+    deleteChoice: function(nodeId, ci) {
+        var node = this.getNode(nodeId);
+        if (!node) return;
+        node.choices.splice(ci, 1);
+        this.connections = this.connections.filter(function(c) {
+            return !(c.fromNodeId === nodeId && c.fromChoiceIndex === ci);
+        });
+        this.connections.forEach(function(c) {
+            if (c.fromNodeId === nodeId && c.fromChoiceIndex > ci) c.fromChoiceIndex--;
+        });
+        this.renderNode(node);
+        this.drawConnections();
+        this.saveState();
+    },
+
+    // ---- DRAWING ----
+    drawConnections: function() {
+        if (!this.ctx) return;
+        var w = this.lineCanvas.width / this.zoomLevel;
+        var h = this.lineCanvas.height / this.zoomLevel;
+        this.ctx.clearRect(0, 0, w, h);
+        var self = this;
+        this.connections.forEach(function(conn) {
+            var fn = self.getNode(conn.fromNodeId);
+            var tn = self.getNode(conn.toNodeId);
+            if (!fn || !tn) return;
+            var fe = document.getElementById(fn.id);
+            var te = document.getElementById(tn.id);
+            if (!fe || !te) return;
+            var fs = fe.querySelector('.choice-item[data-choice="' + conn.fromChoiceIndex + '"] .socket');
+            if (!fs) return;
+            var fr = fs.getBoundingClientRect();
+            var tr = te.getBoundingClientRect();
+            var wr = self.canvasWrap.getBoundingClientRect();
+            var x1 = (fr.left + fr.width / 2 - wr.left) / self.zoomLevel;
+            var y1 = (fr.top + fr.height / 2 - wr.top) / self.zoomLevel;
+            var x2 = (tr.left + tr.width / 2 - wr.left) / self.zoomLevel;
+            var y2 = (tr.top + tr.height / 2 - wr.top) / self.zoomLevel;
+            self.ctx.strokeStyle = '#ff6080';
+            self.ctx.lineWidth = 2;
+            self.ctx.lineCap = 'round';
+            self.ctx.beginPath();
+            self.ctx.moveTo(x1, y1);
+            var cp = (x1 + x2) / 2;
+            self.ctx.bezierCurveTo(cp, y1, cp, y2, x2, y2);
+            self.ctx.stroke();
+            var angle = Math.atan2(y2 - y1, x2 - x1);
+            var as = 8;
+            self.ctx.fillStyle = '#ff6080';
+            self.ctx.beginPath();
+            self.ctx.moveTo(x2, y2);
+            self.ctx.lineTo(x2 - as * Math.cos(angle - 0.5), y2 - as * Math.sin(angle - 0.5));
+            self.ctx.lineTo(x2 - as * Math.cos(angle + 0.5), y2 - as * Math.sin(angle + 0.5));
+            self.ctx.closePath();
+            self.ctx.fill();
+        });
+        if (this.connecting) {
+            var fe = document.getElementById(this.connecting.nodeId);
+            if (fe) {
+                var fs = fe.querySelector('.choice-item[data-choice="' + this.connecting.choiceIndex + '"] .socket');
+                if (fs) {
+                    var fr = fs.getBoundingClientRect();
+                    var wr = this.canvasWrap.getBoundingClientRect();
+                    var x1 = (fr.left + fr.width / 2 - wr.left) / this.zoomLevel;
+                    var y1 = (fr.top + fr.height / 2 - wr.top) / this.zoomLevel;
+                    this.ctx.strokeStyle = '#ff90b0';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([6, 4]);
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(x1, y1);
+                    this.ctx.lineTo((this.mousePos.x - wr.left) / this.zoomLevel, (this.mousePos.y - wr.top) / this.zoomLevel);
+                    this.ctx.stroke();
+                    this.ctx.setLineDash([]);
+                }
+            }
+        }
+    },
+
+    animLoop: function() {
+        if (this.connecting) this.drawConnections();
+        requestAnimationFrame(this.animLoop.bind(this));
+    },
+
+    saveState: function() {
+        var p = ProjectManager.getActive();
+        if (!p) return;
+        var scenes = this.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
+            return {
+                id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
+                text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
+            };
+        });
+        var endings = {};
+        this.nodes.filter(function(n) { return n.type === 'ending'; }).forEach(function(n) {
+            endings[n.id] = { x: n.x, y: n.y, emoji: n.emoji, title: n.title, desc: n.text, color: n.color };
+        });
+        p.scenes = scenes;
+        p.endings = endings;
+        p.connections = this.connections;
+        p.nodeIdCounter = this.nodeIdCounter;
+        p.updatedAt = new Date().toISOString();
+    },
+
+    clearAll: function() {
+        if (!confirm('Clear all nodes from canvas?')) return;
+        this.nodes = [];
+        this.connections = [];
+        this.nodeIdCounter = 0;
+        this.selectedNodeId = null;
+        this.nodesLayer.innerHTML = '';
+        this.ctx.clearRect(0, 0, this.lineCanvas.width, this.lineCanvas.height);
+        if (typeof Sidebar !== 'undefined') Sidebar.render();
+        this.saveState();
+    }
+};
+
+js\CharacterClasses.js:
+----------------------
+
+var CharacterClasses = {
+    presets: {
+        standardGirl: {
+            name: 'Standard Girl',
+            icon: '👩',
+            clothing: ['top', 'bra', 'skirt', 'underwear'],
+            states: ['Normal', 'Stripped', 'Exposed', 'Enslaved'],
+            defaultState: 'Normal',
+            bodyParts: {
+                oral: { icon: '👄', label: 'Oral', enabled: true },
+                vaginal: { icon: '🫦', label: 'Vaginal', enabled: true },
+                anal: { icon: '🍑', label: 'Anal', enabled: true }
+            }
+        },
+        standardBoy: {
+            name: 'Standard Boy',
+            icon: '🧑',
+            clothing: ['top', 'pants', 'underwear'],
+            states: ['Normal', 'Stripped', 'Enslaved'],
+            defaultState: 'Normal',
+            bodyParts: {
+                oral: { icon: '👄', label: 'Oral', enabled: true },
+                vaginal: { icon: '🫦', label: 'Vaginal', enabled: false },
+                anal: { icon: '🍑', label: 'Anal', enabled: true }
+            }
+        }
+    },
+
+    getPreset: function(key) {
+        return this.presets[key] || null;
+    },
+
+    getPresetKeys: function() {
+        return Object.keys(this.presets);
+    },
+
+    clonePreset: function(key) {
+        var preset = this.getPreset(key);
+        if (!preset) return null;
+        return JSON.parse(JSON.stringify(preset));
+    },
+
+    applyPreset: function(character, presetKey) {
+        var preset = this.clonePreset(presetKey);
+        if (!preset) return character;
+        character.classPreset = presetKey;
+        character.icon = preset.icon;
+        character.clothing = preset.clothing.slice();
+        character.states = preset.states.slice();
+        character.defaultState = preset.defaultState;
+        character.bodyParts = JSON.parse(JSON.stringify(preset.bodyParts));
+        return character;
+    },
+
+    savePreset: function(key, data) {
+        this.presets[key] = {
+            name: data.name || key,
+            icon: data.icon || '🧑',
+            clothing: data.clothing || ['top', 'bottom'],
+            states: data.states || ['Normal'],
+            defaultState: data.defaultState || 'Normal',
+            bodyParts: data.bodyParts || { oral: { icon: '👄', label: 'Oral', enabled: true } }
+        };
+        this.saveToStorage();
+    },
+
+    deletePreset: function(key) {
+        if (key === 'standardGirl' || key === 'standardBoy') {
+            alert('Cannot delete built-in presets.');
+            return false;
+        }
+        delete this.presets[key];
+        this.saveToStorage();
+        return true;
+    },
+
+    isCustom: function(character) {
+        return !character.classPreset || !this.presets[character.classPreset];
+    },
+
+    getDisplayName: function(character) {
+        if (this.isCustom(character)) return 'Custom';
+        var preset = this.getPreset(character.classPreset);
+        return preset ? preset.name : 'Unknown';
+    },
+
+    getEnabledBodyParts: function(character) {
+        var parts = [];
+        if (character.bodyParts) {
+            Object.keys(character.bodyParts).forEach(function(key) {
+                if (character.bodyParts[key].enabled) {
+                    parts.push({
+                        key: key,
+                        icon: character.bodyParts[key].icon || '●',
+                        label: character.bodyParts[key].label || key
+                    });
+                }
+            });
+        }
+        return parts;
+    },
+
+    // Create default body part
+    createBodyPart: function(key, icon, label, enabled) {
+        return {
+            icon: icon || '●',
+            label: label || key || 'Part',
+            enabled: enabled !== undefined ? enabled : true
+        };
+    },
+
+    saveToStorage: function() {
+        var userPresets = {};
+        var self = this;
+        Object.keys(this.presets).forEach(function(key) {
+            if (key !== 'standardGirl' && key !== 'standardBoy') {
+                userPresets[key] = self.presets[key];
+            }
+        });
+        try {
+            localStorage.setItem('savida_class_presets', JSON.stringify(userPresets));
+        } catch(e) {
+            console.warn('Could not save class presets.');
+        }
+    },
+
+    loadFromStorage: function() {
+        try {
+            var data = localStorage.getItem('savida_class_presets');
+            if (data) {
+                var userPresets = JSON.parse(data);
+                var self = this;
+                Object.keys(userPresets).forEach(function(key) {
+                    self.presets[key] = userPresets[key];
+                });
+            }
+        } catch(e) { /* use defaults */ }
+    }
+};
+
+CharacterClasses.loadFromStorage();
+
+js\CharacterEditor.js:
+---------------------
+
+var CharacterEditor = {
+    currentCharIndex: -1,
+
+    open: function(charIndex) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[charIndex]) return;
+        this.currentCharIndex = charIndex;
+        var char = p.config.characters[charIndex];
+
+        var overlay = document.getElementById('modal-overlay');
+        var modalTitle = document.getElementById('modal-title');
+        var modalContent = document.getElementById('modal-content');
+        var dlBtn = document.getElementById('modal-dl-btn');
+        if (!overlay || !modalTitle || !modalContent) return;
+
+        modalTitle.textContent = '🧑 Character Editor: ' + char.name;
+        dlBtn.style.display = 'none';
+
+        var isCustom = CharacterClasses.isCustom(char);
+        var preset = char.classPreset ? CharacterClasses.getPreset(char.classPreset) : null;
+        var bodyParts = char.bodyParts || {};
+
+        var html = '<div style="display:flex;gap:12px;max-height:65vh;">';
+        
+        // ---- LEFT COLUMN: Editor Fields ----
+        html += '<div style="flex:1;overflow-y:auto;padding-right:4px;">';
+
+        // Basic Info
+        html += '<h4 style="color:var(--accent);margin:0 0 4px;">📋 Basic Info</h4>';
+        html += '<div style="display:flex;gap:8px;">';
+        html += '<div style="flex:1;"><label>Name</label><input id="ceName" value="' + Utils.escHtml(char.name) + '" onchange="CharacterEditor.updatePreview()"></div>';
+        html += '<div style="flex:1;"><label>Role</label><select id="ceRole" onchange="CharacterEditor.updatePreview()">';
+        ['protagonist', 'companion', 'antagonist', 'neutral'].forEach(function(r) {
+            html += '<option value="' + r + '"' + (char.role === r ? ' selected' : '') + '>' +
+                    r.charAt(0).toUpperCase() + r.slice(1) + '</option>';
+        });
+        html += '</select></div></div>';
+
+        // Icon
+        html += '<label>Icon <button class="btn-sm-edit emoji-trigger" onclick="EmojiPicker.open(\'ceIcon\',event)">Pick</button></label>';
+        html += '<input id="ceIcon" value="' + (char.icon || '🧑') + '" onchange="CharacterEditor.updatePreview()">';
+
+        // Class
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🏗️ Class Preset</h4>';
+        html += '<div style="display:flex;gap:6px;align-items:center;">';
+        html += '<select id="ceClass" style="flex:1;">';
+        CharacterClasses.getPresetKeys().forEach(function(key) {
+            var pr = CharacterClasses.getPreset(key);
+            html += '<option value="' + key + '"' + (char.classPreset === key ? ' selected' : '') + '>' +
+                    (pr ? pr.icon + ' ' + pr.name : key) + '</option>';
+        });
+        html += '<option value="custom"' + (isCustom ? ' selected' : '') + '>🧑 Custom</option>';
+        html += '</select>';
+        html += '<button class="btn-sm-edit" onclick="CharacterEditor.applyClassPreset()">Apply</button>';
+        html += '</div>';
+
+        if (!isCustom && preset) {
+            html += '<div style="font-size:9px;color:var(--dim);margin-top:4px;">';
+            html += 'Preset: <strong>' + Utils.escHtml(preset.name) + '</strong> — ';
+            html += preset.clothing.join(', ') + ' | ' + preset.states.join(', ');
+            html += '</div>';
+        }
+
+        // ---- Character Image ----
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🖼️ Character Images</h4>';
+        html += '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;">';
+
+        // Base image
+        html += '<label>Base Image (naked character)</label>';
+        var baseImg = ImageManager.getBaseImage(char.id);
+        html += '<div style="display:flex;gap:8px;align-items:start;">';
+        if (baseImg) {
+            html += '<img src="' + baseImg + '" style="max-width:120px;max-height:160px;border-radius:4px;border:1px solid var(--border);">';
+            html += '<div style="flex:1;display:flex;flex-direction:column;gap:4px;">';
+            html += '<button class="btn-sm-remove" onclick="ImageManager.removeBaseImage(\'' + char.id + '\');CharacterEditor.renderPreview();">Remove Base</button>';
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;">';
+            html += '</div>';
+        } else {
+            html += '<div style="flex:1;color:var(--dim);font-size:10px;">No base image set.<br>Upload a PNG, WebP, or JPEG.</div>';
+        }
+        html += '</div>';
+        if (!baseImg) {
+            html += '<div style="margin-top:4px;">';
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;width:100%;">';
+            html += '</div>';
+        }
+
+        // Clothing images
+        html += '<label style="margin-top:8px;">Clothing Layers</label>';
+        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Upload an image for each clothing item. Order matters — first items are drawn first (bottom layer).</div>';
+
+        var clothingImgs = ImageManager.getClothingImages(char.id);
+        (char.clothing || []).forEach(function(clothName, ci) {
+            html += '<div style="display:flex;align-items:center;gap:6px;margin:4px 0;padding:4px;background:rgba(0,0,0,0.2);border-radius:4px;">';
+            html += '<span style="font-size:10px;min-width:60px;">' + (ci + 1) + '. ' + Utils.escHtml(clothName) + '</span>';
+            if (clothingImgs[clothName]) {
+                html += '<img src="' + clothingImgs[clothName] + '" style="max-width:50px;max-height:50px;border-radius:3px;border:1px solid var(--border);">';
+                html += '<button class="btn-sm-remove" onclick="ImageManager.removeClothingImage(\'' + char.id + '\',\'' + clothName + '\');CharacterEditor.renderPreview();">✕</button>';
+            } else {
+                html += '<span style="color:var(--dim);font-size:9px;flex:1;">No image</span>';
+            }
+            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadClothingImage(\'' + char.id + '\',\'' + clothName + '\',this)" style="font-size:9px;width:120px;">';
+            html += '</div>';
+        });
+
+        html += '</div>'; // close image section
+
+        // Clothing
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">👔 Clothing Items</h4>';
+        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Drag to reorder. First = innermost layer.</div>';
+        html += '<div id="ceClothingList" style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px;">';
+        (char.clothing || []).forEach(function(item, ci) {
+            html += '<div class="cloth-drag-item" draggable="true" data-cloth-index="' + ci + '" style="display:flex;align-items:center;gap:6px;background:rgba(0,0,0,0.3);padding:5px 8px;border-radius:4px;cursor:grab;font-size:10px;border:1px solid transparent;">';
+            html += '<span style="cursor:grab;color:var(--dim);">⠿</span>';
+            html += '<span style="font-size:9px;color:var(--dim);min-width:18px;">' + (ci + 1) + '.</span>';
+            html += '<span style="flex:1;">' + Utils.escHtml(item) + '</span>';
+            html += '<button class="btn-sm-remove" style="padding:1px 5px;font-size:8px;" onclick="event.stopPropagation();CharacterEditor.removeClothing(' + ci + ')">✕</button>';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '<div style="display:flex;gap:4px;">';
+        html += '<input id="ceNewClothing" placeholder="New clothing item..." style="flex:1;">';
+        html += '<button class="btn-sm-add" onclick="CharacterEditor.addClothing()">+ Add</button>';
+        html += '</div>';
+
+        // States
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">📊 States</h4>';
+        html += '<div id="ceStatesList" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
+        (char.states || []).forEach(function(state, si) {
+            html += '<div style="background:rgba(0,0,0,0.3);padding:3px 8px;border-radius:4px;display:flex;align-items:center;gap:4px;font-size:10px;">';
+            html += '<span>' + Utils.escHtml(state) + '</span>';
+            html += '<button class="btn-sm-remove" style="padding:1px 4px;font-size:8px;" onclick="CharacterEditor.removeState(' + si + ')">✕</button>';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '<div style="display:flex;gap:4px;">';
+        html += '<input id="ceNewState" placeholder="New state..." style="flex:1;">';
+        html += '<button class="btn-sm-add" onclick="CharacterEditor.addState()">+ Add</button>';
+        html += '</div>';
+        html += '<label>Default State</label><select id="ceDefaultState" onchange="CharacterEditor.updatePreview()">';
+        (char.states || ['Normal']).forEach(function(s) {
+            html += '<option value="' + s + '"' + (char.defaultState === s ? ' selected' : '') + '>' + s + '</option>';
+        });
+        html += '</select>';
+
+        // Body Parts
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🫦 Body Parts</h4>';
+        html += '<div id="ceBodyPartsList">';
+        if (Object.keys(bodyParts).length > 0) {
+            html += '<div style="margin-bottom:6px;"><strong style="font-size:10px;">✅ Enable/Disable:</strong></div>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+            Object.keys(bodyParts).forEach(function(key) {
+                html += '<label style="font-size:10px;display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.2);padding:3px 8px;border-radius:4px;">';
+                html += '<input type="checkbox" ' + (bodyParts[key].enabled ? 'checked' : '') + ' onchange="CharacterEditor.toggleBodyPart(\'' + key + '\',this.checked)">';
+                html += (bodyParts[key].icon || '●') + ' ' + Utils.escHtml(bodyParts[key].label || key);
+                html += '</label>';
+            });
+            html += '</div>';
+        }
+        var bpKeys = Object.keys(bodyParts);
+        if (bpKeys.length === 0) {
+            html += '<div style="color:var(--dim);font-size:10px;font-style:italic;">No body parts defined.</div>';
+        }
+        bpKeys.forEach(function(key) {
+            html += '<div style="display:flex;gap:4px;align-items:center;margin:3px 0;background:rgba(0,0,0,0.2);padding:4px 6px;border-radius:4px;">';
+            html += '<span style="flex:1;font-size:10px;">' + Utils.escHtml(key) + '</span>';
+            html += '<input value="' + Utils.escHtml(bodyParts[key].label || key) + '" onchange="CharacterEditor.updateBodyPartLabel(\'' + key + '\',this.value)" style="width:70px;font-size:10px;" placeholder="Label">';
+            html += '<input value="' + Utils.escHtml(bodyParts[key].icon || '🫦') + '" id="bpIcon_' + key + '" onchange="CharacterEditor.updateBodyPartIcon(\'' + key + '\',this.value)" style="width:35px;font-size:10px;cursor:pointer;" class="emoji-trigger" onclick="EmojiPicker.open(\'bpIcon_' + key + '\',event)">';
+            html += '<button class="btn-sm-remove" onclick="CharacterEditor.removeBodyPart(\'' + key + '\')">✕</button>';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '<div style="display:flex;gap:4px;margin-top:4px;">';
+        html += '<input id="ceNewBodyPartKey" placeholder="Key" style="flex:1;">';
+        html += '<input id="ceNewBodyPartLabel" placeholder="Label" style="flex:1;">';
+        html += '<input id="ceNewBodyPartIcon" value="🫦" style="width:40px;" class="emoji-trigger" onclick="EmojiPicker.open(\'ceNewBodyPartIcon\',event)">';
+        html += '<button class="btn-sm-add" onclick="CharacterEditor.addBodyPart()">+</button>';
+        html += '</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">';
+        [
+            { key: 'oral', label: 'Oral', icon: '👄' },
+            { key: 'vaginal', label: 'Vaginal', icon: '🌮' },
+            { key: 'anal', label: 'Anal', icon: '🍑' },
+            { key: 'hand', label: 'Handjob', icon: '✋' },
+            { key: 'foot', label: 'Footjob', icon: '🦶' },
+            { key: 'dick', label: 'Dick', icon: '🍆' },
+            { key: 'breasts', label: 'Breasts', icon: '🍒' },
+            { key: 'mouth', label: 'Mouth', icon: '👅' }
+        ].forEach(function(quick) {
+            html += '<button style="background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);padding:2px 6px;border-radius:3px;font-size:9px;cursor:pointer;" onclick="CharacterEditor.quickAddBodyPart(\'' + quick.key + '\',\'' + quick.label + '\',\'' + quick.icon + '\')">' + quick.icon + ' ' + quick.label + '</button>';
+        });
+        html += '</div>';
+
+        html += '</div>'; // end left column
+
+        // ---- RIGHT COLUMN: Live Preview ----
+        html += '<div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;position:sticky;top:0;">';
+        html += '<h4 style="color:var(--accent);margin:0;">🔍 Live Preview</h4>';
+        
+        html += '<div id="cePreviewContainer" style="position:relative;width:180px;height:260px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid var(--border);">';
+        html += '<div id="cePreviewNoImage" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;">' + (char.icon || '🧑') + '</div>';
+        html += '</div>';
+
+        html += '<div id="cePreviewClothing" style="width:100%;font-size:9px;">';
+        html += '<div style="color:var(--dim);text-align:center;margin-bottom:4px;">Clothing Layers:</div>';
+        (char.clothing || []).forEach(function(item, ci) {
+            html += '<div class="cloth-preview-item" data-cloth-index="' + ci + '" style="display:flex;align-items:center;gap:4px;padding:3px 6px;margin:2px 0;background:rgba(0,0,0,0.25);border-radius:3px;cursor:pointer;font-size:9px;">';
+            html += '<span style="color:var(--dim);">' + (ci + 1) + '.</span>';
+            html += '<span style="flex:1;">' + Utils.escHtml(item) + '</span>';
+            html += '<span class="cloth-preview-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);" title="Visible"></span>';
+            html += '</div>';
+        });
+        html += '</div>';
+
+        html += '<div style="width:100%;font-size:9px;color:var(--dim);text-align:center;">';
+        html += (char.clothing || []).length + ' clothing · ' + (char.states || []).length + ' states · ' + Object.keys(bodyParts).length + ' body parts';
+        html += '</div>';
+
+        html += '</div>'; // end right column
+
+        html += '</div>'; // end flex row
+
+        // Buttons
+        html += '<div style="margin-top:12px;display:flex;gap:6px;">';
+        html += '<button style="background:var(--danger);" onclick="CharacterEditor.deleteCharacter()">🗑️ Delete</button>';
+        html += '<div style="flex:1;"></div>';
+        html += '<button style="background:var(--border);" onclick="UI.closeModal()">Cancel</button>';
+        html += '<button style="background:var(--green);" onclick="CharacterEditor.save()">💾 Save</button>';
+        html += '</div>';
+
+        modalContent.innerHTML = html;
+        overlay.classList.add('show');
+        
+        var self = this;
+        setTimeout(function() {
+            self.initClothingDragDrop();
+            self.renderPreview();
+        }, 150);
+    },
+
+    // ---- LIVE PREVIEW ----
+    renderPreview: function() {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        
+        var container = document.getElementById('cePreviewContainer');
+        if (!container) return;
+
+        var baseImg = ImageManager.getBaseImage(char.id);
+        var clothingImgs = ImageManager.getClothingImages(char.id);
+        
+        container.innerHTML = '';
+        
+        var hasAny = false;
+        
+        if (baseImg) {
+            var img = document.createElement('img');
+            img.src = baseImg;
+            img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:1;';
+            container.appendChild(img);
+            hasAny = true;
+        }
+        
+        (char.clothing || []).forEach(function(clothName, ci) {
+            if (clothingImgs[clothName]) {
+                var cimg = document.createElement('img');
+                cimg.src = clothingImgs[clothName];
+                cimg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:' + (2 + ci) + ';';
+                container.appendChild(cimg);
+                hasAny = true;
+            }
+        });
+        
+        if (!hasAny) {
+            var fallback = document.createElement('div');
+            fallback.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;';
+            fallback.textContent = char.icon || '🧑';
+            container.appendChild(fallback);
+        }
+    },
+
+    updatePreview: function() {
+        var nameEl = document.getElementById('ceName');
+        var iconEl = document.getElementById('ceIcon');
+        if (nameEl && iconEl) {
+            var p = ProjectManager.getActive();
+            if (p && p.config.characters[this.currentCharIndex]) {
+                p.config.characters[this.currentCharIndex].name = nameEl.value.trim() || 'Character';
+                p.config.characters[this.currentCharIndex].icon = iconEl.value || '🧑';
+            }
+        }
+        this.renderPreview();
+    },
+
+    // ---- Image Uploads ----
+    uploadBaseImage: function(charId, input) {
+        var file = input.files[0];
+        if (!file) return;
+        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
+            alert('Please select a PNG, WebP, or JPEG image.');
+            input.value = '';
+            return;
+        }
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setBaseImage(charId, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) {
+            console.error('Upload failed:', err);
+            alert('Could not upload image. Try a smaller file.');
+            input.value = '';
+        });
+    },
+
+    uploadClothingImage: function(charId, clothName, input) {
+        var file = input.files[0];
+        if (!file) return;
+        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
+            alert('Please select a PNG, WebP, or JPEG image.');
+            input.value = '';
+            return;
+        }
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setClothingImage(charId, clothName, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) {
+            console.error('Upload failed:', err);
+            alert('Could not upload image. Try a smaller file.');
+            input.value = '';
+        });
+    },
+
+    // ---- Class ----
+    onClassChange: function() {},
+
+    applyClassPreset: function() {
+        var classKey = document.getElementById('ceClass').value;
+        if (classKey === 'custom') {
+            alert('Select a preset to apply, or choose Custom to edit manually.');
+            return;
+        }
+        if (!confirm('Apply preset "' + classKey + '"? This will overwrite clothing, states, and body parts.')) return;
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        CharacterClasses.applyPreset(p.config.characters[this.currentCharIndex], classKey);
+        this.open(this.currentCharIndex);
+        LeftPanel.render();
+    },
+
+    // ---- Clothing ----
+    addClothing: function() {
+        var input = document.getElementById('ceNewClothing');
+        var val = input.value.trim();
+        if (!val) return;
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].clothing) p.config.characters[this.currentCharIndex].clothing = [];
+        p.config.characters[this.currentCharIndex].clothing.push(val);
+        input.value = '';
+        this.open(this.currentCharIndex);
+    },
+
+    removeClothing: function(index) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        var removedName = char.clothing[index];
+        char.clothing.splice(index, 1);
+        if (removedName) ImageManager.removeClothingImage(char.id, removedName);
+        this.open(this.currentCharIndex);
+    },
+
+    // ---- Clothing Reorder ----
+    initClothingDragDrop: function() {
+        var list = document.getElementById('ceClothingList');
+        if (!list) return;
+        
+        var items = list.querySelectorAll('.cloth-drag-item');
+        var self = this;
+        var draggedIndex = -1;
+
+        items.forEach(function(item) {
+            item.addEventListener('dragstart', function(e) {
+                draggedIndex = parseInt(this.dataset.clothIndex);
+                this.style.opacity = '0.4';
+                this.style.border = '1px dashed var(--accent)';
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            item.addEventListener('dragend', function(e) {
+                this.style.opacity = '1';
+                this.style.border = '1px solid transparent';
+                document.querySelectorAll('.cloth-drag-item').forEach(function(el) {
+                    el.style.borderTop = 'none';
+                    el.style.borderBottom = 'none';
+                });
+            });
+
+            item.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                var rect = this.getBoundingClientRect();
+                var midY = rect.top + rect.height / 2;
+                document.querySelectorAll('.cloth-drag-item').forEach(function(el) {
+                    el.style.borderTop = 'none';
+                    el.style.borderBottom = 'none';
+                });
+                if (e.clientY < midY) {
+                    this.style.borderTop = '2px solid var(--accent)';
+                } else {
+                    this.style.borderBottom = '2px solid var(--accent)';
+                }
+            });
+
+            item.addEventListener('dragleave', function(e) {
+                this.style.borderTop = 'none';
+                this.style.borderBottom = 'none';
+            });
+
+            item.addEventListener('drop', function(e) {
+                e.preventDefault();
+                this.style.borderTop = 'none';
+                this.style.borderBottom = 'none';
+                
+                var targetIndex = parseInt(this.dataset.clothIndex);
+                if (draggedIndex === targetIndex || draggedIndex < 0) return;
+                
+                var p = ProjectManager.getActive();
+                if (!p || !p.config.characters[self.currentCharIndex]) return;
+                var char = p.config.characters[self.currentCharIndex];
+                
+                var movedItem = char.clothing.splice(draggedIndex, 1)[0];
+                char.clothing.splice(targetIndex, 0, movedItem);
+                
+                self.open(self.currentCharIndex);
+            });
+        });
+    },
+
+    // ---- States ----
+    addState: function() {
+        var input = document.getElementById('ceNewState');
+        var val = input.value.trim();
+        if (!val) return;
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].states) p.config.characters[this.currentCharIndex].states = [];
+        p.config.characters[this.currentCharIndex].states.push(val);
+        input.value = '';
+        this.open(this.currentCharIndex);
+    },
+
+    removeState: function(index) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        p.config.characters[this.currentCharIndex].states.splice(index, 1);
+        this.open(this.currentCharIndex);
+    },
+
+    // ---- Body Parts ----
+    addBodyPart: function() {
+        var keyInput = document.getElementById('ceNewBodyPartKey');
+        var labelInput = document.getElementById('ceNewBodyPartLabel');
+        var iconInput = document.getElementById('ceNewBodyPartIcon');
+        var key = keyInput.value.trim().toLowerCase();
+        var label = labelInput.value.trim();
+        var icon = iconInput.value.trim() || '🫦';
+        if (!key) { alert('Enter a body part key.'); return; }
+        if (!label) { alert('Enter a label.'); return; }
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) p.config.characters[this.currentCharIndex].bodyParts = {};
+        p.config.characters[this.currentCharIndex].bodyParts[key] = { label: label, icon: icon, enabled: true };
+        keyInput.value = '';
+        labelInput.value = '';
+        iconInput.value = '🫦';
+        this.open(this.currentCharIndex);
+    },
+
+    quickAddBodyPart: function(key, label, icon) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) p.config.characters[this.currentCharIndex].bodyParts = {};
+        if (!p.config.characters[this.currentCharIndex].bodyParts[key]) {
+            p.config.characters[this.currentCharIndex].bodyParts[key] = { label: label, icon: icon, enabled: true };
+        } else {
+            p.config.characters[this.currentCharIndex].bodyParts[key].enabled = true;
+        }
+        this.open(this.currentCharIndex);
+    },
+
+    removeBodyPart: function(key) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
+        delete p.config.characters[this.currentCharIndex].bodyParts[key];
+        this.open(this.currentCharIndex);
+    },
+
+    toggleBodyPart: function(key, enabled) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
+        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
+            p.config.characters[this.currentCharIndex].bodyParts[key].enabled = enabled;
+        }
+    },
+
+    updateBodyPartLabel: function(key, value) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
+        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
+            p.config.characters[this.currentCharIndex].bodyParts[key].label = value;
+        }
+    },
+
+    updateBodyPartIcon: function(key, value) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
+        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
+            p.config.characters[this.currentCharIndex].bodyParts[key].icon = value;
+        }
+    },
+
+    // ---- Save ----
+    save: function() {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        var nameEl = document.getElementById('ceName');
+        var roleEl = document.getElementById('ceRole');
+        var iconEl = document.getElementById('ceIcon');
+        var stateEl = document.getElementById('ceDefaultState');
+        if (nameEl) char.name = nameEl.value.trim() || 'Character';
+        if (roleEl) char.role = roleEl.value;
+        if (iconEl) char.icon = iconEl.value || '🧑';
+        if (stateEl) char.defaultState = stateEl.value;
+        UI.closeModal();
+        LeftPanel.render();
+        if (typeof Sidebar !== 'undefined') Sidebar.render();
+    },
+
+    // ---- Delete ----
+    deleteCharacter: function() {
+        if (!confirm('Delete this character permanently?')) return;
+        var p = ProjectManager.getActive();
+        if (!p) return;
+        var char = p.config.characters[this.currentCharIndex];
+        ImageManager.clearCharacter(char.id);
+        p.config.characters.splice(this.currentCharIndex, 1);
+        UI.closeModal();
+        LeftPanel.render();
+    }
+};
+
+js\EmojiPicker.js:
+-----------------
+
+var EmojiPicker = {
+    categories: {
+        "Faces": ["😀","😃","😄","😁","😅","😂","🤣","😊","😇","🙂","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😜","🤪","😝","🤑","🤗","🤭","🤫","🤔","🤐","🤨","😐","😑","😶","😏","😒","🙄","😬","😮","😯","😲","😳","🥺","😦","😧","😨","😰","😥","😢","😭","😱","😖","😣","😞","😓","😩","😫","🥱","😤","😡","😠","🤬","😈","👿","💀","☠️","💩","🤡","👻","👽","🤖"],
+        "Hearts": ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","♥️"],
+        "People": ["👩","👨","👧","👦","👶","👵","👴","🧑","👮","👷","💂","🕵️","👰","🤵","👸","🤴","🧙","🧚","🧛","🧜","🧝"],
+        "Body": ["💪","🦵","🦶","👂","👃","🧠","🫀","👀","👁️","👅","👄","💋"],
+        "Clothing": ["👗","👘","👙","👚","👕","👖","👔","👢","👠","👟","🧥","👒","🎩","🧢","👑","💍","🕶️"],
+        "Actions": ["💃","🕺","🛀","🧘","🧎","🤸","🤾","🏋️","🚴","🤼","🤹","🧗"],
+        "Objects": ["🔞","⚠️","🚫","⛔","🔒","🔓","🔑","⛓️","💉","🔪","🗡️","🛡️","🔗","💊","🩹","🩸","📸","📹","🎥","📱","💻"],
+        "Symbols": ["⭐","🌟","✨","💫","🔥","💥","💢","💦","💨","🕳️","💣","💬","🗯️","💭","🌈","💯","✅","❌","⚜️","🔱"],
+        "Places": ["🏠","🏡","🏢","🏚️","🏥","🏦","🏨","🏩","🏪","🏫","🏬","🏰","🏯","💒","⛪","🎪","🎭","🎤","🎬","🎨","🚪","🛏️","🚿","🛁"],
+        "Weather": ["☀️","🌤️","⛅","☁️","🌧️","⛈️","🌩️","❄️","☃️","🌈","☔","⚡"],
+        "Animals": ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐨","🐯","🦁","🐮","🐷","🐸","🐵","🐔","🐧","🐦","🦆","🦅","🦉","🦇","🐺","🐴","🦄","🐝","🦋","🐍","🐢","🐙","🦑","🐬","🐳","🦈"],
+        "Plants": ["🌵","🎄","🌲","🌳","🌴","🌱","🌿","🍀","🎍","🍄","🌾","💐","🌷","🌹","🌸","🌼","🌻"]
+    },
+
+    open: function(targetId, event) {
+        var picker = document.getElementById('emoji-picker');
+        if (!picker) return;
+        var html = '';
+        var self = this;
+        Object.keys(this.categories).forEach(function(cat) {
+            html += '<div class="emoji-cat">' + cat + '</div><div>';
+            self.categories[cat].forEach(function(emoji) {
+                html += '<button class="emoji-btn" onclick="EmojiPicker.pick(\'' + targetId + '\',\'' + emoji + '\')">' + emoji + '</button>';
+            });
+            html += '</div>';
+        });
+        picker.innerHTML = html;
+        picker.style.display = 'block';
+        picker.style.left = Math.min(event.clientX, window.innerWidth - 340) + 'px';
+        picker.style.top = Math.min(event.clientY, window.innerHeight - 370) + 'px';
+        event.stopPropagation();
+    },
+
+    pick: function(targetId, emoji) {
+        var el = document.getElementById(targetId);
+        if (el) { el.value = emoji; el.dispatchEvent(new Event('change')); }
+        var picker = document.getElementById('emoji-picker');
+        if (picker) picker.style.display = 'none';
+    },
+
+    close: function() {
+        var picker = document.getElementById('emoji-picker');
+        if (picker) picker.style.display = 'none';
+    }
+};
+
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#emoji-picker') && !e.target.closest('.emoji-trigger')) {
+        EmojiPicker.close();
+    }
+});
+
+js\Export.js:
+------------
+
+var Export = {
+    buildData: function() {
+        var p = ProjectManager.getActive();
+        if (!p) return null;
+        var chars = p.config.characters || [];
+        var config = {
+            title: p.config.title,
+            subtitle: p.config.subtitle,
+            characters: chars.map(function(c) {
+                return {
+                    id: c.id, name: c.name, role: c.role,
+                    icon: c.icon, classPreset: c.classPreset,
+                    clothing: c.clothing, states: c.states,
+                    defaultState: c.defaultState, bodyParts: c.bodyParts
+                };
+            }),
+            stats: p.config.stats || [],
+            extraSettings: p.config.extraSettings || {}
+        };
+        if (chars[0]) { config.sisterName = chars[0].name; config.sisterId = chars[0].id; }
+        if (chars[1]) { config.brotherName = chars[1].name; config.brotherId = chars[1].id; }
+
+        var scenes = Canvas.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
+            var scene = {
+                id: n.id, subtitle: n.subtitle || '', text: n.text || '',
+                hiddenChars: n.hiddenChars || null,
+                choices: (n.choices || []).map(function(ch, i) {
+                    var conn = Canvas.connections.find(function(c) { return c.fromNodeId === n.id && c.fromChoiceIndex === i; });
+                    var obj = { text: ch.text || '', next: conn ? conn.toNodeId : '' };
+                    (p.config.stats || []).forEach(function(s) { obj[s.id] = ch[s.id] || 0; });
+                    if (ch.sex) obj.sex = true;
+                    if (ch.corrupt) obj.corrupt = true;
+                    chars.forEach(function(c) {
+                        if (ch['strip_' + c.id]) obj['strip_' + c.id] = ch['strip_' + c.id];
+                        if (ch['wear_' + c.id]) obj['wear_' + c.id] = ch['wear_' + c.id];
+                        if (ch['state_' + c.id]) obj['state_' + c.id] = ch['state_' + c.id];
+                        if (ch['enslave_' + c.id]) obj['enslave_' + c.id] = true;
+                        if (c.bodyParts) {
+                            Object.keys(c.bodyParts).forEach(function(bpKey) {
+                                var val = ch['act_' + bpKey + '_' + c.id];
+                                if (val) obj['act_' + bpKey + '_' + c.id] = val;
+                            });
+                        }
+                    });
+                    if (chars[0]) {
+                        if (ch['strip_' + chars[0].id]) obj.sis = ch['strip_' + chars[0].id];
+                        if (ch['wear_' + chars[0].id]) obj.wearSis = ch['wear_' + chars[0].id];
+                        if (ch['act_oral_' + chars[0].id]) obj.mayaOral = ch['act_oral_' + chars[0].id];
+                        if (ch['act_vaginal_' + chars[0].id]) obj.mayaVaginal = ch['act_vaginal_' + chars[0].id];
+                        if (ch['act_anal_' + chars[0].id]) obj.mayaAnal = ch['act_anal_' + chars[0].id];
+                        if (ch['enslave_' + chars[0].id]) obj.enslaveSis = true;
+                    }
+                    if (chars[1]) {
+                        if (ch['strip_' + chars[1].id]) obj.bro = ch['strip_' + chars[1].id];
+                        if (ch['wear_' + chars[1].id]) obj.wearBro = ch['wear_' + chars[1].id];
+                        if (ch['act_oral_' + chars[1].id]) obj.leoOral = ch['act_oral_' + chars[1].id];
+                        if (ch['act_anal_' + chars[1].id]) obj.leoAnal = ch['act_anal_' + chars[1].id];
+                        if (ch['enslave_' + chars[1].id]) obj.enslaveBro = true;
+                    }
+                    Object.keys(n.extraTags || {}).forEach(function(k) { obj[k] = n.extraTags[k]; });
+                    return obj;
+                })
+            };
+            Object.keys(n.extraTags || {}).forEach(function(k) { scene[k] = n.extraTags[k]; });
+            return scene;
+        });
+
+        var endings = {};
+        Canvas.nodes.filter(function(n) { return n.type === 'ending'; }).forEach(function(n) {
+            endings[n.id] = { emoji: n.emoji || '⭐', title: n.title, desc: n.text, color: n.color || '#880030' };
+        });
+
+        var result = { config: config, scenes: scenes, endings: endings };
+        result.images = ImageManager.exportForProject(p.id);
+        return result;
+    },
+
+    exportJS: function() {
+        var data = this.buildData(); if (!data) return;
+        var out = '// ============ STORY CONFIG ============\nvar STORY_CONFIG = ' + JSON.stringify(data.config, null, 4) + ';\n\n';
+        out += '// ============ STORY SCENES ============\nvar STORY_SCENES = ' + JSON.stringify(data.scenes, null, 4) + ';\n\n';
+        out += '// ============ STORY ENDINGS ============\nvar STORY_ENDINGS = ' + JSON.stringify(data.endings, null, 4) + ';\n';
+        out += '// ============ IMAGES ============\nvar STORY_IMAGES = ' + JSON.stringify(data.images, null, 4) + ';\n';
+
+        var blob = new Blob([out], { type: 'text/javascript' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'story.js';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+        Utils.showSaveIndicator();
+    },
+
+    exportHTML: function() {
+        var data = this.buildData(); if (!data) return;
+        var jsContent = 'var STORY_CONFIG = ' + JSON.stringify(data.config) + ';\n';
+        jsContent += 'var STORY_SCENES = ' + JSON.stringify(data.scenes) + ';\n';
+        jsContent += 'var STORY_ENDINGS = ' + JSON.stringify(data.endings) + ';\n';
+        jsContent += 'var STORY_IMAGES = ' + JSON.stringify(data.images || {}) + ';\n';
+
+        var engineHTML = '<!DOCTYPE html>\n<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>' + Utils.escHtml(data.config.title) + '</title>\n<style>\n' +
+            ':root{--bg:#0a0a14;--surface:#14142a;--text:#c8c8e0;--dim:#8888aa;--accent:#e04080;}\n' +
+            '*{margin:0;padding:0;box-sizing:border-box;}\n' +
+            'body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:10px;}\n' +
+            '#game{max-width:1000px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:10px;}\n' +
+            'h1{color:var(--accent);text-align:center;font-size:1.3em;}\n' +
+            '#sub{color:var(--dim);font-style:italic;text-align:center;font-size:0.85em;margin-bottom:10px;}\n' +
+            '#main-row{display:flex;gap:15px;flex-wrap:wrap;}\n' +
+            '#chars-panel{flex:0 0 auto;display:flex;gap:12px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}\n' +
+            '.char-card{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:100px;}\n' +
+            '.char-card .char-label{font-size:0.75em;font-weight:700;color:var(--text);text-align:center;}\n' +
+            '.char-card .char-image{position:relative;width:180px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
+            '.char-card .char-image img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:bottom center;}\n' +
+            '.char-card .char-image .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:2.5em;}\n' +
+            '.char-card .cloth-list{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;font-size:0.6em;}\n' +
+            '.char-card .cloth-list .cloth-dot{padding:1px 4px;border-radius:2px;}\n' +
+            '.char-card .cloth-list .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
+            '.char-card .cloth-list .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
+            '#story-panel{flex:1;min-width:280px;}\n' +
+            '#txt{line-height:1.6;margin:10px 0;font-style:italic;font-size:0.9em;}\n' +
+            '#choices-area{display:flex;flex-direction:column;gap:6px;}\n' +
+            '#choices-area button{display:block;width:100%;padding:10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:6px;cursor:pointer;text-align:left;font-size:0.85em;transition:all 0.15s;}\n' +
+            '#choices-area button:hover{background:#2a2a44;border-color:var(--accent);}\n' +
+            '#endScreen{display:none;text-align:center;padding:20px;}\n' +
+            '#endScreen h2{color:var(--accent);}\n' +
+            '#endScreen p{color:var(--text);line-height:1.6;margin:10px 0;}\n' +
+            '#endScreen button{text-align:center;background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1em;margin-top:10px;}\n' +
+            '@media(max-width:700px){.char-card .char-image{width:120px;height:200px;}}\n' +
+            '</style>\n</head><body>\n' +
+            '<div id="game"><h1>' + Utils.escHtml(data.config.title) + '</h1><p id="sub">' + Utils.escHtml(data.config.subtitle) + '</p>\n' +
+            '<div id="main-row">\n' +
+            '<div id="chars-panel"></div>\n' +
+            '<div id="story-panel"><p id="txt"></p><div id="choices-area"></div></div>\n' +
+            '</div></div>\n' +
+            '<div id="endScreen"><h2 id="endTitle"></h2><p id="endDesc"></p><button onclick="location.reload()">Play Again</button></div>\n';
+
+        engineHTML += '<script>\n' + jsContent + '\n' +
+            'var characterClothing={};\n' +
+            'var characters=STORY_CONFIG.characters||[];\n' +
+            'var images=STORY_IMAGES||{};\n' +
+            'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
+            'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
+            'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
+            'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
+            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
+            '<' + '/script></body></html>';
+
+        var blob = new Blob([engineHTML], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = data.config.title.replace(/\s/g, '_') + '_engine.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+        Utils.showSaveIndicator();
+    },
+
+    previewHTML: function() {
+        var data = this.buildData(); if (!data) return;
+        var jsContent = 'var STORY_CONFIG = ' + JSON.stringify(data.config) + ';\n';
+        jsContent += 'var STORY_SCENES = ' + JSON.stringify(data.scenes) + ';\n';
+        jsContent += 'var STORY_ENDINGS = ' + JSON.stringify(data.endings) + ';\n';
+        jsContent += 'var STORY_IMAGES = ' + JSON.stringify(data.images || {}) + ';\n';
+
+        var engineHTML = '<!DOCTYPE html>\n<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>🔍 Preview: ' + Utils.escHtml(data.config.title) + '</title>\n<style>\n' +
+            ':root{--bg:#0a0a14;--surface:#14142a;--text:#c8c8e0;--dim:#8888aa;--accent:#e04080;}\n' +
+            '*{margin:0;padding:0;box-sizing:border-box;}\n' +
+            'body{background:var(--bg);color:var(--text);font-family:sans-serif;min-height:100vh;display:flex;justify-content:center;align-items:flex-start;padding:10px;}\n' +
+            '#preview-banner{position:fixed;top:0;left:0;right:0;background:rgba(240,192,64,0.95);color:#1a1a00;text-align:center;padding:4px;font-size:0.7em;font-weight:700;z-index:999;}\n' +
+            '#game{max-width:1000px;width:100%;padding:20px;background:var(--surface);border-radius:12px;margin-top:25px;}\n' +
+            'h1{color:var(--accent);text-align:center;font-size:1.3em;}\n' +
+            '#sub{color:var(--dim);font-style:italic;text-align:center;font-size:0.85em;margin-bottom:10px;}\n' +
+            '#main-row{display:flex;gap:15px;flex-wrap:wrap;}\n' +
+            '#chars-panel{flex:0 0 auto;display:flex;gap:12px;justify-content:center;align-items:flex-start;flex-wrap:wrap;}\n' +
+            '.char-card{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:100px;}\n' +
+            '.char-card .char-label{font-size:0.75em;font-weight:700;color:var(--text);text-align:center;}\n' +
+            '.char-card .char-image{position:relative;width:180px;height:300px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid #2a2a44;}\n' +
+            '.char-card .char-image img{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;object-position:bottom center;}\n' +
+            '.char-card .char-image .no-image{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:2.5em;}\n' +
+            '.char-card .cloth-list{display:flex;flex-wrap:wrap;gap:2px;justify-content:center;font-size:0.6em;}\n' +
+            '.char-card .cloth-list .cloth-dot{padding:1px 4px;border-radius:2px;}\n' +
+            '.char-card .cloth-list .cloth-on{background:rgba(46,204,113,0.2);color:#2ecc71;}\n' +
+            '.char-card .cloth-list .cloth-off{background:rgba(255,48,80,0.2);color:#ff3050;text-decoration:line-through;}\n' +
+            '#story-panel{flex:1;min-width:280px;}\n' +
+            '#txt{line-height:1.6;margin:10px 0;font-style:italic;font-size:0.9em;}\n' +
+            '#choices-area{display:flex;flex-direction:column;gap:6px;}\n' +
+            '#choices-area button{display:block;width:100%;padding:10px;background:#1a1a34;color:var(--text);border:1px solid #2a2a44;border-radius:6px;cursor:pointer;text-align:left;font-size:0.85em;transition:all 0.15s;}\n' +
+            '#choices-area button:hover{background:#2a2a44;border-color:var(--accent);}\n' +
+            '#endScreen{display:none;text-align:center;padding:20px;}\n' +
+            '#endScreen h2{color:var(--accent);}\n' +
+            '#endScreen p{color:var(--text);line-height:1.6;margin:10px 0;}\n' +
+            '#endScreen button{text-align:center;background:var(--accent);color:#fff;border:none;padding:10px 20px;border-radius:6px;cursor:pointer;font-size:1em;margin-top:10px;}\n' +
+            '@media(max-width:700px){.char-card .char-image{width:120px;height:200px;}}\n' +
+            '</style>\n</head><body>\n' +
+            '<div id="preview-banner">🔍 PREVIEW MODE — Close this tab to return to the editor</div>\n' +
+            '<div id="game"><h1>' + Utils.escHtml(data.config.title) + '</h1><p id="sub">' + Utils.escHtml(data.config.subtitle) + '</p>\n' +
+            '<div id="main-row">\n' +
+            '<div id="chars-panel"></div>\n' +
+            '<div id="story-panel"><p id="txt"></p><div id="choices-area"></div></div>\n' +
+            '</div></div>\n' +
+            '<div id="endScreen"><h2 id="endTitle"></h2><p id="endDesc"></p><button onclick="location.reload()">Play Again</button></div>\n';
+
+        engineHTML += '<script>\n' + jsContent + '\n' +
+            'var characterClothing={};\n' +
+            'var characters=STORY_CONFIG.characters||[];\n' +
+            'var images=STORY_IMAGES||{};\n' +
+            'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
+            'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
+            'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
+            'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
+            'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
+            '<' + '/script></body></html>';
+
+        var blob = new Blob([engineHTML], { type: 'text/html' });
+        var url = URL.createObjectURL(blob);
+        var previewWindow = window.open(url, '_blank');
+        setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+        if (!previewWindow) {
+            alert('⚠️ Pop-up blocked!\n\nPlease allow pop-ups for this site to use the preview feature.');
+        }
+    }
+};
+
+js\ImageManager.js:
+------------------
+
+var ImageManager = {
+    // Store images as base64 data URIs
+    // Structure: { projectId: { charId: { base: "data:image/png;base64,...", clothing: { clothName: "data:image/png;base64,..." } } } }
+    _imageStore: {},
+
+    init: function() {
+        this._loadFromStorage();
+    },
+
+    // Get or create image store for a character
+    _getCharStore: function(charId) {
+        var p = ProjectManager.getActive();
+        if (!p) return null;
+        if (!this._imageStore[p.id]) this._imageStore[p.id] = {};
+        if (!this._imageStore[p.id][charId]) this._imageStore[p.id][charId] = { base: null, clothing: {} };
+        return this._imageStore[p.id][charId];
+    },
+
+    // Set base image (naked character)
+    setBaseImage: function(charId, dataUrl) {
+        var store = this._getCharStore(charId);
+        if (store) {
+            store.base = dataUrl;
+            this._saveToStorage();
+        }
+    },
+
+    // Get base image
+    getBaseImage: function(charId) {
+        var store = this._getCharStore(charId);
+        return store ? store.base : null;
+    },
+
+    // Set clothing image
+    setClothingImage: function(charId, clothName, dataUrl) {
+        var store = this._getCharStore(charId);
+        if (store) {
+            store.clothing[clothName] = dataUrl;
+            this._saveToStorage();
+        }
+    },
+
+    // Get clothing image
+    getClothingImage: function(charId, clothName) {
+        var store = this._getCharStore(charId);
+        return (store && store.clothing[clothName]) ? store.clothing[clothName] : null;
+    },
+
+    // Remove clothing image
+    removeClothingImage: function(charId, clothName) {
+        var store = this._getCharStore(charId);
+        if (store && store.clothing[clothName]) {
+            delete store.clothing[clothName];
+            this._saveToStorage();
+        }
+    },
+
+    // Remove base image
+    removeBaseImage: function(charId) {
+        var store = this._getCharStore(charId);
+        if (store) {
+            store.base = null;
+            this._saveToStorage();
+        }
+    },
+
+    // Get all clothing images for a character
+    getClothingImages: function(charId) {
+        var store = this._getCharStore(charId);
+        return store ? store.clothing : {};
+    },
+
+    // Get ordered clothing layers (matching character's clothing array order)
+    getOrderedClothingLayers: function(charId) {
+        var p = ProjectManager.getActive();
+        if (!p) return [];
+        var char = (p.config.characters || []).find(function(c) { return c.id === charId; });
+        if (!char) return [];
+        var store = this._getCharStore(charId);
+        if (!store) return [];
+        var layers = [];
+        (char.clothing || []).forEach(function(clothName) {
+            if (store.clothing[clothName]) {
+                layers.push({ name: clothName, dataUrl: store.clothing[clothName] });
+            }
+        });
+        return layers;
+    },
+
+    // Check if a character has any images
+    hasImages: function(charId) {
+        var store = this._getCharStore(charId);
+        if (!store) return false;
+        return !!store.base || Object.keys(store.clothing).length > 0;
+    },
+
+    // Clear all images for a character
+    clearCharacter: function(charId) {
+        var p = ProjectManager.getActive();
+        if (!p) return;
+        if (this._imageStore[p.id]) {
+            delete this._imageStore[p.id][charId];
+            this._saveToStorage();
+        }
+    },
+
+    // Read a file and return as data URL
+    readFileAsDataURL: function(file) {
+        return new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    },
+
+    // Compress and resize image to save storage space
+    compressImage: function(dataUrl, maxWidth, maxHeight, quality) {
+        maxWidth = maxWidth || 400;
+        maxHeight = maxHeight || 600;
+        quality = quality || 0.8;
+        return new Promise(function(resolve) {
+            var img = new Image();
+            img.onload = function() {
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                var w = img.width, h = img.height;
+                if (w > maxWidth) { h = h * (maxWidth / w); w = maxWidth; }
+                if (h > maxHeight) { w = w * (maxHeight / h); h = maxHeight; }
+                canvas.width = w;
+                canvas.height = h;
+                ctx.drawImage(img, 0, 0, w, h);
+                resolve(canvas.toDataURL('image/png', quality));
+            };
+            img.src = dataUrl;
+        });
+    },
+
+    _saveToStorage: function() {
+        try {
+            localStorage.setItem('savida_images', JSON.stringify(this._imageStore));
+        } catch(e) {
+            console.warn('Image storage full. Some images may not be saved.');
+            // Try to free space by compressing
+            this._compactStorage();
+        }
+    },
+
+    _loadFromStorage: function() {
+        try {
+            var data = localStorage.getItem('savida_images');
+            if (data) {
+                this._imageStore = JSON.parse(data);
+            }
+        } catch(e) {
+            this._imageStore = {};
+        }
+    },
+
+    _compactStorage: function() {
+        // Remove images for deleted projects
+        var self = this;
+        var activeProjects = ProjectManager.projects.map(function(p) { return p.id; });
+        Object.keys(this._imageStore).forEach(function(projId) {
+            if (activeProjects.indexOf(projId) === -1) {
+                delete self._imageStore[projId];
+            }
+        });
+        this._saveToStorage();
+    },
+
+   // Export all images for a project
+    exportForProject: function(projectId) {
+        return JSON.parse(JSON.stringify(this._imageStore[projectId] || {}));
+    },
+
+    // Import images from project data
+    importForProject: function(projectId, imageData) {
+        if (imageData && Object.keys(imageData).length > 0) {
+            this._imageStore[projectId] = JSON.parse(JSON.stringify(imageData));
+            this._saveToStorage();
+        }
+    },
+};
+
+js\Import.js:
+------------
+
+var Import = {
+    importJS: function(event) {
+        var file = event.target.files[0]; if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var code = e.target.result;
+                var scenesMatch = code.match(/STORY_SCENES\s*=\s*(\[[\s\S]*?\]);/);
+                var endingsMatch = code.match(/STORY_ENDINGS\s*=\s*(\{[\s\S]*?\});/);
+                var imagesMatch = code.match(/STORY_IMAGES\s*=\s*(\{[\s\S]*?\});/);
+                if (!scenesMatch) { alert('Could not find STORY_SCENES in file.'); return; }
+                var scenes = JSON.parse(scenesMatch[1]);
+                var endings = endingsMatch ? JSON.parse(endingsMatch[1]) : {};
+                var images = imagesMatch ? JSON.parse(imagesMatch[1]) : {};
+                var p = ProjectManager.createProject('Imported Story');
+                var chars = p.config.characters || [];
+                Canvas.nodes = []; Canvas.connections = []; Canvas.nodeIdCounter = 0;
+                scenes.forEach(function(s, si) {
+                    var node = {
+                        id: s.id, type: 'scene', x: 150 + (si % 3) * 350, y: 100 + Math.floor(si / 3) * 350,
+                        title: s.id, subtitle: s.subtitle || '', text: s.text || '',
+                        choices: (s.choices || []).map(function(ch) {
+                            var choice = { text: ch.text || '' };
+                            (p.config.stats || []).forEach(function(st) { choice[st.id] = ch[st.id] || 0; });
+                            choice.sex = ch.sex || false; choice.corrupt = ch.corrupt || false;
+                            if (chars[0]) {
+                                if (ch.sis) choice['strip_' + chars[0].id] = ch.sis;
+                                if (ch.mayaOral) choice['act_oral_' + chars[0].id] = ch.mayaOral;
+                                if (ch.mayaVaginal) choice['act_vaginal_' + chars[0].id] = ch.mayaVaginal;
+                                if (ch.mayaAnal) choice['act_anal_' + chars[0].id] = ch.mayaAnal;
+                                if (ch.enslaveSis) choice['enslave_' + chars[0].id] = true;
+                                chars.forEach(function(c) {
+                                    Object.keys(ch).forEach(function(k) {
+                                        if (k.startsWith('act_') && k.endsWith('_' + c.id)) choice[k] = ch[k];
+                                        if (k.startsWith('strip_') && k.endsWith('_' + c.id)) choice[k] = ch[k];
+                                        if (k.startsWith('state_') && k.endsWith('_' + c.id)) choice[k] = ch[k];
+                                        if (k.startsWith('enslave_') && k.endsWith('_' + c.id)) choice[k] = ch[k];
+                                    });
+                                });
+                            }
+                            if (chars[1]) {
+                                if (ch.bro) choice['strip_' + chars[1].id] = ch.bro;
+                                if (ch.leoOral) choice['act_oral_' + chars[1].id] = ch.leoOral;
+                                if (ch.leoAnal) choice['act_anal_' + chars[1].id] = ch.leoAnal;
+                                if (ch.enslaveBro) choice['enslave_' + chars[1].id] = true;
+                            }
+                            return choice;
+                        }),
+                        extraTags: {}
+                    };
+                    Canvas.nodes.push(node); Canvas.nodeIdCounter++;
+                });
+                Object.keys(endings).forEach(function(id, ei) {
+                    var e = endings[id];
+                    Canvas.nodes.push({
+                        id: id, type: 'ending', x: 600 + (ei % 3) * 300, y: 100 + ei * 250,
+                        title: e.title || id, emoji: e.emoji || '⭐', text: e.desc || '', color: e.color || '#880030'
+                    });
+                });
+                scenes.forEach(function(s) {
+                    (s.choices || []).forEach(function(ch, ci) {
+                        if (ch.next && Canvas.nodes.find(function(n) { return n.id === ch.next; })) {
+                            Canvas.connections.push({ fromNodeId: s.id, fromChoiceIndex: ci, toNodeId: ch.next });
+                        }
+                    });
+                });
+                // Import images
+                if (Object.keys(images).length > 0) {
+                    ImageManager.importForProject(p.id, images);
+                }
+                Canvas.nodes.forEach(function(n) { Canvas.renderNode(n); });
+                Canvas.drawConnections(); Canvas.saveState();
+                App.loadProjectToEditor(); Utils.showSaveIndicator();
+            } catch (err) { alert('Parse error: ' + err.message); }
+        };
+        reader.readAsText(file); event.target.value = '';
+    }
+};
+
+js\LeftPanel.js:
+---------------
+
+var LeftPanel = {
+    render: function() {
+        var p = ProjectManager.getActive();
+        var container = document.getElementById('left-content');
+        if (!container) return;
+        if (!p) {
+            container.innerHTML = '<div class="no-project-msg">📁<br>Create a project<br>to get started</div>';
+            return;
+        }
+
+        var html = '';
+
+        // Project Config
+        html += '<h3>📋 Config</h3><div>';
+        html += '<label>Title</label><input value="' + Utils.escHtml(p.config.title) + '" onchange="ProjectManager.updateConfig(\'title\',this.value)">';
+        html += '<label>Subtitle</label><input value="' + Utils.escHtml(p.config.subtitle) + '" onchange="ProjectManager.updateConfig(\'subtitle\',this.value)">';
+        html += '</div>';
+
+        // Characters — cards that open modal editor
+        html += '<h3>👥 Characters <button class="btn-sm-add" onclick="LeftPanel.addCharacter()">+</button></h3><div>';
+        (p.config.characters || []).forEach(function(char, i) {
+            var presetName = CharacterClasses.getDisplayName(char);
+            var bpCount = char.bodyParts ? Object.keys(char.bodyParts).length : 0;
+            var enabledBpCount = char.bodyParts ?
+                Object.keys(char.bodyParts).filter(function(k) { return char.bodyParts[k].enabled; }).length : 0;
+            var hasImgs = ImageManager.hasImages(char.id);
+            html += '<div class="char-summary-card" onclick="CharacterEditor.open(' + i + ')">';
+            html += '<div class="char-avatar">' + (char.icon || '🧑') + '</div>';
+            html += '<div class="char-info">';
+            html += '<div class="char-name">' + Utils.escHtml(char.name) + '</div>';
+            html += '<div class="char-meta">';
+            html += '<span>' + presetName + '</span>';
+            html += '<span>' + (char.role || 'neutral') + '</span>';
+            html += '<span>' + (char.clothing || []).length + ' 👔</span>';
+            html += '<span>' + (char.states || []).length + ' 📊</span>';
+            html += '<span>' + enabledBpCount + '/' + bpCount + ' 🫦</span>';
+            if (hasImgs) html += '<span style="background:rgba(52,152,219,0.2);color:#3498db;">🖼️</span>';
+            html += '</div></div>';
+            html += '<div class="char-arrow">▶</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+
+        // Stats
+        html += '<h3>📊 Stats <button class="btn-sm-add" onclick="LeftPanel.addStat()">+</button></h3><div>';
+        (p.config.stats || []).forEach(function(stat, i) {
+            html += '<div style="display:flex;gap:3px;align-items:center;margin:2px 0;background:rgba(0,0,0,0.25);padding:3px;border-radius:4px;">';
+            html += '<input value="' + (stat.emoji || '') + '" id="statEmoji_' + i + '" onchange="LeftPanel.updateStat(' + i + ',\'emoji\',this.value)" style="width:35px;cursor:pointer;" class="emoji-trigger" onclick="EmojiPicker.open(\'statEmoji_' + i + '\',event)">';
+            html += '<input value="' + Utils.escHtml(stat.name) + '" onchange="LeftPanel.updateStat(' + i + ',\'name\',this.value)" style="flex:1;">';
+            html += '<input type="number" value="' + stat.start + '" onchange="LeftPanel.updateStat(' + i + ',\'start\',parseInt(this.value))" style="width:40px;" title="Start">';
+            html += '<input type="color" value="' + (stat.color || '#8090e0') + '" onchange="LeftPanel.updateStat(' + i + ',\'color\',this.value)" style="width:28px;height:24px;padding:0;">';
+            html += '<button class="btn-sm-remove" onclick="LeftPanel.removeStat(' + i + ')">✕</button></div>';
+        });
+        html += '</div>';
+
+        // Settings
+        html += '<h3>⚙️ Settings</h3><div>';
+        html += '<label><input type="checkbox" ' + (p.config.extraSettings && p.config.extraSettings.enableSexActs ? 'checked' : '') + ' onchange="LeftPanel.updateSetting(\'enableSexActs\',this.checked)"> Enable Sex Acts</label>';
+        html += '<label><input type="checkbox" ' + (p.config.extraSettings && p.config.extraSettings.enableEnslavement ? 'checked' : '') + ' onchange="LeftPanel.updateSetting(\'enableEnslavement\',this.checked)"> Enable Enslavement</label>';
+        html += '</div>';
+
+        container.innerHTML = html;
+    },
+
+    addCharacter: function() {
+        var p = ProjectManager.getActive(); if (!p) return;
+        p.config.characters.push(ProjectManager._createCharacter('New Character', 'standardGirl', 'neutral'));
+        this.render();
+        CharacterEditor.open(p.config.characters.length - 1);
+    },
+
+    updateStat: function(i, key, value) {
+        var p = ProjectManager.getActive(); if (!p || !p.config.stats[i]) return;
+        p.config.stats[i][key] = value;
+    },
+    addStat: function() {
+        var p = ProjectManager.getActive(); if (!p) return;
+        p.config.stats.push({ id:'stat_'+Date.now(), name:'New Stat', emoji:'📊', start:0, min:0, max:100, color:'#8090e0' });
+        this.render();
+    },
+    removeStat: function(i) {
+        var p = ProjectManager.getActive(); if (!p) return;
+        p.config.stats.splice(i, 1);
+        this.render();
+    },
+    updateSetting: function(key, value) {
+        var p = ProjectManager.getActive(); if (!p) return;
+        if (!p.config.extraSettings) p.config.extraSettings = {};
+        p.config.extraSettings[key] = value;
+    },
+    openClassEditor: function(editKey) {
+        var overlay = document.getElementById('modal-overlay');
+        var modalTitle = document.getElementById('modal-title');
+        var modalContent = document.getElementById('modal-content');
+        var dlBtn = document.getElementById('modal-dl-btn');
+        if (!overlay || !modalTitle || !modalContent) return;
+        modalTitle.textContent = '🏗️ Class Preset Editor';
+        dlBtn.style.display = 'none';
+        var isEditing = !!editKey;
+        var preset = isEditing ? CharacterClasses.getPreset(editKey) : null;
+        var isBuiltIn = (editKey === 'standardGirl' || editKey === 'standardBoy');
+        var html = '<div style="max-height:60vh;overflow-y:auto;">';
+        html += '<label>Preset Key</label><input id="classEditorKey" value="' + (editKey||'') + '" ' + (isEditing?'readonly':'placeholder="e.g. warriorGirl"') + '>';
+        html += '<label>Display Name</label><input id="classEditorName" value="' + (preset?Utils.escHtml(preset.name):'') + '">';
+        html += '<label>Icon</label><input id="classEditorIcon" value="' + (preset?preset.icon:'🧑') + '" class="emoji-trigger" onclick="EmojiPicker.open(\'classEditorIcon\',event)">';
+        html += '<label>Clothing (comma)</label><input id="classEditorClothing" value="' + (preset?preset.clothing.join(','):'top,bottom') + '">';
+        html += '<label>States (comma)</label><input id="classEditorStates" value="' + (preset?preset.states.join(','):'Normal') + '">';
+        html += '<label>Default State</label><input id="classEditorDefaultState" value="' + (preset?preset.defaultState:'Normal') + '">';
+        html += '</div><div style="margin-top:10px;display:flex;gap:6px;">';
+        if (isEditing && !isBuiltIn) html += '<button style="background:var(--danger);" onclick="LeftPanel.deleteClassPreset(\''+editKey+'\')">🗑️ Delete</button>';
+        html += '<button style="background:var(--green);flex:1;" onclick="LeftPanel.saveClassPreset(\''+(editKey||'')+'\')">💾 Save</button>';
+        html += '<button style="background:var(--border);" onclick="UI.closeModal()">Cancel</button></div>';
+        html += '<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;"><strong style="font-size:11px;">Existing:</strong><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;">';
+        CharacterClasses.getPresetKeys().forEach(function(key) {
+            var pr = CharacterClasses.getPreset(key);
+            html += '<div style="background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:4px;font-size:10px;cursor:pointer;" onclick="LeftPanel.openClassEditor(\''+key+'\')">'+(pr?pr.icon:'❓')+' '+Utils.escHtml(pr?pr.name:key)+'</div>';
+        });
+        html += '</div></div>';
+        modalContent.innerHTML = html;
+        overlay.classList.add('show');
+    },
+    saveClassPreset: function(originalKey) {
+        var key = document.getElementById('classEditorKey').value.trim();
+        var name = document.getElementById('classEditorName').value.trim();
+        var icon = document.getElementById('classEditorIcon').value.trim();
+        var clothing = document.getElementById('classEditorClothing').value.split(',').map(function(s){return s.trim();}).filter(function(s){return s;});
+        var states = document.getElementById('classEditorStates').value.split(',').map(function(s){return s.trim();}).filter(function(s){return s;});
+        var defaultState = document.getElementById('classEditorDefaultState').value.trim();
+        if (!key||!name) { alert('Key and name required.'); return; }
+        if (originalKey&&(originalKey==='standardGirl'||originalKey==='standardBoy')&&key!==originalKey) { alert('Cannot rename built-ins.'); return; }
+        if (originalKey&&key!==originalKey) CharacterClasses.deletePreset(originalKey);
+        var existing = originalKey ? CharacterClasses.getPreset(originalKey) : null;
+        var bodyParts = existing ? JSON.parse(JSON.stringify(existing.bodyParts)) : {oral:{icon:'👄',label:'Oral',enabled:true}};
+        CharacterClasses.savePreset(key,{name:name,icon:icon||'🧑',clothing:clothing,states:states,defaultState:defaultState,bodyParts:bodyParts});
+        UI.closeModal(); this.render();
+        if (typeof Sidebar !== 'undefined') Sidebar.render();
+    },
+    deleteClassPreset: function(key) {
+        if (key==='standardGirl'||key==='standardBoy') { alert('Cannot delete built-ins.'); return; }
+        if (!confirm('Delete preset "'+key+'"?')) return;
+        var p = ProjectManager.getActive();
+        if (p) { (p.config.characters||[]).forEach(function(c) { if (c.classPreset===key) c.classPreset='custom'; }); }
+        CharacterClasses.deletePreset(key);
+        UI.closeModal(); this.render();
+        if (typeof Sidebar !== 'undefined') Sidebar.render();
+    }
+};
+
+js\NodeEditor.js:
+----------------
+
+var NodeEditor = {
+    addNode: function(type) { Canvas.addNode(type); },
+    addChoice: function(nodeId) { Canvas.addChoice(nodeId); },
+    deleteChoice: function(nodeId, ci) { Canvas.deleteChoice(nodeId, ci); },
+    updateNodeProp: function(prop, value) {
+        var node = Canvas.getNode(Canvas.selectedNodeId);
+        if (!node) return;
+        node[prop] = value;
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
+    },
+    updateChoice: function(nodeId, ci, prop, value) {
+        var node = Canvas.getNode(nodeId);
+        if (!node || !node.choices || !node.choices[ci]) return;
+        node.choices[ci][prop] = value;
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
+    }
+};
+
+js\ProjectManager.js:
+--------------------
+
+var ProjectManager = {
+    projects: [],
+    activeProjectId: null,
+    saveDirectory: null,
+    hasFileSystem: false,
+    _initialized: false,
+
+    init: function() {
+        if (this._initialized) return;
+        this._initialized = true;
+        
+        this.hasFileSystem = (typeof window.showDirectoryPicker === 'function');
+        this.projects = [];
+        this.activeProjectId = null;
+        this.renderTabs();
+        this._initDragDrop();
+        
+        if (!this.hasFileSystem) {
+            this._showBrowserWarning();
+            return;
+        }
+        
+        this._restoreLastSession();
+    },
+
+    _showBrowserWarning: function() {
+        var container = document.getElementById('left-content');
+        if (container) {
+            container.innerHTML = '<div class="no-project-msg">' +
+                '⚠️<br>This app requires <b>Chrome, Edge, or Opera</b><br>' +
+                'for file system access.<br><br>' +
+                'Use <b>📁 File → Select Save Folder</b><br>to get started.</div>';
+        }
+    },
+
+    // ---- SESSION ----
+    _saveSession: function() {
+        var session = {
+            activeProjectId: this.activeProjectId,
+            projectNames: this.projects.map(function(p) { return p.name; }),
+            timestamp: new Date().toISOString()
+        };
+        if (this.saveDirectory) session.folderName = this.saveDirectory.name;
+        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
+    },
+
+    _restoreLastSession: async function() {
+        try {
+            var data = localStorage.getItem('savida_last_session');
+            if (!data) { this._showWelcomePrompt(); return; }
+            var session = JSON.parse(data);
+            await new Promise(function(r) { setTimeout(r, 100); });
+            
+            var reopen = confirm(
+                '📁 Reopen last project folder?\n\n' +
+                'Folder: ' + (session.folderName || 'Unknown') + '\n' +
+                'Projects: ' + (session.projectNames || []).join(', ') + '\n' +
+                'Last saved: ' + new Date(session.timestamp).toLocaleString() + '\n\n' +
+                'OK = reopen | Cancel = start fresh'
+            );
+            
+            if (reopen) {
+                await this._reopenFolder(session);
+            } else {
+                localStorage.removeItem('savida_last_session');
+                this._showWelcomePrompt();
+            }
+        } catch(e) {
+            localStorage.removeItem('savida_last_session');
+            this._showWelcomePrompt();
+        }
+    },
+
+    _showWelcomePrompt: function() {
+        var container = document.getElementById('left-content');
+        if (container) {
+            container.innerHTML = '<div class="no-project-msg">' +
+                '👋<br>Welcome!<br><br>' +
+                'Use <b>📁 File → Select Save Folder</b><br>' +
+                'to open or create a project.<br><br>' +
+                '<button class="btn-sm-add" onclick="ProjectManager.pickSaveFolder()" style="font-size:12px;padding:8px 16px;cursor:pointer;">' +
+                '📂 Select Folder</button></div>';
+        }
+        var cw = document.getElementById('canvas-wrap');
+        if (cw) {
+            var ex = cw.querySelector('.welcome-msg'); if (ex) ex.remove();
+            var m = document.createElement('div');
+            m.className = 'welcome-msg';
+            m.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:18px;pointer-events:none;z-index:5;';
+            m.innerHTML = '📁<br><span style="font-size:14px;">Select a project folder to begin</span>';
+            cw.appendChild(m);
+        }
+    },
+
+    _hideWelcomeMessage: function() {
+        var cw = document.getElementById('canvas-wrap');
+        if (cw) { var m = cw.querySelector('.welcome-msg'); if (m) m.remove(); }
+    },
+
+    _reopenFolder: async function(session) {
+        try {
+            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            await this._loadProjectsFromDirectory(this.saveDirectory);
+            this.renderTabs();
+            if (session.activeProjectId) {
+                var found = this.projects.find(function(p) { return p.id === session.activeProjectId; });
+                this.activeProjectId = found ? found.id : (this.projects[0] ? this.projects[0].id : null);
+            } else if (this.projects.length > 0) {
+                this.activeProjectId = this.projects[0].id;
+            }
+            if (this.projects.length === 0) this.createProject('My First Story');
+            this._saveSession();
+            this._hideWelcomeMessage();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+        } catch(e) {
+            if (e.name !== 'AbortError') console.error(e);
+            this._showWelcomePrompt();
+        }
+    },
+
+    // ---- FOLDER SELECTION ----
+    pickSaveFolder: async function() {
+        if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
+        try {
+            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            await this._loadProjectsFromDirectory(this.saveDirectory);
+            this.renderTabs();
+            if (this.projects.length > 0) {
+                this.activeProjectId = this.projects[0].id;
+            } else {
+                this.createProject('My First Story');
+            }
+            this._saveSession();
+            this._hideWelcomeMessage();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+            Utils.showSaveIndicator();
+        } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+    },
+
+    // ---- SAVE ----
+    saveActiveProject: async function() {
+        if (!this.saveDirectory) {
+            await this.pickSaveFolder();
+            if (!this.saveDirectory) return;
+        }
+        var project = this.getActive();
+        if (!project) return;
+        
+        App._syncCanvasToProject();
+        
+        // EMBED IMAGES INTO PROJECT DATA
+        if (typeof ImageManager !== 'undefined') {
+            project.images = ImageManager.exportForProject(project.id);
+        }
+        
+        project.updatedAt = new Date().toISOString();
+        try {
+            await this._writeProjectFile(project);
+            this._saveSession();
+            Utils.showSaveIndicator();
+        } catch(e) {
+            console.error('Save error:', e);
+            alert('Could not save: ' + e.message);
+        }
+    },
+
+    _writeProjectFile: async function(project) {
+        if (!this.saveDirectory) throw new Error('No save directory');
+        var filename = this._sanitizeFilename(project.name) + '.story.json';
+        var content = JSON.stringify(project, null, 2);
+        var fileHandle = await this.saveDirectory.getFileHandle(filename, { create: true });
+        var writable = await fileHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+    },
+
+    // ---- DRAG AND DROP ----
+    _initDragDrop: function() {
+        var self = this;
+        var body = document.body;
+        var dragCounter = 0;
+
+        body.addEventListener('dragenter', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            dragCounter++;
+            body.classList.add('drag-over');
+        });
+        body.addEventListener('dragleave', function(e) {
+            e.preventDefault(); e.stopPropagation();
+            dragCounter--;
+            if (dragCounter <= 0) { dragCounter = 0; body.classList.remove('drag-over'); }
+        });
+        body.addEventListener('dragover', function(e) { e.preventDefault(); e.stopPropagation(); });
+        
+        body.addEventListener('drop', async function(e) {
+            e.preventDefault(); e.stopPropagation();
+            dragCounter = 0;
+            body.classList.remove('drag-over');
+
+            var files = e.dataTransfer.files;
+            if (files.length === 0) return;
+
+            var jsonFiles = [];
+            for (var i = 0; i < files.length; i++) {
+                var f = files[i];
+                if (f.name.endsWith('.story.json') || f.name.endsWith('.json') || f.type === 'application/json') {
+                    jsonFiles.push(f);
+                }
+            }
+            if (jsonFiles.length === 0) {
+                self._showToast('⚠️ No .story.json files found.', 'warning');
+                return;
+            }
+
+            var imported = 0, failed = 0;
+            self._showToast('📥 Importing ' + jsonFiles.length + ' file(s)...', 'info');
+
+            for (var j = 0; j < jsonFiles.length; j++) {
+                try {
+                    var text = await self._readFileAsText(jsonFiles[j]);
+                    var project = JSON.parse(text);
+                    if (project.id && project.config && project.scenes !== undefined) {
+                        var existing = self.projects.find(function(p) { return p.id === project.id; });
+                        if (existing) {
+                            project.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
+                            if (project.name) project.name = project.name + ' (Imported)';
+                        }
+                        // RESTORE IMAGES FROM DROPPED FILE
+                        if (project.images && typeof ImageManager !== 'undefined') {
+                            ImageManager.importForProject(project.id, project.images);
+                        }
+                        self.projects.push(project);
+                        self.activeProjectId = project.id;
+                        imported++;
+                    } else { failed++; }
+                } catch(err) { failed++; }
+            }
+
+            self.renderTabs();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+            self._hideWelcomeMessage();
+
+            if (imported > 0) {
+                self._showToast('✅ Imported ' + imported + ' project(s). Press Ctrl+S to save.', 'success');
+            } else {
+                self._showToast('❌ No valid projects found.', 'error');
+            }
+        });
+    },
+
+    _readFileAsText: function(file) {
+        return new Promise(function(resolve, reject) {
+            var reader = new FileReader();
+            reader.onload = function(e) { resolve(e.target.result); };
+            reader.onerror = reject;
+            reader.readAsText(file);
+        });
+    },
+
+    _showToast: function(message, type) {
+        var existing = document.querySelector('.drop-toast');
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+        var toast = document.createElement('div');
+        toast.className = 'drop-toast';
+        toast.textContent = message;
+        var bg = 'rgba(46,204,113,0.9)';
+        if (type === 'warning') bg = 'rgba(240,192,64,0.9)';
+        if (type === 'error') bg = 'rgba(255,48,80,0.9)';
+        if (type === 'info') bg = 'rgba(52,152,219,0.9)';
+        toast.style.cssText = 'position:fixed;bottom:40px;left:50%;transform:translateX(-50%);background:'+bg+';color:#fff;padding:10px 24px;border-radius:20px;font-size:13px;font-weight:600;z-index:500;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,0.4);animation:toastIn 0.3s ease-out;';
+        document.body.appendChild(toast);
+        setTimeout(function() {
+            toast.style.opacity='0';toast.style.transition='opacity 0.3s';
+            setTimeout(function(){if(toast.parentNode)toast.parentNode.removeChild(toast);},300);
+        },2500);
+    },
+
+    _sanitizeFilename: function(name) {
+        return name.replace(/[^a-zA-Z0-9 _-]/g,'').substring(0,60)||'untitled';
+    },
+
+    _loadProjectsFromDirectory: async function(dir) {
+        this.projects = [];
+        for await (var entry of dir.values()) {
+            if (entry.kind === 'file' && entry.name.endsWith('.story.json')) {
+                try {
+                    var file = await entry.getFile();
+                    var text = await file.text();
+                    var project = JSON.parse(text);
+                    if (project.id && project.config && project.scenes !== undefined) {
+                        // RESTORE IMAGES WHEN LOADING FROM FOLDER
+                        if (project.images && typeof ImageManager !== 'undefined') {
+                            ImageManager.importForProject(project.id, project.images);
+                        }
+                        this.projects.push(project);
+                    }
+                } catch(e) {}
+            }
+        }
+        this.projects.sort(function(a,b){ return (b.updatedAt||'').localeCompare(a.updatedAt||''); });
+    },
+
+    _deleteProjectFile: async function(project) {
+        if (!this.saveDirectory) return;
+        try { await this.saveDirectory.removeEntry(this._sanitizeFilename(project.name)+'.story.json'); } catch(e) {}
+    },
+
+    // ---- PROJECT CRUD ----
+    createProject: function(name) {
+        name = name || 'Untitled Story';
+        var id = 'proj_' + Date.now();
+        var project = {
+            id:id, name:name,
+            config:{
+                title:name, subtitle:'A branching tale.',
+                characters:[
+                    this._createCharacter('Maya','standardGirl','protagonist'),
+                    this._createCharacter('Leo','standardBoy','companion')
+                ],
+                stats:[
+                    {id:'c',name:'Corruption',emoji:'💔',start:0,min:0,max:100,color:'#ff4060'},
+                    {id:'p',name:'Purity',emoji:'✨',start:100,min:0,max:100,color:'#8090e0'},
+                    {id:'d',name:'Broken',emoji:'😳',start:0,min:0,max:100,color:'#d4a040'}
+                ],
+                extraSettings:{enableSexActs:true,enableEnslavement:true}
+            },
+            scenes:[],endings:{},connections:[],nodeIdCounter:0,
+            images:{},
+            createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()
+        };
+        this.projects.push(project);
+        this.activeProjectId = project.id;
+        this.renderTabs();
+        this._saveSession();
+        if (this.saveDirectory) this._writeProjectFile(project);
+        return project;
+    },
+
+    _createCharacter: function(name, classPreset, role) {
+        var char = {
+            id:'char_'+Date.now()+'_'+Math.random().toString(36).substr(2,4),
+            name:name||'Character', role:role||'neutral',
+            classPreset:classPreset||'custom', icon:'🧑',
+            clothing:['top','bottom'], states:['Normal'], defaultState:'Normal',
+            bodyParts:{oral:{icon:'👄',label:'Oral',enabled:true}}
+        };
+        if (classPreset && classPreset !== 'custom') CharacterClasses.applyPreset(char, classPreset);
+        return char;
+    },
+
+    getActive: function() {
+        var self = this;
+        return this.projects.find(function(p){return p.id===self.activeProjectId;});
+    },
+
+    setActive: function(id) {
+        this.activeProjectId = id; this.renderTabs(); this._saveSession();
+        if (typeof App !== 'undefined') App.loadProjectToEditor();
+    },
+
+    deleteProject: function(id) {
+        if (this.projects.length <= 1) { alert('Cannot delete last project.'); return; }
+        var project = this.projects.find(function(p){return p.id===id;});
+        this.projects = this.projects.filter(function(p){return p.id!==id;});
+        if (this.activeProjectId === id) this.activeProjectId = this.projects[0] ? this.projects[0].id : null;
+        if (this.saveDirectory && project) this._deleteProjectFile(project);
+        this._saveSession(); this.renderTabs();
+        if (this.activeProjectId && typeof App !== 'undefined') App.loadProjectToEditor();
+    },
+
+    renameProject: function(id, newName) {
+        var p = this.projects.find(function(pr){return pr.id===id;});
+        if (!p) return;
+        var oldName = p.name; p.name = newName; p.config.title = newName;
+        p.updatedAt = new Date().toISOString();
+        this.renderTabs(); this._saveSession();
+        if (this.saveDirectory) {
+            var self = this;
+            this._deleteProjectFile({name:oldName}).then(function(){self._writeProjectFile(p);});
+        }
+    },
+
+    updateConfig: function(key, value) { var p=this.getActive(); if(p) p.config[key]=value; },
+    updateCharacterField: function(i, key, value) { var p=this.getActive(); if(p&&p.config.characters[i]) p.config.characters[i][key]=value; },
+    setCharacterClass: function(i, preset) {
+        var p=this.getActive(); if(!p||!p.config.characters[i]) return;
+        if (preset==='custom') p.config.characters[i].classPreset='custom';
+        else CharacterClasses.applyPreset(p.config.characters[i], preset);
+    },
+    saveProjectData: function(data) {
+        var p=this.getActive(); if(!p)return;
+        Object.keys(data).forEach(function(k){p[k]=data[k];});
+        p.updatedAt=new Date().toISOString();
+    },
+
+    downloadProjectFile: function() {
+        var project = this.getActive(); if (!project) return;
+        App._syncCanvasToProject();
+        // Embed images
+        if (typeof ImageManager !== 'undefined') {
+            project.images = ImageManager.exportForProject(project.id);
+        }
+        project.updatedAt = new Date().toISOString();
+        var content = JSON.stringify(project, null, 2);
+        var blob = new Blob([content], {type:'application/json'});
+        var a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = this._sanitizeFilename(project.name) + '.story.json';
+        a.click(); URL.revokeObjectURL(a.href);
+    },
+
+    importProjectFile: function(event) {
+        var file = event.target.files[0]; if (!file) return;
+        var self = this;
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                var project = JSON.parse(e.target.result);
+                if (!project.id || !project.config || project.scenes === undefined) { alert('Invalid file.'); return; }
+                var existing = self.projects.find(function(p){return p.id===project.id;});
+                if (existing) {
+                    if (!confirm('Duplicate ID. Overwrite?')) {
+                        project.id = 'proj_' + Date.now();
+                        project.name = (project.name||'Imported') + ' (Copy)';
+                    } else {
+                        self.projects = self.projects.filter(function(p){return p.id!==project.id;});
+                    }
+                }
+                // RESTORE IMAGES
+                if (project.images && typeof ImageManager !== 'undefined') {
+                    ImageManager.importForProject(project.id, project.images);
+                }
+                self.projects.push(project); self.activeProjectId = project.id;
+                self.renderTabs(); self._saveSession();
+                App.loadProjectToEditor();
+                if (self.saveDirectory) self._writeProjectFile(project);
+                Utils.showSaveIndicator();
+            } catch(err) { alert('Error: ' + err.message); }
+        };
+        reader.readAsText(file); event.target.value = '';
+    },
+
+    renderTabs: function() {
+        var bar = document.getElementById('tab-bar'); if (!bar) return;
+        bar.innerHTML = '';
+        var self = this;
+        this.projects.forEach(function(p) {
+            var tab = document.createElement('div');
+            tab.className = 'tab' + (p.id === self.activeProjectId ? ' active' : '');
+            tab.innerHTML = '<span ondblclick="event.stopPropagation();App.renameProjectPrompt(\''+p.id+'\')" title="Double-click to rename">' +
+                Utils.escHtml(p.name) + '</span><span class="close-tab" onclick="event.stopPropagation();ProjectManager.deleteProject(\''+p.id+'\')">×</span>';
+            tab.addEventListener('click', function() { self.setActive(p.id); });
+            bar.appendChild(tab);
+        });
+        var addBtn = document.createElement('div');
+        addBtn.className = 'add-tab'; addBtn.textContent = '+'; addBtn.title = 'New Project';
+        addBtn.addEventListener('click', function() { self.createProject(); });
+        bar.appendChild(addBtn);
+    },
+
+    hasActiveFolder: function() { return !!this.saveDirectory; }
+};
+
+js\Sidebar.js:
+-------------
+
+var Sidebar = {
+    render: function() {
+        var sidebar = document.getElementById('sidebar');
+        if (!sidebar) return;
+        if (!Canvas.selectedNodeId) {
+            sidebar.innerHTML = '<div style="color:var(--dim);text-align:center;padding:20px;">👈 Select a node<br>to edit properties</div>';
+            return;
+        }
+        var node = Canvas.getNode(Canvas.selectedNodeId);
+        if (!node) { sidebar.innerHTML = '<div>Node not found</div>'; return; }
+        var p = ProjectManager.getActive();
+        var chars = p ? (p.config.characters || []) : [];
+        var stats = p ? (p.config.stats || []) : [];
+
+        var html = '<h3>' + (node.type === 'scene' ? '🎬' : '🏁') + ' ' + Utils.escHtml(node.title) + '</h3>';
+        html += '<label>ID</label><input value="' + node.id + '" readonly style="opacity:0.5;">';
+        html += '<label>Title</label><input value="' + Utils.escHtml(node.title) + '" onchange="NodeEditor.updateNodeProp(\'title\',this.value)">';
+
+        if (node.type === 'scene') {
+            html += '<label>Subtitle</label><input value="' + Utils.escHtml(node.subtitle || '') + '" onchange="NodeEditor.updateNodeProp(\'subtitle\',this.value)">';
+            html += '<label>Text</label><textarea onchange="NodeEditor.updateNodeProp(\'text\',this.value)">' + Utils.escHtml(node.text || '') + '</textarea>';
+            // Character visibility toggle for this scene
+            html += '<h3>👁️ Visible Characters</h3>';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
+            var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
+            chars.forEach(function(c) {
+                var isVisible = hiddenChars.indexOf(c.id) < 0;
+                html += '<label style="font-size:9px;display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 8px;border-radius:4px;cursor:pointer;">';
+                html += '<input type="checkbox" ' + (isVisible ? 'checked' : '') + ' onchange="Sidebar.toggleCharVisibility(\'' + node.id + '\',\'' + c.id + '\',this.checked)" style="width:auto;">';
+                html += (c.icon || '🧑') + ' ' + Utils.escHtml(c.name);
+                html += '</label>';
+            });
+            html += '</div>';
+            html += '<h3>Choices <button class="btn-sm-add" onclick="NodeEditor.addChoice(\'' + node.id + '\');Sidebar.render();">+</button></h3>';
+            
+            
+            
+
+            if (node.choices) {
+                node.choices.forEach(function(ch, i) {
+                    var conn = Canvas.connections.find(function(c) { return c.fromNodeId === node.id && c.fromChoiceIndex === i; });
+                    var nextNode = conn ? Canvas.getNode(conn.toNodeId) : null;
+                    html += '<div style="background:rgba(0,0,0,0.3);padding:6px;border-radius:5px;margin:4px 0;">';
+                    html += '<strong>Choice ' + (i + 1) + '</strong> → ' + (nextNode ? Utils.escHtml(nextNode.title) : '<span style="color:var(--dim);">unconnected</span>');
+                    html += '<button class="btn-sm-remove" style="float:right;" onclick="NodeEditor.deleteChoice(\'' + node.id + '\',' + i + ');Sidebar.render();">✕</button>';
+                    html += '<label>Text</label><input value="' + Utils.escHtml(ch.text || '') + '" onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'text\',this.value)">';
+
+                    // Stats
+                    html += '<div class="stat-row">';
+                    stats.forEach(function(s) {
+                        html += '<label>' + s.emoji + ' ' + s.name + '</label><input type="number" value="' + (ch[s.id] || 0) + '" onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'' + s.id + '\',parseInt(this.value)||0)">';
+                    });
+                    html += '</div>';
+
+                    // Flags
+                    html += '<div class="checkbox-row">';
+                    html += '<label><input type="checkbox" ' + (ch.sex ? 'checked' : '') + ' onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'sex\',this.checked)">🔞Sex</label>';
+                    html += '<label><input type="checkbox" ' + (ch.corrupt ? 'checked' : '') + ' onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'corrupt\',this.checked)">Corrupt</label>';
+                    html += '</div>';
+
+                    // Sex acts — per character, per body part
+                    if (p && p.config.extraSettings && p.config.extraSettings.enableSexActs) {
+                        chars.forEach(function(c) {
+                            if (c.bodyParts) {
+                                Object.keys(c.bodyParts).forEach(function(bpKey) {
+                                    var bp = c.bodyParts[bpKey];
+                                    if (bp.enabled) {
+                                        html += '<div class="stat-row">';
+                                        html += '<label>' + (bp.icon||'') + ' ' + Utils.escHtml(bp.label||bpKey) + ' (' + Utils.escHtml(c.name) + ')</label>';
+                                        html += '<input type="number" value="' + (ch['act_' + bpKey + '_' + c.id] || 0) + '" onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'act_' + bpKey + '_' + c.id + '\',parseInt(this.value)||0)" style="width:40px;">';
+                                        html += '</div>';
+                                    }
+                                });
+                            }
+                        });
+                    }
+
+                    // Per-character: clothing toggle (strip / wear)
+                    chars.forEach(function(c) {
+                        html += '<div style="margin-top:4px;">';
+                        html += '<label style="min-width:100%;margin-bottom:2px;">' + Utils.escHtml(c.name) + ' clothing</label>';
+                        html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
+                        (c.clothing || []).forEach(function(l) {
+                            var strippedItems = ch['strip_' + c.id] ? ch['strip_' + c.id].split(',') : [];
+                            var wornItems = ch['wear_' + c.id] ? ch['wear_' + c.id].split(',') : [];
+                            var isStripped = strippedItems.indexOf(l) >= 0;
+                            var isWorn = wornItems.indexOf(l) >= 0;
+
+                            html += '<div style="display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 6px;border-radius:4px;">';
+                            html += '<span style="font-size:9px;min-width:40px;">' + l + '</span>';
+
+                            // Strip button
+                            html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'strip\')" ';
+                            html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isStripped ? '#ff3050' : '#3a3a55') + ';background:' + (isStripped ? 'rgba(255,48,80,0.3)' : 'transparent') + ';color:' + (isStripped ? '#ff6080' : 'var(--dim)') + ';" ';
+                            html += 'title="Remove this clothing">− Strip</button>';
+
+                            // Wear button
+                            html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'wear\')" ';
+                            html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isWorn ? '#2ecc71' : '#3a3a55') + ';background:' + (isWorn ? 'rgba(46,204,113,0.3)' : 'transparent') + ';color:' + (isWorn ? '#2ecc71' : 'var(--dim)') + ';" ';
+                            html += 'title="Put this clothing back on">+ Wear</button>';
+
+                            html += '</div>';
+                        });
+                        html += '</div></div>';
+                    });
+
+                    // Per-character: state
+                    chars.forEach(function(c) {
+                        html += '<div class="stat-row" style="margin-top:4px;">';
+                        html += '<label>' + Utils.escHtml(c.name) + ' state</label>';
+                        html += '<select onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'state_' + c.id + '\',this.value)">';
+                        (c.states||['Normal']).forEach(function(s) {
+                            html += '<option value="' + s + '"' + (ch['state_'+c.id]===s?' selected':'') + '>' + s + '</option>';
+                        });
+                        html += '</select>';
+                        html += '</div>';
+                    });
+
+                    // Enslavement
+                    if (p && p.config.extraSettings && p.config.extraSettings.enableEnslavement) {
+                        html += '<div class="checkbox-row" style="margin-top:4px;">';
+                        chars.forEach(function(c) {
+                            html += '<label><input type="checkbox" ' + (ch['enslave_'+c.id]?'checked':'') + ' onchange="NodeEditor.updateChoice(\'' + node.id + '\',' + i + ',\'enslave_'+c.id+'\',this.checked)">⛓️'+Utils.escHtml(c.name)+'</label>';
+                        });
+                        html += '</div>';
+                    }
+
+                    html += '</div>';
+                });
+            }
+        } else {
+            html += '<label>Emoji <button class="btn-sm-edit emoji-trigger" onclick="EmojiPicker.open(\'endingEmojiInput\',event)">Pick</button></label>';
+            html += '<input id="endingEmojiInput" value="' + (node.emoji||'⭐') + '" onchange="NodeEditor.updateNodeProp(\'emoji\',this.value)">';
+            html += '<label>Color</label><input type="color" value="' + (node.color||'#880030') + '" onchange="NodeEditor.updateNodeProp(\'color\',this.value)" style="height:28px;">';
+            html += '<label>Text</label><textarea onchange="NodeEditor.updateNodeProp(\'text\',this.value)">' + Utils.escHtml(node.text||'') + '</textarea>';
+        }
+
+        sidebar.innerHTML = html;
+    },
+
+    toggleClothingAction: function(nodeId, choiceIndex, charId, clothItem, action) {
+        var node = Canvas.getNode(nodeId);
+        if (!node || !node.choices || !node.choices[choiceIndex]) return;
+        var ch = node.choices[choiceIndex];
+
+        var stripKey = 'strip_' + charId;
+        var wearKey = 'wear_' + charId;
+
+        var strippedItems = ch[stripKey] ? ch[stripKey].split(',') : [];
+        var wornItems = ch[wearKey] ? ch[wearKey].split(',') : [];
+
+        if (action === 'strip') {
+            var idx = strippedItems.indexOf(clothItem);
+            if (idx >= 0) {
+                strippedItems.splice(idx, 1);
+            } else {
+                strippedItems.push(clothItem);
+                var wearIdx = wornItems.indexOf(clothItem);
+                if (wearIdx >= 0) wornItems.splice(wearIdx, 1);
+            }
+        } else if (action === 'wear') {
+            var idx = wornItems.indexOf(clothItem);
+            if (idx >= 0) {
+                wornItems.splice(idx, 1);
+            } else {
+                wornItems.push(clothItem);
+                var stripIdx = strippedItems.indexOf(clothItem);
+                if (stripIdx >= 0) strippedItems.splice(stripIdx, 1);
+            }
+        }
+
+        ch[stripKey] = strippedItems.length > 0 ? strippedItems.join(',') : null;
+        ch[wearKey] = wornItems.length > 0 ? wornItems.join(',') : null;
+
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
+        
+        // Re-render sidebar immediately for real-time button color update
+        this.render();
+    },
+    toggleCharVisibility: function(nodeId, charId, visible) {
+        var node = Canvas.getNode(nodeId);
+        if (!node) return;
+        var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
+        if (visible) {
+            hiddenChars = hiddenChars.filter(function(id) { return id !== charId; });
+        } else {
+            if (hiddenChars.indexOf(charId) < 0) hiddenChars.push(charId);
+        }
+        node.hiddenChars = hiddenChars.length > 0 ? hiddenChars.join(',') : null;
+        Canvas.renderNode(node);
+        Canvas.drawConnections();
+        Canvas.saveState();
+        // Update the sidebar to reflect changes
+        this.render();
+    },
+};
+
+js\Utils.js:
+-----------
+
+var Utils = {
+    escHtml: function(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    },
+    generateId: function(prefix) {
+        return (prefix || 'id') + '_' + Date.now() + '_' + Math.random().toString(36).substr(2,6);
+    },
+    showSaveIndicator: function() {
+        var el = document.getElementById('save-indicator');
+        if (!el) return;
+        el.classList.add('show');
+        setTimeout(function() { el.classList.remove('show'); }, 1500);
+    },
+    updateToolbarButtons: function(hasProject) {
+        ['btnAddScene','btnAddEnding','btnSave','btnExport','btnExportHTML','btnClear','btnPreview'].forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (btn) btn.disabled = !hasProject;
+        });
+    },
+};
+
+js\app.js:
+---------
+
+var UI = {
+    modalContent: '',
+    modalFilename: 'export.js',
+    modalType: 'text/javascript',
+
+    showModal: function(title, content, filename, type) {
+        document.getElementById('modal-title').textContent = title;
+        document.getElementById('modal-content').textContent = content;
+        document.getElementById('modal-overlay').classList.add('show');
+        this.modalContent = content;
+        this.modalFilename = filename || 'export.js';
+        this.modalType = type || 'text/javascript';
+        
+        var dlBtn = document.getElementById('modal-dl-btn');
+        if (dlBtn) {
+            dlBtn.style.display = 'inline-block';
+            dlBtn.textContent = '📥 Download ' + (filename || 'file');
+        }
+    },
+
+    closeModal: function() {
+        document.getElementById('modal-overlay').classList.remove('show');
+    },
+
+    downloadModal: function() {
+        if (!this.modalContent) {
+            alert('Nothing to download.');
+            return;
+        }
+        var blob = new Blob([this.modalContent], { type: this.modalType });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = this.modalFilename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+    },
+
+    toggleDropdown: function(ddId) {
+        var dd = document.getElementById(ddId); if (!dd) return;
+        var isOpen = dd.classList.contains('open');
+        document.querySelectorAll('.toolbar-dropdown.open').forEach(function(el) { el.classList.remove('open'); });
+        if (!isOpen) { dd.classList.add('open'); setTimeout(function() { document.addEventListener('click', UI._closeDropdowns); }, 10); }
+    },
+    _closeDropdowns: function(e) {
+        if (!e.target.closest('.toolbar-dropdown')) {
+            document.querySelectorAll('.toolbar-dropdown.open').forEach(function(el) { el.classList.remove('open'); });
+            document.removeEventListener('click', UI._closeDropdowns);
+        }
+    }
+};
+
+var App = {
+    init: function() {
+        ImageManager.init();
+        ProjectManager.init();
+        Canvas.init();
+        this.bindKeyboard();
+        this.bindModalClose();
+        LeftPanel.render();
+        Sidebar.render();
+        Utils.updateToolbarButtons(false);
+    },
+
+    loadProjectToEditor: function() {
+        var p = ProjectManager.getActive();
+        if (!p) {
+            Canvas.nodes = []; Canvas.connections = []; Canvas.nodeIdCounter = 0;
+            Canvas.selectedNodeId = null;
+            if (Canvas.nodesLayer) Canvas.nodesLayer.innerHTML = '';
+            if (Canvas.ctx) Canvas.ctx.clearRect(0, 0, Canvas.lineCanvas.width, Canvas.lineCanvas.height);
+            LeftPanel.render(); Sidebar.render(); Utils.updateToolbarButtons(false);
+            return;
+        }
+        Canvas.nodes = (p.scenes || []).map(function(s) {
+            return {
+                id: s.id, type: 'scene', x: s.x || 200, y: s.y || 200,
+                title: s.title || s.id, subtitle: s.subtitle || '', text: s.text || '',
+                choices: s.choices || [], hiddenChars: s.hiddenChars || null, extraTags: s.extraTags || {}
+            };
+        });
+        Object.keys(p.endings || {}).forEach(function(id) {
+            var e = p.endings[id];
+            Canvas.nodes.push({
+                id: id, type: 'ending', x: e.x || 600, y: e.y || 200,
+                title: e.title || id, emoji: e.emoji || '⭐', text: e.desc || '', color: e.color || '#880030'
+            });
+        });
+        Canvas.connections = p.connections || [];
+        Canvas.nodeIdCounter = p.nodeIdCounter || Canvas.nodes.length;
+        Canvas.selectedNodeId = null;
+        if (Canvas.nodesLayer) Canvas.nodesLayer.innerHTML = '';
+        Canvas.nodes.forEach(function(n) { Canvas.renderNode(n); });
+        Canvas.drawConnections(); Canvas.applyZoomTransform(); Canvas.updateZoomDisplay();
+        LeftPanel.render(); Sidebar.render(); Utils.updateToolbarButtons(!!p);
+        if (Canvas.nodes.length === 0) {
+            Canvas.addNode('scene'); Canvas.addNode('ending');
+            if (Canvas.nodes.length >= 2) {
+                Canvas.connections.push({
+                    fromNodeId: Canvas.nodes[0].id,
+                    fromChoiceIndex: 0,
+                    toNodeId: Canvas.nodes[1].id
+                });
+                Canvas.renderNode(Canvas.nodes[0]); Canvas.drawConnections();
+            }
+        }
+    },
+
+    _syncCanvasToProject: function() {
+        var p = ProjectManager.getActive(); if (!p) return;
+        p.scenes = Canvas.nodes.filter(function(n){return n.type==='scene';}).map(function(n){
+            return {
+                id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
+                text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
+            };
+        });
+        p.endings = {};
+        Canvas.nodes.filter(function(n){return n.type==='ending';}).forEach(function(n){
+            p.endings[n.id] = { x: n.x, y: n.y, emoji: n.emoji, title: n.title, desc: n.text, color: n.color };
+        });
+        p.connections = Canvas.connections;
+        p.nodeIdCounter = Canvas.nodeIdCounter;
+    },
+
+    save: function() {
+        ProjectManager.saveActiveProject().catch(function(err){ console.error('Save failed:', err); });
+    },
+
+    createProject: function() {
+        var name = prompt('Project name:', 'New Story');
+        if (name) { ProjectManager.createProject(name.trim() || 'Untitled'); this.loadProjectToEditor(); }
+    },
+
+    renameProjectPrompt: function(id) {
+        var p = ProjectManager.projects.find(function(pr){return pr.id===id;});
+        if (!p) return;
+        var n = prompt('Rename:', p.name);
+        if (n && n.trim()) ProjectManager.renameProject(id, n.trim());
+    },
+
+    bindKeyboard: function() {
+        var self = this;
+        window.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 's') {
+                e.preventDefault();
+                self.save();
+            }
+            if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
+            if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); Canvas.setZoom(1); }
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 'p') {
+                e.preventDefault();
+                Export.previewHTML();
+                return;
+            }
+        });
+    },
+
+    bindModalClose: function() {
+        var overlay = document.getElementById('modal-overlay');
+        if (overlay) overlay.addEventListener('click', function(e) { if (e.target === overlay) UI.closeModal(); });
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function() { App.init(); });
+
