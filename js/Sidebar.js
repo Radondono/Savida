@@ -19,7 +19,8 @@ var Sidebar = {
         if (node.type === 'scene') {
             html += '<label>Subtitle</label><input value="' + Utils.escHtml(node.subtitle || '') + '" onchange="NodeEditor.updateNodeProp(\'subtitle\',this.value)">';
             html += '<label>Text</label><textarea onchange="NodeEditor.updateNodeProp(\'text\',this.value)">' + Utils.escHtml(node.text || '') + '</textarea>';
-            // Character visibility toggle for this scene
+
+            // Character visibility toggle
             html += '<h3>👁️ Visible Characters</h3>';
             html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
             var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
@@ -31,10 +32,32 @@ var Sidebar = {
                 html += '</label>';
             });
             html += '</div>';
+
+            // Scene default pose/expression per character
+            html += '<h3>🎭 Pose & Expression</h3>';
+            html += '<div style="font-size:8px;color:var(--dim);margin-bottom:4px;">Set pose/expression for this scene, or follow previous scene.</div>';
+            chars.forEach(function(c) {
+                html += '<div style="display:flex;gap:4px;align-items:center;margin:2px 0;font-size:9px;background:rgba(0,0,0,0.2);padding:4px 6px;border-radius:4px;">';
+                html += '<span style="min-width:45px;font-weight:700;">' + Utils.escHtml(c.name) + '</span>';
+                
+                html += '<select onchange="NodeEditor.updateNodeProp(\'pose_' + c.id + '\',this.value)" style="font-size:9px;flex:1;">';
+                html += '<option value=""' + (!node['pose_'+c.id]?' selected':'') + '>↻ follow prev</option>';
+                (c.poses||['default']).forEach(function(p) {
+                    html += '<option value="' + p + '"' + (node['pose_'+c.id]===p?' selected':'') + '>' + p + '</option>';
+                });
+                html += '</select>';
+                
+                html += '<select onchange="NodeEditor.updateNodeProp(\'expr_' + c.id + '\',this.value)" style="font-size:9px;flex:1;">';
+                html += '<option value=""' + (!node['expr_'+c.id]?' selected':'') + '>↻ follow prev</option>';
+                (c.expressions||['neutral']).forEach(function(e) {
+                    html += '<option value="' + e + '"' + (node['expr_'+c.id]===e?' selected':'') + '>' + e + '</option>';
+                });
+                html += '</select>';
+                
+                html += '</div>';
+            });
+
             html += '<h3>Choices <button class="btn-sm-add" onclick="NodeEditor.addChoice(\'' + node.id + '\');Sidebar.render();">+</button></h3>';
-            
-            
-            
 
             if (node.choices) {
                 node.choices.forEach(function(ch, i) {
@@ -89,12 +112,10 @@ var Sidebar = {
                             html += '<div style="display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 6px;border-radius:4px;">';
                             html += '<span style="font-size:9px;min-width:40px;">' + l + '</span>';
 
-                            // Strip button
                             html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'strip\')" ';
                             html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isStripped ? '#ff3050' : '#3a3a55') + ';background:' + (isStripped ? 'rgba(255,48,80,0.3)' : 'transparent') + ';color:' + (isStripped ? '#ff6080' : 'var(--dim)') + ';" ';
                             html += 'title="Remove this clothing">− Strip</button>';
 
-                            // Wear button
                             html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'wear\')" ';
                             html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isWorn ? '#2ecc71' : '#3a3a55') + ';background:' + (isWorn ? 'rgba(46,204,113,0.3)' : 'transparent') + ';color:' + (isWorn ? '#2ecc71' : 'var(--dim)') + ';" ';
                             html += 'title="Put this clothing back on">+ Wear</button>';
@@ -175,10 +196,9 @@ var Sidebar = {
         Canvas.renderNode(node);
         Canvas.drawConnections();
         Canvas.saveState();
-        
-        // Re-render sidebar immediately for real-time button color update
         this.render();
     },
+
     toggleCharVisibility: function(nodeId, charId, visible) {
         var node = Canvas.getNode(nodeId);
         if (!node) return;
@@ -192,7 +212,6 @@ var Sidebar = {
         Canvas.renderNode(node);
         Canvas.drawConnections();
         Canvas.saveState();
-        // Update the sidebar to reflect changes
         this.render();
-    },
+    }
 };

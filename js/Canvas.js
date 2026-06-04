@@ -430,10 +430,17 @@ var Canvas = {
         var p = ProjectManager.getActive();
         if (!p) return;
         var scenes = this.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
-            return {
+            var scene = {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
                 text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
+            // Copy all pose_ and expr_ properties
+            Object.keys(n).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    scene[key] = n[key];
+                }
+            });
+            return scene;
         });
         var endings = {};
         this.nodes.filter(function(n) { return n.type === 'ending'; }).forEach(function(n) {

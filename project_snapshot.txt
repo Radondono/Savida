@@ -6,6 +6,7 @@ Savida/
   LICENSE
   README.md
   index.html
+  sns.bat
 css/
   character-editor.css
   emoji-picker.css
@@ -31,6 +32,722 @@ js/
 ==================================================
 FILE CONTENTS
 ==================================================
+
+.gitignore:
+----------
+
+sns.py
+
+
+LICENSE:
+-------
+
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                            Preamble
+
+  The GNU General Public License is a free, copyleft license for
+software and other kinds of works.
+
+  The licenses for most software and other practical works are designed
+to take away your freedom to share and change the works.  By contrast,
+the GNU General Public License is intended to guarantee your freedom to
+share and change all versions of a program--to make sure it remains free
+software for all its users.  We, the Free Software Foundation, use the
+GNU General Public License for most of our software; it applies also to
+any other work released this way by its authors.  You can apply it to
+your programs, too.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to distribute copies of free software (and charge for
+them if you wish), that you receive source code or can get it if you
+want it, that you can change the software or use pieces of it in new
+free programs, and that you know you can do these things.
+
+  To protect your rights, we need to prevent others from denying you
+these rights or asking you to surrender the rights.  Therefore, you have
+certain responsibilities if you distribute copies of the software, or if
+you modify it: responsibilities to respect the freedom of others.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must pass on to the recipients the same
+freedoms that you received.  You must make sure that they, too, receive
+or can get the source code.  And you must show them these terms so they
+know their rights.
+
+  Developers that use the GNU GPL protect your rights with two steps:
+(1) assert copyright on the software, and (2) offer you this License
+giving you legal permission to copy, distribute and/or modify it.
+
+  For the developers' and authors' protection, the GPL clearly explains
+that there is no warranty for this free software.  For both users' and
+authors' sake, the GPL requires that modified versions be marked as
+changed, so that their problems will not be attributed erroneously to
+authors of previous versions.
+
+  Some devices are designed to deny users access to install or run
+modified versions of the software inside them, although the manufacturer
+can do so.  This is fundamentally incompatible with the aim of
+protecting users' freedom to change the software.  The systematic
+pattern of such abuse occurs in the area of products for individuals to
+use, which is precisely where it is most unacceptable.  Therefore, we
+have designed this version of the GPL to prohibit the practice for those
+products.  If such problems arise substantially in other domains, we
+stand ready to extend this provision to those domains in future versions
+of the GPL, as needed to protect the freedom of users.
+
+  Finally, every program is threatened constantly by software patents.
+States should not allow patents to restrict development and use of
+software on general-purpose computers, but in those that do, we wish to
+avoid the special danger that patents applied to a free program could
+make it effectively proprietary.  To prevent this, the GPL assures that
+patents cannot be used to render the program non-free.
+
+  The precise terms and conditions for copying, distribution and
+modification follow.
+
+                       TERMS AND CONDITIONS
+
+  0. Definitions.
+
+  "This License" refers to version 3 of the GNU General Public License.
+
+  "Copyright" also means copyright-like laws that apply to other kinds of
+works, such as semiconductor masks.
+
+  "The Program" refers to any copyrightable work licensed under this
+License.  Each licensee is addressed as "you".  "Licensees" and
+"recipients" may be individuals or organizations.
+
+  To "modify" a work means to copy from or adapt all or part of the work
+in a fashion requiring copyright permission, other than the making of an
+exact copy.  The resulting work is called a "modified version" of the
+earlier work or a work "based on" the earlier work.
+
+  A "covered work" means either the unmodified Program or a work based
+on the Program.
+
+  To "propagate" a work means to do anything with it that, without
+permission, would make you directly or secondarily liable for
+infringement under applicable copyright law, except executing it on a
+computer or modifying a private copy.  Propagation includes copying,
+distribution (with or without modification), making available to the
+public, and in some countries other activities as well.
+
+  To "convey" a work means any kind of propagation that enables other
+parties to make or receive copies.  Mere interaction with a user through
+a computer network, with no transfer of a copy, is not conveying.
+
+  An interactive user interface displays "Appropriate Legal Notices"
+to the extent that it includes a convenient and prominently visible
+feature that (1) displays an appropriate copyright notice, and (2)
+tells the user that there is no warranty for the work (except to the
+extent that warranties are provided), that licensees may convey the
+work under this License, and how to view a copy of this License.  If
+the interface presents a list of user commands or options, such as a
+menu, a prominent item in the list meets this criterion.
+
+  1. Source Code.
+
+  The "source code" for a work means the preferred form of the work
+for making modifications to it.  "Object code" means any non-source
+form of a work.
+
+  A "Standard Interface" means an interface that either is an official
+standard defined by a recognized standards body, or, in the case of
+interfaces specified for a particular programming language, one that
+is widely used among developers working in that language.
+
+  The "System Libraries" of an executable work include anything, other
+than the work as a whole, that (a) is included in the normal form of
+packaging a Major Component, but which is not part of that Major
+Component, and (b) serves only to enable use of the work with that
+Major Component, or to implement a Standard Interface for which an
+implementation is available to the public in source code form.  A
+"Major Component", in this context, means a major essential component
+(kernel, window system, and so on) of the specific operating system
+(if any) on which the executable work runs, or a compiler used to
+produce the work, or an object code interpreter used to run it.
+
+  The "Corresponding Source" for a work in object code form means all
+the source code needed to generate, install, and (for an executable
+work) run the object code and to modify the work, including scripts to
+control those activities.  However, it does not include the work's
+System Libraries, or general-purpose tools or generally available free
+programs which are used unmodified in performing those activities but
+which are not part of the work.  For example, Corresponding Source
+includes interface definition files associated with source files for
+the work, and the source code for shared libraries and dynamically
+linked subprograms that the work is specifically designed to require,
+such as by intimate data communication or control flow between those
+subprograms and other parts of the work.
+
+  The Corresponding Source need not include anything that users
+can regenerate automatically from other parts of the Corresponding
+Source.
+
+  The Corresponding Source for a work in source code form is that
+same work.
+
+  2. Basic Permissions.
+
+  All rights granted under this License are granted for the term of
+copyright on the Program, and are irrevocable provided the stated
+conditions are met.  This License explicitly affirms your unlimited
+permission to run the unmodified Program.  The output from running a
+covered work is covered by this License only if the output, given its
+content, constitutes a covered work.  This License acknowledges your
+rights of fair use or other equivalent, as provided by copyright law.
+
+  You may make, run and propagate covered works that you do not
+convey, without conditions so long as your license otherwise remains
+in force.  You may convey covered works to others for the sole purpose
+of having them make modifications exclusively for you, or provide you
+with facilities for running those works, provided that you comply with
+the terms of this License in conveying all material for which you do
+not control copyright.  Those thus making or running the covered works
+for you must do so exclusively on your behalf, under your direction
+and control, on terms that prohibit them from making any copies of
+your copyrighted material outside their relationship with you.
+
+  Conveying under any other circumstances is permitted solely under
+the conditions stated below.  Sublicensing is not allowed; section 10
+makes it unnecessary.
+
+  3. Protecting Users' Legal Rights From Anti-Circumvention Law.
+
+  No covered work shall be deemed part of an effective technological
+measure under any applicable law fulfilling obligations under article
+11 of the WIPO copyright treaty adopted on 20 December 1996, or
+similar laws prohibiting or restricting circumvention of such
+measures.
+
+  When you convey a covered work, you waive any legal power to forbid
+circumvention of technological measures to the extent such circumvention
+is effected by exercising rights under this License with respect to
+the covered work, and you disclaim any intention to limit operation or
+modification of the work as a means of enforcing, against the work's
+users, your or third parties' legal rights to forbid circumvention of
+technological measures.
+
+  4. Conveying Verbatim Copies.
+
+  You may convey verbatim copies of the Program's source code as you
+receive it, in any medium, provided that you conspicuously and
+appropriately publish on each copy an appropriate copyright notice;
+keep intact all notices stating that this License and any
+non-permissive terms added in accord with section 7 apply to the code;
+keep intact all notices of the absence of any warranty; and give all
+recipients a copy of this License along with the Program.
+
+  You may charge any price or no price for each copy that you convey,
+and you may offer support or warranty protection for a fee.
+
+  5. Conveying Modified Source Versions.
+
+  You may convey a work based on the Program, or the modifications to
+produce it from the Program, in the form of source code under the
+terms of section 4, provided that you also meet all of these conditions:
+
+    a) The work must carry prominent notices stating that you modified
+    it, and giving a relevant date.
+
+    b) The work must carry prominent notices stating that it is
+    released under this License and any conditions added under section
+    7.  This requirement modifies the requirement in section 4 to
+    "keep intact all notices".
+
+    c) You must license the entire work, as a whole, under this
+    License to anyone who comes into possession of a copy.  This
+    License will therefore apply, along with any applicable section 7
+    additional terms, to the whole of the work, and all its parts,
+    regardless of how they are packaged.  This License gives no
+    permission to license the work in any other way, but it does not
+    invalidate such permission if you have separately received it.
+
+    d) If the work has interactive user interfaces, each must display
+    Appropriate Legal Notices; however, if the Program has interactive
+    interfaces that do not display Appropriate Legal Notices, your
+    work need not make them do so.
+
+  A compilation of a covered work with other separate and independent
+works, which are not by their nature extensions of the covered work,
+and which are not combined with it such as to form a larger program,
+in or on a volume of a storage or distribution medium, is called an
+"aggregate" if the compilation and its resulting copyright are not
+used to limit the access or legal rights of the compilation's users
+beyond what the individual works permit.  Inclusion of a covered work
+in an aggregate does not cause this License to apply to the other
+parts of the aggregate.
+
+  6. Conveying Non-Source Forms.
+
+  You may convey a covered work in object code form under the terms
+of sections 4 and 5, provided that you also convey the
+machine-readable Corresponding Source under the terms of this License,
+in one of these ways:
+
+    a) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by the
+    Corresponding Source fixed on a durable physical medium
+    customarily used for software interchange.
+
+    b) Convey the object code in, or embodied in, a physical product
+    (including a physical distribution medium), accompanied by a
+    written offer, valid for at least three years and valid for as
+    long as you offer spare parts or customer support for that product
+    model, to give anyone who possesses the object code either (1) a
+    copy of the Corresponding Source for all the software in the
+    product that is covered by this License, on a durable physical
+    medium customarily used for software interchange, for a price no
+    more than your reasonable cost of physically performing this
+    conveying of source, or (2) access to copy the
+    Corresponding Source from a network server at no charge.
+
+    c) Convey individual copies of the object code with a copy of the
+    written offer to provide the Corresponding Source.  This
+    alternative is allowed only occasionally and noncommercially, and
+    only if you received the object code with such an offer, in accord
+    with subsection 6b.
+
+    d) Convey the object code by offering access from a designated
+    place (gratis or for a charge), and offer equivalent access to the
+    Corresponding Source in the same way through the same place at no
+    further charge.  You need not require recipients to copy the
+    Corresponding Source along with the object code.  If the place to
+    copy the object code is a network server, the Corresponding Source
+    may be on a different server (operated by you or a third party)
+    that supports equivalent copying facilities, provided you maintain
+    clear directions next to the object code saying where to find the
+    Corresponding Source.  Regardless of what server hosts the
+    Corresponding Source, you remain obligated to ensure that it is
+    available for as long as needed to satisfy these requirements.
+
+    e) Convey the object code using peer-to-peer transmission, provided
+    you inform other peers where the object code and Corresponding
+    Source of the work are being offered to the general public at no
+    charge under subsection 6d.
+
+  A separable portion of the object code, whose source code is excluded
+from the Corresponding Source as a System Library, need not be
+included in conveying the object code work.
+
+  A "User Product" is either (1) a "consumer product", which means any
+tangible personal property which is normally used for personal, family,
+or household purposes, or (2) anything designed or sold for incorporation
+into a dwelling.  In determining whether a product is a consumer product,
+doubtful cases shall be resolved in favor of coverage.  For a particular
+product received by a particular user, "normally used" refers to a
+typical or common use of that class of product, regardless of the status
+of the particular user or of the way in which the particular user
+actually uses, or expects or is expected to use, the product.  A product
+is a consumer product regardless of whether the product has substantial
+commercial, industrial or non-consumer uses, unless such uses represent
+the only significant mode of use of the product.
+
+  "Installation Information" for a User Product means any methods,
+procedures, authorization keys, or other information required to install
+and execute modified versions of a covered work in that User Product from
+a modified version of its Corresponding Source.  The information must
+suffice to ensure that the continued functioning of the modified object
+code is in no case prevented or interfered with solely because
+modification has been made.
+
+  If you convey an object code work under this section in, or with, or
+specifically for use in, a User Product, and the conveying occurs as
+part of a transaction in which the right of possession and use of the
+User Product is transferred to the recipient in perpetuity or for a
+fixed term (regardless of how the transaction is characterized), the
+Corresponding Source conveyed under this section must be accompanied
+by the Installation Information.  But this requirement does not apply
+if neither you nor any third party retains the ability to install
+modified object code on the User Product (for example, the work has
+been installed in ROM).
+
+  The requirement to provide Installation Information does not include a
+requirement to continue to provide support service, warranty, or updates
+for a work that has been modified or installed by the recipient, or for
+the User Product in which it has been modified or installed.  Access to a
+network may be denied when the modification itself materially and
+adversely affects the operation of the network or violates the rules and
+protocols for communication across the network.
+
+  Corresponding Source conveyed, and Installation Information provided,
+in accord with this section must be in a format that is publicly
+documented (and with an implementation available to the public in
+source code form), and must require no special password or key for
+unpacking, reading or copying.
+
+  7. Additional Terms.
+
+  "Additional permissions" are terms that supplement the terms of this
+License by making exceptions from one or more of its conditions.
+Additional permissions that are applicable to the entire Program shall
+be treated as though they were included in this License, to the extent
+that they are valid under applicable law.  If additional permissions
+apply only to part of the Program, that part may be used separately
+under those permissions, but the entire Program remains governed by
+this License without regard to the additional permissions.
+
+  When you convey a copy of a covered work, you may at your option
+remove any additional permissions from that copy, or from any part of
+it.  (Additional permissions may be written to require their own
+removal in certain cases when you modify the work.)  You may place
+additional permissions on material, added by you to a covered work,
+for which you have or can give appropriate copyright permission.
+
+  Notwithstanding any other provision of this License, for material you
+add to a covered work, you may (if authorized by the copyright holders of
+that material) supplement the terms of this License with terms:
+
+    a) Disclaiming warranty or limiting liability differently from the
+    terms of sections 15 and 16 of this License; or
+
+    b) Requiring preservation of specified reasonable legal notices or
+    author attributions in that material or in the Appropriate Legal
+    Notices displayed by works containing it; or
+
+    c) Prohibiting misrepresentation of the origin of that material, or
+    requiring that modified versions of such material be marked in
+    reasonable ways as different from the original version; or
+
+    d) Limiting the use for publicity purposes of names of licensors or
+    authors of the material; or
+
+    e) Declining to grant rights under trademark law for use of some
+    trade names, trademarks, or service marks; or
+
+    f) Requiring indemnification of licensors and authors of that
+    material by anyone who conveys the material (or modified versions of
+    it) with contractual assumptions of liability to the recipient, for
+    any liability that these contractual assumptions directly impose on
+    those licensors and authors.
+
+  All other non-permissive additional terms are considered "further
+restrictions" within the meaning of section 10.  If the Program as you
+received it, or any part of it, contains a notice stating that it is
+governed by this License along with a term that is a further
+restriction, you may remove that term.  If a license document contains
+a further restriction but permits relicensing or conveying under this
+License, you may add to a covered work material governed by the terms
+of that license document, provided that the further restriction does
+not survive such relicensing or conveying.
+
+  If you add terms to a covered work in accord with this section, you
+must place, in the relevant source files, a statement of the
+additional terms that apply to those files, or a notice indicating
+where to find the applicable terms.
+
+  Additional terms, permissive or non-permissive, may be stated in the
+form of a separately written license, or stated as exceptions;
+the above requirements apply either way.
+
+  8. Termination.
+
+  You may not propagate or modify a covered work except as expressly
+provided under this License.  Any attempt otherwise to propagate or
+modify it is void, and will automatically terminate your rights under
+this License (including any patent licenses granted under the third
+paragraph of section 11).
+
+  However, if you cease all violation of this License, then your
+license from a particular copyright holder is reinstated (a)
+provisionally, unless and until the copyright holder explicitly and
+finally terminates your license, and (b) permanently, if the copyright
+holder fails to notify you of the violation by some reasonable means
+prior to 60 days after the cessation.
+
+  Moreover, your license from a particular copyright holder is
+reinstated permanently if the copyright holder notifies you of the
+violation by some reasonable means, this is the first time you have
+received notice of violation of this License (for any work) from that
+copyright holder, and you cure the violation prior to 30 days after
+your receipt of the notice.
+
+  Termination of your rights under this section does not terminate the
+licenses of parties who have received copies or rights from you under
+this License.  If your rights have been terminated and not permanently
+reinstated, you do not qualify to receive new licenses for the same
+material under section 10.
+
+  9. Acceptance Not Required for Having Copies.
+
+  You are not required to accept this License in order to receive or
+run a copy of the Program.  Ancillary propagation of a covered work
+occurring solely as a consequence of using peer-to-peer transmission
+to receive a copy likewise does not require acceptance.  However,
+nothing other than this License grants you permission to propagate or
+modify any covered work.  These actions infringe copyright if you do
+not accept this License.  Therefore, by modifying or propagating a
+covered work, you indicate your acceptance of this License to do so.
+
+  10. Automatic Licensing of Downstream Recipients.
+
+  Each time you convey a covered work, the recipient automatically
+receives a license from the original licensors, to run, modify and
+propagate that work, subject to this License.  You are not responsible
+for enforcing compliance by third parties with this License.
+
+  An "entity transaction" is a transaction transferring control of an
+organization, or substantially all assets of one, or subdividing an
+organization, or merging organizations.  If propagation of a covered
+work results from an entity transaction, each party to that
+transaction who receives a copy of the work also receives whatever
+licenses to the work the party's predecessor in interest had or could
+give under the previous paragraph, plus a right to possession of the
+Corresponding Source of the work from the predecessor in interest, if
+the predecessor has it or can get it with reasonable efforts.
+
+  You may not impose any further restrictions on the exercise of the
+rights granted or affirmed under this License.  For example, you may
+not impose a license fee, royalty, or other charge for exercise of
+rights granted under this License, and you may not initiate litigation
+(including a cross-claim or counterclaim in a lawsuit) alleging that
+any patent claim is infringed by making, using, selling, offering for
+sale, or importing the Program or any portion of it.
+
+  11. Patents.
+
+  A "contributor" is a copyright holder who authorizes use under this
+License of the Program or a work on which the Program is based.  The
+work thus licensed is called the contributor's "contributor version".
+
+  A contributor's "essential patent claims" are all patent claims
+owned or controlled by the contributor, whether already acquired or
+hereafter acquired, that would be infringed by some manner, permitted
+by this License, of making, using, or selling its contributor version,
+but do not include claims that would be infringed only as a
+consequence of further modification of the contributor version.  For
+purposes of this definition, "control" includes the right to grant
+patent sublicenses in a manner consistent with the requirements of
+this License.
+
+  Each contributor grants you a non-exclusive, worldwide, royalty-free
+patent license under the contributor's essential patent claims, to
+make, use, sell, offer for sale, import and otherwise run, modify and
+propagate the contents of its contributor version.
+
+  In the following three paragraphs, a "patent license" is any express
+agreement or commitment, however denominated, not to enforce a patent
+(such as an express permission to practice a patent or covenant not to
+sue for patent infringement).  To "grant" such a patent license to a
+party means to make such an agreement or commitment not to enforce a
+patent against the party.
+
+  If you convey a covered work, knowingly relying on a patent license,
+and the Corresponding Source of the work is not available for anyone
+to copy, free of charge and under the terms of this License, through a
+publicly available network server or other readily accessible means,
+then you must either (1) cause the Corresponding Source to be so
+available, or (2) arrange to deprive yourself of the benefit of the
+patent license for this particular work, or (3) arrange, in a manner
+consistent with the requirements of this License, to extend the patent
+license to downstream recipients.  "Knowingly relying" means you have
+actual knowledge that, but for the patent license, your conveying the
+covered work in a country, or your recipient's use of the covered work
+in a country, would infringe one or more identifiable patents in that
+country that you have reason to believe are valid.
+
+  If, pursuant to or in connection with a single transaction or
+arrangement, you convey, or propagate by procuring conveyance of, a
+covered work, and grant a patent license to some of the parties
+receiving the covered work authorizing them to use, propagate, modify
+or convey a specific copy of the covered work, then the patent license
+you grant is automatically extended to all recipients of the covered
+work and works based on it.
+
+  A patent license is "discriminatory" if it does not include within
+the scope of its coverage, prohibits the exercise of, or is
+conditioned on the non-exercise of one or more of the rights that are
+specifically granted under this License.  You may not convey a covered
+work if you are a party to an arrangement with a third party that is
+in the business of distributing software, under which you make payment
+to the third party based on the extent of your activity of conveying
+the work, and under which the third party grants, to any of the
+parties who would receive the covered work from you, a discriminatory
+patent license (a) in connection with copies of the covered work
+conveyed by you (or copies made from those copies), or (b) primarily
+for and in connection with specific products or compilations that
+contain the covered work, unless you entered into that arrangement,
+or that patent license was granted, prior to 28 March 2007.
+
+  Nothing in this License shall be construed as excluding or limiting
+any implied license or other defenses to infringement that may
+otherwise be available to you under applicable patent law.
+
+  12. No Surrender of Others' Freedom.
+
+  If conditions are imposed on you (whether by court order, agreement or
+otherwise) that contradict the conditions of this License, they do not
+excuse you from the conditions of this License.  If you cannot convey a
+covered work so as to satisfy simultaneously your obligations under this
+License and any other pertinent obligations, then as a consequence you may
+not convey it at all.  For example, if you agree to terms that obligate you
+to collect a royalty for further conveying from those to whom you convey
+the Program, the only way you could satisfy both those terms and this
+License would be to refrain entirely from conveying the Program.
+
+  13. Use with the GNU Affero General Public License.
+
+  Notwithstanding any other provision of this License, you have
+permission to link or combine any covered work with a work licensed
+under version 3 of the GNU Affero General Public License into a single
+combined work, and to convey the resulting work.  The terms of this
+License will continue to apply to the part which is the covered work,
+but the special requirements of the GNU Affero General Public License,
+section 13, concerning interaction through a network will apply to the
+combination as such.
+
+  14. Revised Versions of this License.
+
+  The Free Software Foundation may publish revised and/or new versions of
+the GNU General Public License from time to time.  Such new versions will
+be similar in spirit to the present version, but may differ in detail to
+address new problems or concerns.
+
+  Each version is given a distinguishing version number.  If the
+Program specifies that a certain numbered version of the GNU General
+Public License "or any later version" applies to it, you have the
+option of following the terms and conditions either of that numbered
+version or of any later version published by the Free Software
+Foundation.  If the Program does not specify a version number of the
+GNU General Public License, you may choose any version ever published
+by the Free Software Foundation.
+
+  If the Program specifies that a proxy can decide which future
+versions of the GNU General Public License can be used, that proxy's
+public statement of acceptance of a version permanently authorizes you
+to choose that version for the Program.
+
+  Later license versions may give you additional or different
+permissions.  However, no additional obligations are imposed on any
+author or copyright holder as a result of your choosing to follow a
+later version.
+
+  15. Disclaimer of Warranty.
+
+  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
+OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM
+IS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF
+ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+  16. Limitation of Liability.
+
+  IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS
+THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY
+GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE
+USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
+DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD
+PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),
+EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+  17. Interpretation of Sections 15 and 16.
+
+  If the disclaimer of warranty and limitation of liability provided
+above cannot be given local legal effect according to their terms,
+reviewing courts shall apply local law that most closely approximates
+an absolute waiver of all civil liability in connection with the
+Program, unless a warranty or assumption of liability accompanies a
+copy of the Program in return for a fee.
+
+                     END OF TERMS AND CONDITIONS
+
+            How to Apply These Terms to Your New Programs
+
+  If you develop a new program, and you want it to be of the greatest
+possible use to the public, the best way to achieve this is to make it
+free software which everyone can redistribute and change under these terms.
+
+  To do so, attach the following notices to the program.  It is safest
+to attach them to the start of each source file to most effectively
+state the exclusion of warranty; and each file should have at least
+the "copyright" line and a pointer to where the full notice is found.
+
+    <one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+Also add information on how to contact you by electronic and paper mail.
+
+  If the program does terminal interaction, make it output a short
+notice like this when it starts in an interactive mode:
+
+    <program>  Copyright (C) <year>  <name of author>
+    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
+    This is free software, and you are welcome to redistribute it
+    under certain conditions; type `show c' for details.
+
+The hypothetical commands `show w' and `show c' should show the appropriate
+parts of the General Public License.  Of course, your program's commands
+might be different; for a GUI interface, you would use an "about box".
+
+  You should also get your employer (if you work as a programmer) or school,
+if any, to sign a "copyright disclaimer" for the program, if necessary.
+For more information on this, and how to apply and follow the GNU GPL, see
+<https://www.gnu.org/licenses/>.
+
+  The GNU General Public License does not permit incorporating your program
+into proprietary programs.  If your program is a subroutine library, you
+may consider it more useful to permit linking proprietary applications with
+the library.  If this is what you want to do, use the GNU Lesser General
+Public License instead of this License.  But first, please read
+<https://www.gnu.org/licenses/why-not-lgpl.html>.
+
+
+README.md:
+---------
+
+# Savida
+
+An open-source HTML-based interactive story engine maker.
+
+## Features
+
+- **Visual Node Editor** — Create branching stories with a drag-and-drop node graph
+- **Character System** — Define characters with custom clothing, states, and body parts
+- **Class Presets** — Save and reuse character templates
+- **Image Support** — Upload base images and clothing layers for each character
+- **Strip/Wear Mechanics** — Control clothing visibility per choice
+- **Live Preview** — Test your story in a new tab with full image support
+- **Export** — Export as standalone playable HTML or story.js data file
+- **File System Saving** — Save directly to your computer with Ctrl+S
+- **Drag & Drop** — Import .story.json files by dropping them on the window
+
+## Getting Started
+
+1. Open `index.html` in Chrome, Edge, or Opera
+2. Click **📁 File → Set Save Folder** to choose where projects are stored
+3. Create or import a project
+4. Add scenes and connect them with the node editor
+5. Press **Ctrl+S** to save, **Ctrl+P** to preview
+
+## License
+
+GNU General Public License v3.0
 
 index.html:
 ----------
@@ -151,6 +868,11 @@ index.html:
 
 </body>
 </html>
+
+sns.bat:
+-------
+
+python sns.py
 
 css\character-editor.css:
 ------------------------
@@ -609,7 +1331,7 @@ css\panels.css:
 #modal-overlay.show{display:flex;}
 #modal{
     background:var(--surface);border:1px solid var(--border);border-radius:10px;
-    padding:16px;max-width:600px;width:90%;max-height:80vh;overflow-y:auto;
+    padding:16px;max-width:900px;width:95%;max-height:85vh;overflow-y:auto;
     box-shadow:0 8px 40px rgba(0,0,0,0.9);font-size:12px;
 }
 #modal h3{color:var(--accent);margin-bottom:10px;}
@@ -1060,10 +1782,17 @@ var Canvas = {
         var p = ProjectManager.getActive();
         if (!p) return;
         var scenes = this.nodes.filter(function(n) { return n.type === 'scene'; }).map(function(n) {
-            return {
+            var scene = {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
                 text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
+            // Copy all pose_ and expr_ properties
+            Object.keys(n).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    scene[key] = n[key];
+                }
+            });
+            return scene;
         });
         var endings = {};
         this.nodes.filter(function(n) { return n.type === 'ending'; }).forEach(function(n) {
@@ -1239,12 +1968,23 @@ js\CharacterEditor.js:
 
 var CharacterEditor = {
     currentCharIndex: -1,
+    currentPoseKey: 'default',
 
     open: function(charIndex) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[charIndex]) return;
         this.currentCharIndex = charIndex;
         var char = p.config.characters[charIndex];
+        this.currentPoseKey = char.currentPose || 'default';
+
+        // Ensure all poses exist in ImageManager
+        (char.poses || ['default']).forEach(function(pk) {
+            ImageManager.addPose(char.id, pk, pk);
+        });
+        // Initialize expressions for current pose from character's global list
+        (char.expressions || ['neutral']).forEach(function(ek) {
+            ImageManager.addExpression(char.id, this.currentPoseKey, ek);
+        }, this);
 
         var overlay = document.getElementById('modal-overlay');
         var modalTitle = document.getElementById('modal-title');
@@ -1258,26 +1998,29 @@ var CharacterEditor = {
         var isCustom = CharacterClasses.isCustom(char);
         var preset = char.classPreset ? CharacterClasses.getPreset(char.classPreset) : null;
         var bodyParts = char.bodyParts || {};
+        var poses = char.poses || ['default'];
+        var poseKey = this.currentPoseKey;
+        var poseData = ImageManager.getPoseData(char.id, poseKey) || { base: null, clothing: {}, expressions: {} };
+        var expressions = char.expressions || ['neutral'];
 
-        var html = '<div style="display:flex;gap:12px;max-height:65vh;">';
+        var html = '<div style="display:flex;gap:16px;max-height:75vh;">';
         
-        // ---- LEFT COLUMN: Editor Fields ----
-        html += '<div style="flex:1;overflow-y:auto;padding-right:4px;">';
+        // ---- LEFT COLUMN ----
+        html += '<div style="flex:1;overflow-y:auto;padding-right:6px;">';
 
         // Basic Info
         html += '<h4 style="color:var(--accent);margin:0 0 4px;">📋 Basic Info</h4>';
         html += '<div style="display:flex;gap:8px;">';
-        html += '<div style="flex:1;"><label>Name</label><input id="ceName" value="' + Utils.escHtml(char.name) + '" onchange="CharacterEditor.updatePreview()"></div>';
-        html += '<div style="flex:1;"><label>Role</label><select id="ceRole" onchange="CharacterEditor.updatePreview()">';
+        html += '<div style="flex:1;"><label>Name</label><input id="ceName" value="' + Utils.escHtml(char.name) + '"></div>';
+        html += '<div style="flex:1;"><label>Role</label><select id="ceRole">';
         ['protagonist', 'companion', 'antagonist', 'neutral'].forEach(function(r) {
-            html += '<option value="' + r + '"' + (char.role === r ? ' selected' : '') + '>' +
-                    r.charAt(0).toUpperCase() + r.slice(1) + '</option>';
+            html += '<option value="' + r + '"' + (char.role === r ? ' selected' : '') + '>' + r.charAt(0).toUpperCase() + r.slice(1) + '</option>';
         });
         html += '</select></div></div>';
 
         // Icon
         html += '<label>Icon <button class="btn-sm-edit emoji-trigger" onclick="EmojiPicker.open(\'ceIcon\',event)">Pick</button></label>';
-        html += '<input id="ceIcon" value="' + (char.icon || '🧑') + '" onchange="CharacterEditor.updatePreview()">';
+        html += '<input id="ceIcon" value="' + (char.icon || '🧑') + '">';
 
         // Class
         html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🏗️ Class Preset</h4>';
@@ -1285,8 +2028,7 @@ var CharacterEditor = {
         html += '<select id="ceClass" style="flex:1;">';
         CharacterClasses.getPresetKeys().forEach(function(key) {
             var pr = CharacterClasses.getPreset(key);
-            html += '<option value="' + key + '"' + (char.classPreset === key ? ' selected' : '') + '>' +
-                    (pr ? pr.icon + ' ' + pr.name : key) + '</option>';
+            html += '<option value="' + key + '"' + (char.classPreset === key ? ' selected' : '') + '>' + (pr ? pr.icon + ' ' + pr.name : key) + '</option>';
         });
         html += '<option value="custom"' + (isCustom ? ' selected' : '') + '>🧑 Custom</option>';
         html += '</select>';
@@ -1294,57 +2036,87 @@ var CharacterEditor = {
         html += '</div>';
 
         if (!isCustom && preset) {
-            html += '<div style="font-size:9px;color:var(--dim);margin-top:4px;">';
-            html += 'Preset: <strong>' + Utils.escHtml(preset.name) + '</strong> — ';
-            html += preset.clothing.join(', ') + ' | ' + preset.states.join(', ');
-            html += '</div>';
+            html += '<div style="font-size:9px;color:var(--dim);margin-top:4px;">Preset: <strong>' + Utils.escHtml(preset.name) + '</strong></div>';
         }
 
-        // ---- Character Image ----
-        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🖼️ Character Images</h4>';
-        html += '<div style="background:rgba(0,0,0,0.2);padding:8px;border-radius:6px;">';
+        // ---- POSE SELECTOR ----
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🎭 Poses <button class="btn-sm-add" onclick="CharacterEditor.addPose()">+</button></h4>';
+        html += '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px;">';
+        poses.forEach(function(pk) {
+            var pd = ImageManager.getPoseData(char.id, pk) || {};
+            var isActive = pk === poseKey;
+            html += '<div onclick="CharacterEditor.switchPose(\'' + pk + '\')" style="cursor:pointer;padding:6px 12px;border-radius:5px;font-size:11px;border:1px solid ' + (isActive ? 'var(--accent)' : 'var(--border)') + ';background:' + (isActive ? 'rgba(224,64,128,0.2)' : 'rgba(0,0,0,0.3)') + ';font-weight:' + (isActive ? '700' : '400') + ';">';
+            html += (pd.label || pk);
+            if (pk !== 'default') html += ' <span onclick="event.stopPropagation();CharacterEditor.removePose(\'' + pk + '\')" style="color:var(--danger);margin-left:4px;">✕</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+
+        // ---- POSE IMAGES ----
+        html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🖼️ Pose: ' + (poseData.label || poseKey) + '</h4>';
+        html += '<div style="background:rgba(0,0,0,0.2);padding:10px;border-radius:6px;">';
 
         // Base image
-        html += '<label>Base Image (naked character)</label>';
-        var baseImg = ImageManager.getBaseImage(char.id);
-        html += '<div style="display:flex;gap:8px;align-items:start;">';
-        if (baseImg) {
-            html += '<img src="' + baseImg + '" style="max-width:120px;max-height:160px;border-radius:4px;border:1px solid var(--border);">';
-            html += '<div style="flex:1;display:flex;flex-direction:column;gap:4px;">';
-            html += '<button class="btn-sm-remove" onclick="ImageManager.removeBaseImage(\'' + char.id + '\');CharacterEditor.renderPreview();">Remove Base</button>';
-            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;">';
-            html += '</div>';
+        html += '<label>Base Image</label>';
+        html += '<div style="display:flex;gap:8px;align-items:start;margin-bottom:4px;">';
+        if (poseData.base) {
+            html += '<img src="' + poseData.base + '" style="max-width:120px;max-height:160px;border-radius:4px;border:1px solid var(--border);">';
+            html += '<button class="btn-sm-remove" onclick="ImageManager.setPoseBase(\'' + char.id + '\',\'' + poseKey + '\',null);CharacterEditor.open(' + this.currentCharIndex + ')">Remove</button>';
         } else {
-            html += '<div style="flex:1;color:var(--dim);font-size:10px;">No base image set.<br>Upload a PNG, WebP, or JPEG.</div>';
+            html += '<div style="color:var(--dim);font-size:10px;">No base image set.</div>';
         }
         html += '</div>';
-        if (!baseImg) {
-            html += '<div style="margin-top:4px;">';
-            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadBaseImage(\'' + char.id + '\',this)" style="font-size:10px;width:100%;">';
-            html += '</div>';
-        }
+        html += '<input type="file" id="ceBaseUpload" accept="image/png,image/webp,image/jpeg" style="font-size:10px;">';
 
-        // Clothing images
-        html += '<label style="margin-top:8px;">Clothing Layers</label>';
-        html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Upload an image for each clothing item. Order matters — first items are drawn first (bottom layer).</div>';
-
-        var clothingImgs = ImageManager.getClothingImages(char.id);
+        // Clothing for this pose
+        html += '<label style="margin-top:10px;">Clothing Images</label>';
         (char.clothing || []).forEach(function(clothName, ci) {
-            html += '<div style="display:flex;align-items:center;gap:6px;margin:4px 0;padding:4px;background:rgba(0,0,0,0.2);border-radius:4px;">';
-            html += '<span style="font-size:10px;min-width:60px;">' + (ci + 1) + '. ' + Utils.escHtml(clothName) + '</span>';
-            if (clothingImgs[clothName]) {
-                html += '<img src="' + clothingImgs[clothName] + '" style="max-width:50px;max-height:50px;border-radius:3px;border:1px solid var(--border);">';
-                html += '<button class="btn-sm-remove" onclick="ImageManager.removeClothingImage(\'' + char.id + '\',\'' + clothName + '\');CharacterEditor.renderPreview();">✕</button>';
+            var clothImg = ImageManager.getPoseClothing(char.id, poseKey, clothName);
+            html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;padding:4px;background:rgba(0,0,0,0.15);border-radius:4px;">';
+            html += '<span style="font-size:10px;min-width:60px;">' + (ci+1) + '. ' + Utils.escHtml(clothName) + '</span>';
+            if (clothImg) {
+                html += '<img src="' + clothImg + '" style="max-width:45px;max-height:45px;border-radius:3px;">';
+                html += '<button class="btn-sm-remove" onclick="ImageManager.removePoseClothing(\'' + char.id + '\',\'' + poseKey + '\',\'' + clothName + '\');CharacterEditor.open(' + this.currentCharIndex + ')">✕</button>';
             } else {
-                html += '<span style="color:var(--dim);font-size:9px;flex:1;">No image</span>';
+                html += '<span style="color:var(--dim);font-size:9px;">No img</span>';
             }
-            html += '<input type="file" accept="image/png,image/webp,image/jpeg" onchange="CharacterEditor.uploadClothingImage(\'' + char.id + '\',\'' + clothName + '\',this)" style="font-size:9px;width:120px;">';
+            html += '<input type="file" id="ceClothUpload_' + ci + '" accept="image/png,image/webp,image/jpeg" style="font-size:9px;width:110px;">';
             html += '</div>';
         });
 
-        html += '</div>'; // close image section
+        // Expressions for this pose
+        html += '<label style="margin-top:10px;">😊 Expressions <button class="btn-sm-add" onclick="CharacterEditor.addExpression(\'' + poseKey + '\')">+</button></label>';
+        expressions.forEach(function(exprKey) {
+            var exprData = (poseData.expressions && poseData.expressions[exprKey]) ? poseData.expressions[exprKey] : { eyes: null, mouth: null };
+            var isNeutral = exprKey === 'neutral';
+            html += '<div style="display:flex;align-items:center;gap:6px;margin:3px 0;padding:5px 8px;background:rgba(0,0,0,0.2);border-radius:4px;">';
+            html += '<span style="font-size:10px;min-width:55px;font-weight:' + (isNeutral ? '700' : '400') + ';">' + Utils.escHtml(exprKey) + '</span>';
+            
+            html += '<span style="font-size:8px;">Eyes:</span>';
+            if (exprData.eyes) {
+                html += '<img src="' + exprData.eyes + '" style="max-width:40px;max-height:24px;border-radius:2px;">';
+            } else {
+                html += '<span style="color:var(--dim);font-size:8px;">-</span>';
+            }
+            html += '<input type="file" id="ceExprEyes_' + exprKey + '" accept="image/png,image/webp,image/jpeg" style="font-size:8px;width:75px;">';
+            
+            html += '<span style="font-size:8px;">Mouth:</span>';
+            if (exprData.mouth) {
+                html += '<img src="' + exprData.mouth + '" style="max-width:40px;max-height:24px;border-radius:2px;">';
+            } else {
+                html += '<span style="color:var(--dim);font-size:8px;">-</span>';
+            }
+            html += '<input type="file" id="ceExprMouth_' + exprKey + '" accept="image/png,image/webp,image/jpeg" style="font-size:8px;width:75px;">';
+            
+            if (!isNeutral) {
+                html += '<button class="btn-sm-remove" onclick="CharacterEditor.removeExpressionAndRefresh(\'' + char.id + '\',\'' + poseKey + '\',\'' + exprKey + '\')">✕</button>';
+            }
+            html += '</div>';
+        });
 
-        // Clothing
+        html += '</div>'; // close pose images
+
+        // Clothing names
         html += '<h4 style="color:var(--accent);margin:12px 0 4px;">👔 Clothing Items</h4>';
         html += '<div style="font-size:9px;color:var(--dim);margin-bottom:4px;">Drag to reorder. First = innermost layer.</div>';
         html += '<div id="ceClothingList" style="display:flex;flex-direction:column;gap:3px;margin-bottom:4px;">';
@@ -1376,7 +2148,7 @@ var CharacterEditor = {
         html += '<input id="ceNewState" placeholder="New state..." style="flex:1;">';
         html += '<button class="btn-sm-add" onclick="CharacterEditor.addState()">+ Add</button>';
         html += '</div>';
-        html += '<label>Default State</label><select id="ceDefaultState" onchange="CharacterEditor.updatePreview()">';
+        html += '<label>Default State</label><select id="ceDefaultState">';
         (char.states || ['Normal']).forEach(function(s) {
             html += '<option value="' + s + '"' + (char.defaultState === s ? ' selected' : '') + '>' + s + '</option>';
         });
@@ -1384,10 +2156,8 @@ var CharacterEditor = {
 
         // Body Parts
         html += '<h4 style="color:var(--accent);margin:12px 0 4px;">🫦 Body Parts</h4>';
-        html += '<div id="ceBodyPartsList">';
         if (Object.keys(bodyParts).length > 0) {
-            html += '<div style="margin-bottom:6px;"><strong style="font-size:10px;">✅ Enable/Disable:</strong></div>';
-            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">';
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px;">';
             Object.keys(bodyParts).forEach(function(key) {
                 html += '<label style="font-size:10px;display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.2);padding:3px 8px;border-radius:4px;">';
                 html += '<input type="checkbox" ' + (bodyParts[key].enabled ? 'checked' : '') + ' onchange="CharacterEditor.toggleBodyPart(\'' + key + '\',this.checked)">';
@@ -1396,19 +2166,6 @@ var CharacterEditor = {
             });
             html += '</div>';
         }
-        var bpKeys = Object.keys(bodyParts);
-        if (bpKeys.length === 0) {
-            html += '<div style="color:var(--dim);font-size:10px;font-style:italic;">No body parts defined.</div>';
-        }
-        bpKeys.forEach(function(key) {
-            html += '<div style="display:flex;gap:4px;align-items:center;margin:3px 0;background:rgba(0,0,0,0.2);padding:4px 6px;border-radius:4px;">';
-            html += '<span style="flex:1;font-size:10px;">' + Utils.escHtml(key) + '</span>';
-            html += '<input value="' + Utils.escHtml(bodyParts[key].label || key) + '" onchange="CharacterEditor.updateBodyPartLabel(\'' + key + '\',this.value)" style="width:70px;font-size:10px;" placeholder="Label">';
-            html += '<input value="' + Utils.escHtml(bodyParts[key].icon || '🫦') + '" id="bpIcon_' + key + '" onchange="CharacterEditor.updateBodyPartIcon(\'' + key + '\',this.value)" style="width:35px;font-size:10px;cursor:pointer;" class="emoji-trigger" onclick="EmojiPicker.open(\'bpIcon_' + key + '\',event)">';
-            html += '<button class="btn-sm-remove" onclick="CharacterEditor.removeBodyPart(\'' + key + '\')">✕</button>';
-            html += '</div>';
-        });
-        html += '</div>';
         html += '<div style="display:flex;gap:4px;margin-top:4px;">';
         html += '<input id="ceNewBodyPartKey" placeholder="Key" style="flex:1;">';
         html += '<input id="ceNewBodyPartLabel" placeholder="Label" style="flex:1;">';
@@ -1417,14 +2174,10 @@ var CharacterEditor = {
         html += '</div>';
         html += '<div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:4px;">';
         [
-            { key: 'oral', label: 'Oral', icon: '👄' },
-            { key: 'vaginal', label: 'Vaginal', icon: '🌮' },
-            { key: 'anal', label: 'Anal', icon: '🍑' },
-            { key: 'hand', label: 'Handjob', icon: '✋' },
-            { key: 'foot', label: 'Footjob', icon: '🦶' },
-            { key: 'dick', label: 'Dick', icon: '🍆' },
-            { key: 'breasts', label: 'Breasts', icon: '🍒' },
-            { key: 'mouth', label: 'Mouth', icon: '👅' }
+            { key: 'oral', label: 'Oral', icon: '👄' }, { key: 'vaginal', label: 'Vaginal', icon: '🌮' },
+            { key: 'anal', label: 'Anal', icon: '🍑' }, { key: 'hand', label: 'Handjob', icon: '✋' },
+            { key: 'foot', label: 'Footjob', icon: '🦶' }, { key: 'dick', label: 'Dick', icon: '🍆' },
+            { key: 'breasts', label: 'Breasts', icon: '🍒' }, { key: 'mouth', label: 'Mouth', icon: '👅' }
         ].forEach(function(quick) {
             html += '<button style="background:rgba(0,0,0,0.3);border:1px solid var(--border);color:var(--text);padding:2px 6px;border-radius:3px;font-size:9px;cursor:pointer;" onclick="CharacterEditor.quickAddBodyPart(\'' + quick.key + '\',\'' + quick.label + '\',\'' + quick.icon + '\')">' + quick.icon + ' ' + quick.label + '</button>';
         });
@@ -1433,34 +2186,16 @@ var CharacterEditor = {
         html += '</div>'; // end left column
 
         // ---- RIGHT COLUMN: Live Preview ----
-        html += '<div style="width:220px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:8px;background:rgba(0,0,0,0.2);border-radius:8px;padding:10px;position:sticky;top:0;">';
+        html += '<div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px;background:rgba(0,0,0,0.2);border-radius:10px;padding:12px;position:sticky;top:0;">';
         html += '<h4 style="color:var(--accent);margin:0;">🔍 Live Preview</h4>';
-        
-        html += '<div id="cePreviewContainer" style="position:relative;width:180px;height:260px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid var(--border);">';
-        html += '<div id="cePreviewNoImage" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;">' + (char.icon || '🧑') + '</div>';
+        html += '<div id="cePreviewContainer" style="position:relative;width:220px;height:320px;background:rgba(0,0,0,0.3);border-radius:8px;overflow:hidden;border:1px solid var(--border);"></div>';
+        html += '<div style="font-size:9px;color:var(--dim);">Pose: ' + (poseData.label || poseKey) + ' | Expr: neutral</div>';
         html += '</div>';
-
-        html += '<div id="cePreviewClothing" style="width:100%;font-size:9px;">';
-        html += '<div style="color:var(--dim);text-align:center;margin-bottom:4px;">Clothing Layers:</div>';
-        (char.clothing || []).forEach(function(item, ci) {
-            html += '<div class="cloth-preview-item" data-cloth-index="' + ci + '" style="display:flex;align-items:center;gap:4px;padding:3px 6px;margin:2px 0;background:rgba(0,0,0,0.25);border-radius:3px;cursor:pointer;font-size:9px;">';
-            html += '<span style="color:var(--dim);">' + (ci + 1) + '.</span>';
-            html += '<span style="flex:1;">' + Utils.escHtml(item) + '</span>';
-            html += '<span class="cloth-preview-dot" style="width:6px;height:6px;border-radius:50%;background:var(--green);" title="Visible"></span>';
-            html += '</div>';
-        });
-        html += '</div>';
-
-        html += '<div style="width:100%;font-size:9px;color:var(--dim);text-align:center;">';
-        html += (char.clothing || []).length + ' clothing · ' + (char.states || []).length + ' states · ' + Object.keys(bodyParts).length + ' body parts';
-        html += '</div>';
-
-        html += '</div>'; // end right column
 
         html += '</div>'; // end flex row
 
         // Buttons
-        html += '<div style="margin-top:12px;display:flex;gap:6px;">';
+        html += '<div style="margin-top:14px;display:flex;gap:6px;">';
         html += '<button style="background:var(--danger);" onclick="CharacterEditor.deleteCharacter()">🗑️ Delete</button>';
         html += '<div style="flex:1;"></div>';
         html += '<button style="background:var(--border);" onclick="UI.closeModal()">Cancel</button>';
@@ -1474,44 +2209,196 @@ var CharacterEditor = {
         setTimeout(function() {
             self.initClothingDragDrop();
             self.renderPreview();
-        }, 150);
+            self._bindImageUploads(char.id, poseKey, char.clothing || [], expressions);
+        }, 200);
     },
 
-    // ---- LIVE PREVIEW ----
+    _bindImageUploads: function(charId, poseKey, clothing, expressions) {
+        var self = this;
+        
+        var baseUpload = document.getElementById('ceBaseUpload');
+        if (baseUpload) {
+            baseUpload.addEventListener('change', function() {
+                self.uploadPoseBase(charId, poseKey, this);
+            });
+        }
+        
+        clothing.forEach(function(clothName, ci) {
+            var clothUpload = document.getElementById('ceClothUpload_' + ci);
+            if (clothUpload) {
+                clothUpload.addEventListener('change', function() {
+                    self.uploadPoseClothing(charId, poseKey, clothName, this);
+                });
+            }
+        });
+        
+        expressions.forEach(function(exprKey) {
+            var eyesUpload = document.getElementById('ceExprEyes_' + exprKey);
+            if (eyesUpload) {
+                eyesUpload.addEventListener('change', function() {
+                    self.uploadExpressionPart(charId, poseKey, exprKey, 'eyes', this);
+                });
+            }
+            var mouthUpload = document.getElementById('ceExprMouth_' + exprKey);
+            if (mouthUpload) {
+                mouthUpload.addEventListener('change', function() {
+                    self.uploadExpressionPart(charId, poseKey, exprKey, 'mouth', this);
+                });
+            }
+        });
+    },
+
+    switchPose: function(poseKey) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        p.config.characters[this.currentCharIndex].currentPose = poseKey;
+        this.currentPoseKey = poseKey;
+        this.open(this.currentCharIndex);
+    },
+
+    refreshPose: function() {
+        this.renderPreview();
+    },
+
+    addPose: function() {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        var key = prompt('Pose key (e.g. kneeling, sitting):');
+        if (!key) return;
+        key = key.toLowerCase().replace(/\s+/g, '_');
+        var label = prompt('Display name:', key);
+        if (!label) return;
+        if (!char.poses) char.poses = ['default'];
+        if (char.poses.indexOf(key) < 0) char.poses.push(key);
+        ImageManager.addPose(char.id, key, label);
+        // Initialize all global expressions for this new pose
+        (char.expressions || ['neutral']).forEach(function(ek) {
+            ImageManager.addExpression(char.id, key, ek);
+        });
+        this.currentPoseKey = key;
+        this.open(this.currentCharIndex);
+    },
+
+    removePose: function(poseKey) {
+        if (poseKey === 'default') { alert('Cannot remove default pose.'); return; }
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        char.poses = char.poses.filter(function(pk) { return pk !== poseKey; });
+        ImageManager.removePose(char.id, poseKey);
+        this.currentPoseKey = 'default';
+        this.open(this.currentCharIndex);
+    },
+
+    addExpression: function(poseKey) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        var key = prompt('Expression key (e.g. angry, happy):');
+        if (!key) return;
+        key = key.toLowerCase().replace(/\s+/g, '_');
+        if (!char.expressions) char.expressions = ['neutral'];
+        if (char.expressions.indexOf(key) < 0) char.expressions.push(key);
+        // Initialize this expression for ALL poses
+        (char.poses || ['default']).forEach(function(pk) {
+            ImageManager.addExpression(char.id, pk, key);
+        });
+        this.open(this.currentCharIndex);
+    },
+
+    removeExpressionAndRefresh: function(charId, poseKey, exprKey) {
+        var p = ProjectManager.getActive();
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        char.expressions = (char.expressions || ['neutral']).filter(function(e) { return e !== exprKey; });
+        (char.poses || ['default']).forEach(function(pk) {
+            ImageManager.removeExpression(charId, pk, exprKey);
+        });
+        this.open(this.currentCharIndex);
+    },
+
+    uploadPoseBase: function(charId, poseKey, input) {
+        var file = input.files[0]; if (!file) return;
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setPoseBase(charId, poseKey, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) { console.error('Upload failed:', err); input.value = ''; });
+    },
+
+    uploadPoseClothing: function(charId, poseKey, clothName, input) {
+        var file = input.files[0]; if (!file) return;
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl);
+        }).then(function(compressed) {
+            ImageManager.setPoseClothing(charId, poseKey, clothName, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) { console.error('Upload failed:', err); input.value = ''; });
+    },
+
+    uploadExpressionPart: function(charId, poseKey, exprKey, part, input) {
+        var file = input.files[0]; if (!file) return;
+        var self = this;
+        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
+            return ImageManager.compressImage(dataUrl, 800, 400, 1.0);
+        }).then(function(compressed) {
+            ImageManager.setExpressionPart(charId, poseKey, exprKey, part, compressed);
+            self.renderPreview();
+            input.value = '';
+        }).catch(function(err) { console.error('Upload failed:', err); input.value = ''; });
+    },
+
     renderPreview: function() {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         var char = p.config.characters[this.currentCharIndex];
-        
+        var poseKey = this.currentPoseKey;
         var container = document.getElementById('cePreviewContainer');
         if (!container) return;
 
-        var baseImg = ImageManager.getBaseImage(char.id);
-        var clothingImgs = ImageManager.getClothingImages(char.id);
-        
+        var poseData = ImageManager.getPoseData(char.id, poseKey) || { base: null, clothing: {}, expressions: {} };
         container.innerHTML = '';
-        
         var hasAny = false;
-        
-        if (baseImg) {
+
+        if (poseData.base) {
             var img = document.createElement('img');
-            img.src = baseImg;
+            img.src = poseData.base;
             img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:1;';
             container.appendChild(img);
             hasAny = true;
         }
-        
+
         (char.clothing || []).forEach(function(clothName, ci) {
-            if (clothingImgs[clothName]) {
+            if (poseData.clothing && poseData.clothing[clothName]) {
                 var cimg = document.createElement('img');
-                cimg.src = clothingImgs[clothName];
+                cimg.src = poseData.clothing[clothName];
                 cimg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:' + (2 + ci) + ';';
                 container.appendChild(cimg);
                 hasAny = true;
             }
         });
-        
-        if (!hasAny) {
+
+        var neutralExpr = (poseData.expressions && poseData.expressions['neutral']) ? poseData.expressions['neutral'] : { eyes: null, mouth: null };
+        if (neutralExpr.eyes) {
+            var eimg = document.createElement('img');
+            eimg.src = neutralExpr.eyes;
+            eimg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:99;pointer-events:none;';
+            container.appendChild(eimg);
+        }
+        if (neutralExpr.mouth) {
+            var mimg = document.createElement('img');
+            mimg.src = neutralExpr.mouth;
+            mimg.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:100;pointer-events:none;';
+            container.appendChild(mimg);
+        }
+
+        if (!hasAny && !neutralExpr.eyes && !neutralExpr.mouth) {
             var fallback = document.createElement('div');
             fallback.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:var(--dim);font-size:3em;';
             fallback.textContent = char.icon || '🧑';
@@ -1519,74 +2406,12 @@ var CharacterEditor = {
         }
     },
 
-    updatePreview: function() {
-        var nameEl = document.getElementById('ceName');
-        var iconEl = document.getElementById('ceIcon');
-        if (nameEl && iconEl) {
-            var p = ProjectManager.getActive();
-            if (p && p.config.characters[this.currentCharIndex]) {
-                p.config.characters[this.currentCharIndex].name = nameEl.value.trim() || 'Character';
-                p.config.characters[this.currentCharIndex].icon = iconEl.value || '🧑';
-            }
-        }
-        this.renderPreview();
-    },
-
-    // ---- Image Uploads ----
-    uploadBaseImage: function(charId, input) {
-        var file = input.files[0];
-        if (!file) return;
-        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
-            alert('Please select a PNG, WebP, or JPEG image.');
-            input.value = '';
-            return;
-        }
-        var self = this;
-        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
-            return ImageManager.compressImage(dataUrl);
-        }).then(function(compressed) {
-            ImageManager.setBaseImage(charId, compressed);
-            self.renderPreview();
-            input.value = '';
-        }).catch(function(err) {
-            console.error('Upload failed:', err);
-            alert('Could not upload image. Try a smaller file.');
-            input.value = '';
-        });
-    },
-
-    uploadClothingImage: function(charId, clothName, input) {
-        var file = input.files[0];
-        if (!file) return;
-        if (!file.type.match(/image\/(png|webp|jpeg)/)) {
-            alert('Please select a PNG, WebP, or JPEG image.');
-            input.value = '';
-            return;
-        }
-        var self = this;
-        ImageManager.readFileAsDataURL(file).then(function(dataUrl) {
-            return ImageManager.compressImage(dataUrl);
-        }).then(function(compressed) {
-            ImageManager.setClothingImage(charId, clothName, compressed);
-            self.renderPreview();
-            input.value = '';
-        }).catch(function(err) {
-            console.error('Upload failed:', err);
-            alert('Could not upload image. Try a smaller file.');
-            input.value = '';
-        });
-    },
-
-    // ---- Class ----
-    onClassChange: function() {},
+    updatePreview: function() { this.renderPreview(); },
 
     applyClassPreset: function() {
         var classKey = document.getElementById('ceClass').value;
-        if (classKey === 'custom') {
-            alert('Select a preset to apply, or choose Custom to edit manually.');
-            return;
-        }
-        if (!confirm('Apply preset "' + classKey + '"? This will overwrite clothing, states, and body parts.')) return;
+        if (classKey === 'custom') { alert('Select a preset to apply.'); return; }
+        if (!confirm('Apply preset "' + classKey + '"? This overwrites clothing, states, and body parts.')) return;
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         CharacterClasses.applyPreset(p.config.characters[this.currentCharIndex], classKey);
@@ -1594,109 +2419,51 @@ var CharacterEditor = {
         LeftPanel.render();
     },
 
-    // ---- Clothing ----
     addClothing: function() {
-        var input = document.getElementById('ceNewClothing');
-        var val = input.value.trim();
-        if (!val) return;
+        var input = document.getElementById('ceNewClothing'); var val = input.value.trim(); if (!val) return;
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         if (!p.config.characters[this.currentCharIndex].clothing) p.config.characters[this.currentCharIndex].clothing = [];
         p.config.characters[this.currentCharIndex].clothing.push(val);
-        input.value = '';
-        this.open(this.currentCharIndex);
+        input.value = ''; this.open(this.currentCharIndex);
     },
-
     removeClothing: function(index) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
-        var char = p.config.characters[this.currentCharIndex];
-        var removedName = char.clothing[index];
-        char.clothing.splice(index, 1);
-        if (removedName) ImageManager.removeClothingImage(char.id, removedName);
+        p.config.characters[this.currentCharIndex].clothing.splice(index, 1);
         this.open(this.currentCharIndex);
     },
 
-    // ---- Clothing Reorder ----
     initClothingDragDrop: function() {
-        var list = document.getElementById('ceClothingList');
-        if (!list) return;
-        
+        var list = document.getElementById('ceClothingList'); if (!list) return;
         var items = list.querySelectorAll('.cloth-drag-item');
-        var self = this;
-        var draggedIndex = -1;
-
+        var self = this; var draggedIndex = -1;
         items.forEach(function(item) {
-            item.addEventListener('dragstart', function(e) {
-                draggedIndex = parseInt(this.dataset.clothIndex);
-                this.style.opacity = '0.4';
-                this.style.border = '1px dashed var(--accent)';
-                e.dataTransfer.effectAllowed = 'move';
-            });
-
-            item.addEventListener('dragend', function(e) {
-                this.style.opacity = '1';
-                this.style.border = '1px solid transparent';
-                document.querySelectorAll('.cloth-drag-item').forEach(function(el) {
-                    el.style.borderTop = 'none';
-                    el.style.borderBottom = 'none';
-                });
-            });
-
-            item.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                e.dataTransfer.dropEffect = 'move';
-                var rect = this.getBoundingClientRect();
-                var midY = rect.top + rect.height / 2;
-                document.querySelectorAll('.cloth-drag-item').forEach(function(el) {
-                    el.style.borderTop = 'none';
-                    el.style.borderBottom = 'none';
-                });
-                if (e.clientY < midY) {
-                    this.style.borderTop = '2px solid var(--accent)';
-                } else {
-                    this.style.borderBottom = '2px solid var(--accent)';
-                }
-            });
-
-            item.addEventListener('dragleave', function(e) {
-                this.style.borderTop = 'none';
-                this.style.borderBottom = 'none';
-            });
-
+            item.addEventListener('dragstart', function(e) { draggedIndex = parseInt(this.dataset.clothIndex); this.style.opacity = '0.4'; e.dataTransfer.effectAllowed = 'move'; });
+            item.addEventListener('dragend', function() { this.style.opacity = '1'; });
+            item.addEventListener('dragover', function(e) { e.preventDefault(); });
             item.addEventListener('drop', function(e) {
                 e.preventDefault();
-                this.style.borderTop = 'none';
-                this.style.borderBottom = 'none';
-                
                 var targetIndex = parseInt(this.dataset.clothIndex);
                 if (draggedIndex === targetIndex || draggedIndex < 0) return;
-                
                 var p = ProjectManager.getActive();
                 if (!p || !p.config.characters[self.currentCharIndex]) return;
                 var char = p.config.characters[self.currentCharIndex];
-                
                 var movedItem = char.clothing.splice(draggedIndex, 1)[0];
                 char.clothing.splice(targetIndex, 0, movedItem);
-                
                 self.open(self.currentCharIndex);
             });
         });
     },
 
-    // ---- States ----
     addState: function() {
-        var input = document.getElementById('ceNewState');
-        var val = input.value.trim();
-        if (!val) return;
+        var input = document.getElementById('ceNewState'); var val = input.value.trim(); if (!val) return;
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         if (!p.config.characters[this.currentCharIndex].states) p.config.characters[this.currentCharIndex].states = [];
         p.config.characters[this.currentCharIndex].states.push(val);
-        input.value = '';
-        this.open(this.currentCharIndex);
+        input.value = ''; this.open(this.currentCharIndex);
     },
-
     removeState: function(index) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
@@ -1704,38 +2471,25 @@ var CharacterEditor = {
         this.open(this.currentCharIndex);
     },
 
-    // ---- Body Parts ----
     addBodyPart: function() {
-        var keyInput = document.getElementById('ceNewBodyPartKey');
-        var labelInput = document.getElementById('ceNewBodyPartLabel');
-        var iconInput = document.getElementById('ceNewBodyPartIcon');
-        var key = keyInput.value.trim().toLowerCase();
-        var label = labelInput.value.trim();
-        var icon = iconInput.value.trim() || '🫦';
-        if (!key) { alert('Enter a body part key.'); return; }
-        if (!label) { alert('Enter a label.'); return; }
+        var k = document.getElementById('ceNewBodyPartKey'), l = document.getElementById('ceNewBodyPartLabel'), i = document.getElementById('ceNewBodyPartIcon');
+        var key = k.value.trim().toLowerCase(), label = l.value.trim(), icon = i.value.trim() || '🫦';
+        if (!key || !label) { alert('Key and label required.'); return; }
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         if (!p.config.characters[this.currentCharIndex].bodyParts) p.config.characters[this.currentCharIndex].bodyParts = {};
         p.config.characters[this.currentCharIndex].bodyParts[key] = { label: label, icon: icon, enabled: true };
-        keyInput.value = '';
-        labelInput.value = '';
-        iconInput.value = '🫦';
         this.open(this.currentCharIndex);
     },
-
     quickAddBodyPart: function(key, label, icon) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         if (!p.config.characters[this.currentCharIndex].bodyParts) p.config.characters[this.currentCharIndex].bodyParts = {};
         if (!p.config.characters[this.currentCharIndex].bodyParts[key]) {
             p.config.characters[this.currentCharIndex].bodyParts[key] = { label: label, icon: icon, enabled: true };
-        } else {
-            p.config.characters[this.currentCharIndex].bodyParts[key].enabled = true;
-        }
+        } else { p.config.characters[this.currentCharIndex].bodyParts[key].enabled = true; }
         this.open(this.currentCharIndex);
     },
-
     removeBodyPart: function(key) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
@@ -1743,53 +2497,29 @@ var CharacterEditor = {
         delete p.config.characters[this.currentCharIndex].bodyParts[key];
         this.open(this.currentCharIndex);
     },
-
     toggleBodyPart: function(key, enabled) {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         if (!p.config.characters[this.currentCharIndex].bodyParts) return;
-        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
-            p.config.characters[this.currentCharIndex].bodyParts[key].enabled = enabled;
-        }
+        if (p.config.characters[this.currentCharIndex].bodyParts[key]) p.config.characters[this.currentCharIndex].bodyParts[key].enabled = enabled;
     },
 
-    updateBodyPartLabel: function(key, value) {
-        var p = ProjectManager.getActive();
-        if (!p || !p.config.characters[this.currentCharIndex]) return;
-        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
-        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
-            p.config.characters[this.currentCharIndex].bodyParts[key].label = value;
-        }
-    },
-
-    updateBodyPartIcon: function(key, value) {
-        var p = ProjectManager.getActive();
-        if (!p || !p.config.characters[this.currentCharIndex]) return;
-        if (!p.config.characters[this.currentCharIndex].bodyParts) return;
-        if (p.config.characters[this.currentCharIndex].bodyParts[key]) {
-            p.config.characters[this.currentCharIndex].bodyParts[key].icon = value;
-        }
-    },
-
-    // ---- Save ----
     save: function() {
         var p = ProjectManager.getActive();
         if (!p || !p.config.characters[this.currentCharIndex]) return;
         var char = p.config.characters[this.currentCharIndex];
-        var nameEl = document.getElementById('ceName');
-        var roleEl = document.getElementById('ceRole');
-        var iconEl = document.getElementById('ceIcon');
-        var stateEl = document.getElementById('ceDefaultState');
+        var nameEl = document.getElementById('ceName'), roleEl = document.getElementById('ceRole');
+        var iconEl = document.getElementById('ceIcon'), stateEl = document.getElementById('ceDefaultState');
         if (nameEl) char.name = nameEl.value.trim() || 'Character';
         if (roleEl) char.role = roleEl.value;
         if (iconEl) char.icon = iconEl.value || '🧑';
         if (stateEl) char.defaultState = stateEl.value;
+        char.currentPose = this.currentPoseKey;
         UI.closeModal();
         LeftPanel.render();
         if (typeof Sidebar !== 'undefined') Sidebar.render();
     },
 
-    // ---- Delete ----
     deleteCharacter: function() {
         if (!confirm('Delete this character permanently?')) return;
         var p = ProjectManager.getActive();
@@ -1875,7 +2605,11 @@ var Export = {
                     id: c.id, name: c.name, role: c.role,
                     icon: c.icon, classPreset: c.classPreset,
                     clothing: c.clothing, states: c.states,
-                    defaultState: c.defaultState, bodyParts: c.bodyParts
+                    defaultState: c.defaultState, bodyParts: c.bodyParts,
+                    poses: c.poses || ['default'],
+                    expressions: c.expressions || ['neutral'],
+                    currentPose: c.currentPose || 'default',
+                    currentExpression: c.currentExpression || 'neutral'
                 };
             }),
             stats: p.config.stats || [],
@@ -1898,6 +2632,8 @@ var Export = {
                         if (ch['strip_' + c.id]) obj['strip_' + c.id] = ch['strip_' + c.id];
                         if (ch['wear_' + c.id]) obj['wear_' + c.id] = ch['wear_' + c.id];
                         if (ch['state_' + c.id]) obj['state_' + c.id] = ch['state_' + c.id];
+                        if (ch['pose_' + c.id]) obj['pose_' + c.id] = ch['pose_' + c.id];
+                        if (ch['expr_' + c.id]) obj['expr_' + c.id] = ch['expr_' + c.id];
                         if (ch['enslave_' + c.id]) obj['enslave_' + c.id] = true;
                         if (c.bodyParts) {
                             Object.keys(c.bodyParts).forEach(function(bpKey) {
@@ -1925,6 +2661,10 @@ var Export = {
                     return obj;
                 })
             };
+            chars.forEach(function(c) {
+                if (n['pose_' + c.id]) scene['pose_' + c.id] = n['pose_' + c.id];
+                if (n['expr_' + c.id]) scene['expr_' + c.id] = n['expr_' + c.id];
+            });
             Object.keys(n.extraTags || {}).forEach(function(k) { scene[k] = n.extraTags[k]; });
             return scene;
         });
@@ -2003,17 +2743,18 @@ var Export = {
 
         engineHTML += '<script>\n' + jsContent + '\n' +
             'var characterClothing={};\n' +
+            'var characterState={};\n' +
             'var characters=STORY_CONFIG.characters||[];\n' +
             'var images=STORY_IMAGES||{};\n' +
-            'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
+            'function initState(){characters.forEach(function(c){characterClothing[c.id]={};characterState[c.id]={pose:c.currentPose||"default",expr:c.currentExpression||"neutral"};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
             'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
             'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
-            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var st=characterState[charId]||{pose:"default",expr:"neutral"};var poseKey=st.pose||"default";var exprKey=st.expr||"neutral";var cimgs=images&&images[charId];var poseData=(cimgs&&cimgs.poses&&cimgs.poses[poseKey])?cimgs.poses[poseKey]:{base:null,clothing:{},expressions:{}};container.innerHTML="";var has=false;if(poseData.base){var img=document.createElement("img");img.src=poseData.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&poseData.clothing&&poseData.clothing[cn]){var cimg=document.createElement("img");cimg.src=poseData.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});var exprData=(poseData.expressions&&poseData.expressions[exprKey])?poseData.expressions[exprKey]:{eyes:null,mouth:null};if(exprData.eyes){var eimg=document.createElement("img");eimg.src=exprData.eyes;eimg.style.cssText="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:99;pointer-events:none;";container.appendChild(eimg);}if(exprData.mouth){var mimg=document.createElement("img");mimg.src=exprData.mouth;mimg.style.cssText="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:100;pointer-events:none;";container.appendChild(mimg);}if(!has&&!exprData.eyes&&!exprData.mouth){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
             'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
             'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
             'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
-            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
-            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);characters.forEach(function(c){if(s["pose_"+c.id]&&s["pose_"+c.id]!=="")characterState[c.id].pose=s["pose_"+c.id];if(s["expr_"+c.id]&&s["expr_"+c.id]!=="")characterState[c.id].expr=s["expr_"+c.id];});updateAllImages();var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);if(ch["pose_"+c.id]&&ch["pose_"+c.id]!=="")characterState[c.id].pose=ch["pose_"+c.id];if(ch["expr_"+c.id]&&ch["expr_"+c.id]!=="")characterState[c.id].expr=ch["expr_"+c.id];});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initState();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
             '<' + '/script></body></html>';
 
         var blob = new Blob([engineHTML], { type: 'text/html' });
@@ -2075,17 +2816,18 @@ var Export = {
 
         engineHTML += '<script>\n' + jsContent + '\n' +
             'var characterClothing={};\n' +
+            'var characterState={};\n' +
             'var characters=STORY_CONFIG.characters||[];\n' +
             'var images=STORY_IMAGES||{};\n' +
-            'function initClothing(){characters.forEach(function(c){characterClothing[c.id]={};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
+            'function initState(){characters.forEach(function(c){characterClothing[c.id]={};characterState[c.id]={pose:c.currentPose||"default",expr:c.currentExpression||"neutral"};(c.clothing||[]).forEach(function(cloth){characterClothing[c.id][cloth]=true;});});}\n' +
             'function buildAllChars(){var panel=document.getElementById("chars-panel");panel.innerHTML="";characters.forEach(function(c){var card=document.createElement("div");card.className="char-card";card.id="card_"+c.id;var label=document.createElement("div");label.className="char-label";label.textContent=(c.icon||"🧑")+" "+c.name;var imgDiv=document.createElement("div");imgDiv.className="char-image";imgDiv.id="img_"+c.id;imgDiv.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';var clothDiv=document.createElement("div");clothDiv.className="cloth-list";clothDiv.id="cloth_"+c.id;card.appendChild(label);card.appendChild(imgDiv);card.appendChild(clothDiv);panel.appendChild(card);});updateAllImages();}\n' +
             'function updateAllImages(){characters.forEach(function(c){updateCharImage(c.id);});}\n' +
-            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var cimgs=(images&&images[charId])||{base:null,clothing:{}};container.innerHTML="";var has=false;if(cimgs.base){var img=document.createElement("img");img.src=cimgs.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&cimgs.clothing&&cimgs.clothing[cn]){var cimg=document.createElement("img");cimg.src=cimgs.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});if(!has){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
+            'function updateCharImage(charId){var container=document.getElementById("img_"+charId);if(!container)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;var st=characterState[charId]||{pose:"default",expr:"neutral"};var poseKey=st.pose||"default";var exprKey=st.expr||"neutral";var cimgs=images&&images[charId];var poseData=(cimgs&&cimgs.poses&&cimgs.poses[poseKey])?cimgs.poses[poseKey]:{base:null,clothing:{},expressions:{}};container.innerHTML="";var has=false;if(poseData.base){var img=document.createElement("img");img.src=poseData.base;img.style.zIndex="1";container.appendChild(img);has=true;}var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn,ci){if(cs[cn]&&poseData.clothing&&poseData.clothing[cn]){var cimg=document.createElement("img");cimg.src=poseData.clothing[cn];cimg.style.zIndex=(2+ci);container.appendChild(cimg);has=true;}});var exprData=(poseData.expressions&&poseData.expressions[exprKey])?poseData.expressions[exprKey]:{eyes:null,mouth:null};if(exprData.eyes){var eimg=document.createElement("img");eimg.src=exprData.eyes;eimg.style.cssText="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:99;pointer-events:none;";container.appendChild(eimg);}if(exprData.mouth){var mimg=document.createElement("img");mimg.src=exprData.mouth;mimg.style.cssText="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:contain;z-index:100;pointer-events:none;";container.appendChild(mimg);}if(!has&&!exprData.eyes&&!exprData.mouth){container.innerHTML=\'<div class="no-image">\'+(c.icon||"🧑")+\'</div>\';}updateClothIndicator(charId);}\n' +
             'function updateClothIndicator(charId){var ci=document.getElementById("cloth_"+charId);if(!ci)return;var c=characters.find(function(x){return x.id===charId;});if(!c)return;ci.innerHTML="";var cs=characterClothing[charId]||{};(c.clothing||[]).forEach(function(cn){var tag=document.createElement("span");tag.className="cloth-dot "+(cs[cn]?"cloth-on":"cloth-off");tag.textContent=(cs[cn]?"✓":"✗")+" "+cn;ci.appendChild(tag);});}\n' +
             'function updateCharVisibility(scene){characters.forEach(function(c){var card=document.getElementById("card_"+c.id);if(!card)return;var hiddenChars=scene&&scene.hiddenChars?scene.hiddenChars.split(","):[];if(hiddenChars.indexOf(c.id)>=0){card.style.display="none";}else{card.style.display="flex";}});}\n' +
             'function applyClothing(charId,stripList,wearList){if(stripList&&stripList!=="none"){var items=stripList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=false;});}if(wearList&&wearList!=="none"){var items=wearList.split(",");items.forEach(function(item){if(characterClothing[charId])characterClothing[charId][item]=true;});}updateCharImage(charId);}\n' +
-            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);});show(ch.next);};ca.appendChild(b);});}\n' +
-            'initClothing();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
+            'function show(id){var s=STORY_SCENES.find(function(x){return x.id===id});if(!s){if(STORY_ENDINGS[id]){document.getElementById("game").style.display="none";document.getElementById("endScreen").style.display="block";document.getElementById("endTitle").textContent=STORY_ENDINGS[id].title;document.getElementById("endDesc").textContent=STORY_ENDINGS[id].desc;return;}alert("Scene: "+id+" not found");return;}document.getElementById("txt").textContent=s.text;if(s.subtitle)document.getElementById("sub").textContent=s.subtitle;updateCharVisibility(s);characters.forEach(function(c){if(s["pose_"+c.id]&&s["pose_"+c.id]!=="")characterState[c.id].pose=s["pose_"+c.id];if(s["expr_"+c.id]&&s["expr_"+c.id]!=="")characterState[c.id].expr=s["expr_"+c.id];});updateAllImages();var ca=document.getElementById("choices-area");ca.innerHTML="";s.choices.forEach(function(ch){var b=document.createElement("button");b.textContent=ch.text;b.onclick=function(){characters.forEach(function(c){applyClothing(c.id,ch["strip_"+c.id],ch["wear_"+c.id]);if(ch["pose_"+c.id]&&ch["pose_"+c.id]!=="")characterState[c.id].pose=ch["pose_"+c.id];if(ch["expr_"+c.id]&&ch["expr_"+c.id]!=="")characterState[c.id].expr=ch["expr_"+c.id];});show(ch.next);};ca.appendChild(b);});}\n' +
+            'initState();buildAllChars();if(STORY_SCENES.length>0)show(STORY_SCENES[0].id);\n' +
             '<' + '/script></body></html>';
 
         var blob = new Blob([engineHTML], { type: 'text/html' });
@@ -2102,102 +2844,160 @@ js\ImageManager.js:
 ------------------
 
 var ImageManager = {
-    // Store images as base64 data URIs
-    // Structure: { projectId: { charId: { base: "data:image/png;base64,...", clothing: { clothName: "data:image/png;base64,..." } } } }
     _imageStore: {},
 
     init: function() {
         this._loadFromStorage();
     },
 
-    // Get or create image store for a character
     _getCharStore: function(charId) {
         var p = ProjectManager.getActive();
         if (!p) return null;
         if (!this._imageStore[p.id]) this._imageStore[p.id] = {};
-        if (!this._imageStore[p.id][charId]) this._imageStore[p.id][charId] = { base: null, clothing: {} };
+        if (!this._imageStore[p.id][charId]) this._imageStore[p.id][charId] = { poses: {} };
         return this._imageStore[p.id][charId];
     },
 
-    // Set base image (naked character)
-    setBaseImage: function(charId, dataUrl) {
+    // ---- POSE MANAGEMENT ----
+    addPose: function(charId, poseKey, label) {
         var store = this._getCharStore(charId);
-        if (store) {
-            store.base = dataUrl;
+        if (!store) return;
+        if (!store.poses) store.poses = {};
+        if (!store.poses[poseKey]) {
+            store.poses[poseKey] = {
+                label: label || poseKey,
+                base: null,
+                clothing: {},
+                expressions: { neutral: { eyes: null, mouth: null } }
+            };
             this._saveToStorage();
         }
     },
 
-    // Get base image
-    getBaseImage: function(charId) {
+    removePose: function(charId, poseKey) {
         var store = this._getCharStore(charId);
-        return store ? store.base : null;
+        if (!store || !store.poses || !store.poses[poseKey]) return;
+        if (poseKey === 'default') return;
+        delete store.poses[poseKey];
+        this._saveToStorage();
     },
 
-    // Set clothing image
-    setClothingImage: function(charId, clothName, dataUrl) {
+    getPoses: function(charId) {
         var store = this._getCharStore(charId);
-        if (store) {
-            store.clothing[clothName] = dataUrl;
-            this._saveToStorage();
-        }
+        return (store && store.poses) ? Object.keys(store.poses) : [];
     },
 
-    // Get clothing image
-    getClothingImage: function(charId, clothName) {
+    getPoseData: function(charId, poseKey) {
         var store = this._getCharStore(charId);
-        return (store && store.clothing[clothName]) ? store.clothing[clothName] : null;
+        if (!store || !store.poses || !store.poses[poseKey]) return null;
+        return store.poses[poseKey];
     },
 
-    // Remove clothing image
-    removeClothingImage: function(charId, clothName) {
+    // ---- POSE BASE ----
+    setPoseBase: function(charId, poseKey, dataUrl) {
         var store = this._getCharStore(charId);
-        if (store && store.clothing[clothName]) {
-            delete store.clothing[clothName];
-            this._saveToStorage();
-        }
+        if (!store || !store.poses || !store.poses[poseKey]) return;
+        store.poses[poseKey].base = dataUrl;
+        this._saveToStorage();
     },
 
-    // Remove base image
-    removeBaseImage: function(charId) {
+    getPoseBase: function(charId, poseKey) {
         var store = this._getCharStore(charId);
-        if (store) {
-            store.base = null;
-            this._saveToStorage();
-        }
+        return (store && store.poses && store.poses[poseKey]) ? store.poses[poseKey].base : null;
     },
 
-    // Get all clothing images for a character
-    getClothingImages: function(charId) {
+    // ---- POSE CLOTHING ----
+    setPoseClothing: function(charId, poseKey, clothName, dataUrl) {
         var store = this._getCharStore(charId);
-        return store ? store.clothing : {};
+        if (!store || !store.poses || !store.poses[poseKey]) return;
+        if (!store.poses[poseKey].clothing) store.poses[poseKey].clothing = {};
+        store.poses[poseKey].clothing[clothName] = dataUrl;
+        this._saveToStorage();
     },
 
-    // Get ordered clothing layers (matching character's clothing array order)
-    getOrderedClothingLayers: function(charId) {
+    getPoseClothing: function(charId, poseKey, clothName) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey]) return null;
+        if (!store.poses[poseKey].clothing) return null;
+        return store.poses[poseKey].clothing[clothName] || null;
+    },
+
+    getPoseClothingAll: function(charId, poseKey) {
+        var store = this._getCharStore(charId);
+        return (store && store.poses && store.poses[poseKey] && store.poses[poseKey].clothing) 
+            ? store.poses[poseKey].clothing : {};
+    },
+
+    removePoseClothing: function(charId, poseKey, clothName) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey] || !store.poses[poseKey].clothing) return;
+        delete store.poses[poseKey].clothing[clothName];
+        this._saveToStorage();
+    },
+
+    // ---- EXPRESSIONS ----
+    addExpression: function(poseKey) {
         var p = ProjectManager.getActive();
-        if (!p) return [];
-        var char = (p.config.characters || []).find(function(c) { return c.id === charId; });
-        if (!char) return [];
-        var store = this._getCharStore(charId);
-        if (!store) return [];
-        var layers = [];
-        (char.clothing || []).forEach(function(clothName) {
-            if (store.clothing[clothName]) {
-                layers.push({ name: clothName, dataUrl: store.clothing[clothName] });
-            }
+        if (!p || !p.config.characters[this.currentCharIndex]) return;
+        var char = p.config.characters[this.currentCharIndex];
+        var key = prompt('Expression key (e.g. angry, happy):');
+        if (!key) return;
+        key = key.toLowerCase().replace(/\s+/g, '_');
+        // Add to character's global expression list
+        if (!char.expressions) char.expressions = ['neutral'];
+        if (char.expressions.indexOf(key) < 0) char.expressions.push(key);
+        // Initialize this expression for ALL poses
+        (char.poses || ['default']).forEach(function(pk) {
+            ImageManager.addExpression(char.id, pk, key);
         });
-        return layers;
+        this.open(this.currentCharIndex);
     },
 
-    // Check if a character has any images
+    removeExpression: function(charId, poseKey, exprKey) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey] || !store.poses[poseKey].expressions) return;
+        if (exprKey === 'neutral') return;
+        delete store.poses[poseKey].expressions[exprKey];
+        this._saveToStorage();
+    },
+
+    getExpressions: function(charId, poseKey) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey] || !store.poses[poseKey].expressions) return [];
+        return Object.keys(store.poses[poseKey].expressions);
+    },
+
+    setExpressionPart: function(charId, poseKey, exprKey, part, dataUrl) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey]) return;
+        if (!store.poses[poseKey].expressions) store.poses[poseKey].expressions = {};
+        if (!store.poses[poseKey].expressions[exprKey]) return;
+        store.poses[poseKey].expressions[exprKey][part] = dataUrl;
+        this._saveToStorage();
+    },
+
+    getExpressionPart: function(charId, poseKey, exprKey, part) {
+        var store = this._getCharStore(charId);
+        if (!store || !store.poses || !store.poses[poseKey]) return null;
+        if (!store.poses[poseKey].expressions) return null;
+        if (!store.poses[poseKey].expressions[exprKey]) return null;
+        return store.poses[poseKey].expressions[exprKey][part] || null;
+    },
+
+    // ---- HELPERS ----
     hasImages: function(charId) {
         var store = this._getCharStore(charId);
-        if (!store) return false;
-        return !!store.base || Object.keys(store.clothing).length > 0;
+        if (!store || !store.poses) return false;
+        var poseKeys = Object.keys(store.poses);
+        for (var i = 0; i < poseKeys.length; i++) {
+            var p = store.poses[poseKeys[i]];
+            if (!p) continue;
+            if (p.base) return true;
+            if (p.clothing && Object.keys(p.clothing).length > 0) return true;
+        }
+        return false;
     },
 
-    // Clear all images for a character
     clearCharacter: function(charId) {
         var p = ProjectManager.getActive();
         if (!p) return;
@@ -2207,7 +3007,6 @@ var ImageManager = {
         }
     },
 
-    // Read a file and return as data URL
     readFileAsDataURL: function(file) {
         return new Promise(function(resolve, reject) {
             var reader = new FileReader();
@@ -2217,7 +3016,6 @@ var ImageManager = {
         });
     },
 
-    // Compress and resize image to save storage space
     compressImage: function(dataUrl, maxWidth, maxHeight, quality) {
         maxWidth = maxWidth || 400;
         maxHeight = maxHeight || 600;
@@ -2239,51 +3037,29 @@ var ImageManager = {
         });
     },
 
-    _saveToStorage: function() {
-        try {
-            localStorage.setItem('savida_images', JSON.stringify(this._imageStore));
-        } catch(e) {
-            console.warn('Image storage full. Some images may not be saved.');
-            // Try to free space by compressing
-            this._compactStorage();
-        }
-    },
-
-    _loadFromStorage: function() {
-        try {
-            var data = localStorage.getItem('savida_images');
-            if (data) {
-                this._imageStore = JSON.parse(data);
-            }
-        } catch(e) {
-            this._imageStore = {};
-        }
-    },
-
-    _compactStorage: function() {
-        // Remove images for deleted projects
-        var self = this;
-        var activeProjects = ProjectManager.projects.map(function(p) { return p.id; });
-        Object.keys(this._imageStore).forEach(function(projId) {
-            if (activeProjects.indexOf(projId) === -1) {
-                delete self._imageStore[projId];
-            }
-        });
-        this._saveToStorage();
-    },
-
-   // Export all images for a project
     exportForProject: function(projectId) {
         return JSON.parse(JSON.stringify(this._imageStore[projectId] || {}));
     },
 
-    // Import images from project data
     importForProject: function(projectId, imageData) {
         if (imageData && Object.keys(imageData).length > 0) {
             this._imageStore[projectId] = JSON.parse(JSON.stringify(imageData));
             this._saveToStorage();
         }
     },
+
+    _saveToStorage: function() {
+        try {
+            localStorage.setItem('savida_images', JSON.stringify(this._imageStore));
+        } catch(e) { console.warn('Image storage full.'); }
+    },
+
+    _loadFromStorage: function() {
+        try {
+            var data = localStorage.getItem('savida_images');
+            if (data) { this._imageStore = JSON.parse(data); }
+        } catch(e) { this._imageStore = {}; }
+    }
 };
 
 js\Import.js:
@@ -2374,6 +3150,7 @@ js\LeftPanel.js:
 var LeftPanel = {
     render: function() {
         var p = ProjectManager.getActive();
+        console.log('LeftPanel render - active project:', p); // DEBUG
         var container = document.getElementById('left-content');
         if (!container) return;
         if (!p) {
@@ -2569,7 +3346,14 @@ var ProjectManager = {
             return;
         }
         
-        this._restoreLastSession();
+        var recentSessions = this._getRecentSessions();
+        if (recentSessions.length > 0) {
+            this._showStartupScreen(recentSessions);
+        } else {
+            this.createProject('My First Story');
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+        }
     },
 
     _showBrowserWarning: function() {
@@ -2582,61 +3366,74 @@ var ProjectManager = {
         }
     },
 
-    // ---- SESSION ----
-    _saveSession: function() {
-        var session = {
-            activeProjectId: this.activeProjectId,
-            projectNames: this.projects.map(function(p) { return p.name; }),
-            timestamp: new Date().toISOString()
-        };
-        if (this.saveDirectory) session.folderName = this.saveDirectory.name;
-        try { localStorage.setItem('savida_last_session', JSON.stringify(session)); } catch(e) {}
-    },
-
-    _restoreLastSession: async function() {
+    _getRecentSessions: function() {
+        var sessions = [];
         try {
             var data = localStorage.getItem('savida_last_session');
-            if (!data) { this._showWelcomePrompt(); return; }
-            var session = JSON.parse(data);
-            await new Promise(function(r) { setTimeout(r, 100); });
-            
-            var reopen = confirm(
-                '📁 Reopen last project folder?\n\n' +
-                'Folder: ' + (session.folderName || 'Unknown') + '\n' +
-                'Projects: ' + (session.projectNames || []).join(', ') + '\n' +
-                'Last saved: ' + new Date(session.timestamp).toLocaleString() + '\n\n' +
-                'OK = reopen | Cancel = start fresh'
-            );
-            
-            if (reopen) {
-                await this._reopenFolder(session);
-            } else {
-                localStorage.removeItem('savida_last_session');
-                this._showWelcomePrompt();
+            if (data) {
+                var session = JSON.parse(data);
+                if (session.folderName) sessions.push(session);
             }
-        } catch(e) {
-            localStorage.removeItem('savida_last_session');
-            this._showWelcomePrompt();
-        }
+        } catch(e) {}
+        return sessions;
     },
 
-    _showWelcomePrompt: function() {
+    _saveRecentSession: function() {
+        if (!this.saveDirectory) return;
+        var session = {
+            folderName: this.saveDirectory.name,
+            projectNames: this.projects.map(function(p) { return p.name; }),
+            activeProjectId: this.activeProjectId,
+            timestamp: new Date().toISOString()
+        };
+        try {
+            localStorage.setItem('savida_last_session', JSON.stringify(session));
+        } catch(e) {}
+    },
+
+    _showStartupScreen: function(recentSessions) {
         var container = document.getElementById('left-content');
-        if (container) {
-            container.innerHTML = '<div class="no-project-msg">' +
-                '👋<br>Welcome!<br><br>' +
-                'Use <b>📁 File → Select Save Folder</b><br>' +
-                'to open or create a project.<br><br>' +
-                '<button class="btn-sm-add" onclick="ProjectManager.pickSaveFolder()" style="font-size:12px;padding:8px 16px;cursor:pointer;">' +
-                '📂 Select Folder</button></div>';
-        }
+        if (!container) return;
+        
+        var html = '<div style="padding:10px;text-align:center;">';
+        html += '<h3 style="color:var(--accent);margin-bottom:12px;">🚀 Savida</h3>';
+        
+        html += '<button onclick="ProjectManager.startNewProject()" style="width:100%;padding:12px;margin:6px 0;background:var(--accent);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;">✨ New Project</button>';
+        
+        html += '<h4 style="color:var(--dim);margin:14px 0 8px;font-size:10px;text-transform:uppercase;letter-spacing:1px;">📁 Recent</h4>';
+        html += '<div style="display:flex;flex-direction:column;gap:5px;">';
+        
+        recentSessions.forEach(function(session, index) {
+            var timeAgo = Utils.timeAgo(new Date(session.timestamp));
+            var projectNames = session.projectNames || [];
+            
+            html += '<div onclick="ProjectManager.openRecentSession(' + index + ')" style="background:rgba(0,0,0,0.3);padding:10px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--border);transition:all 0.15s;text-align:left;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.background=\'rgba(139,92,246,0.1)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.background=\'rgba(0,0,0,0.3)\'">';
+            html += '<div style="font-size:12px;font-weight:700;color:var(--text);">📂 ' + Utils.escHtml(session.folderName || 'Unknown Folder') + '</div>';
+            if (projectNames.length > 0) {
+                html += '<div style="font-size:9px;color:var(--dim);margin-top:3px;">' + Utils.escHtml(projectNames.join(', ')) + '</div>';
+            }
+            html += '<div style="font-size:8px;color:var(--dim);margin-top:2px;">' + timeAgo + '</div>';
+            html += '</div>';
+        });
+        
+        html += '</div>';
+        
+        html += '<button onclick="ProjectManager.pickSaveFolder()" style="width:100%;padding:10px;margin:10px 0;background:rgba(0,0,0,0.3);color:var(--text);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:11px;">📂 Browse Folders</button>';
+        
+        html += '<button onclick="document.getElementById(\'importProjectFile\').click()" style="width:100%;padding:8px;background:transparent;color:var(--dim);border:1px dashed var(--border);border-radius:8px;cursor:pointer;font-size:10px;">📤 Import .story.json</button>';
+        
+        html += '<div style="margin-top:8px;font-size:8px;color:var(--dim);">or drag & drop a .story.json file anywhere</div>';
+        html += '</div>';
+        
+        container.innerHTML = html;
+        
         var cw = document.getElementById('canvas-wrap');
         if (cw) {
             var ex = cw.querySelector('.welcome-msg'); if (ex) ex.remove();
             var m = document.createElement('div');
             m.className = 'welcome-msg';
-            m.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:18px;pointer-events:none;z-index:5;';
-            m.innerHTML = '📁<br><span style="font-size:14px;">Select a project folder to begin</span>';
+            m.style.cssText = 'position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--dim);font-size:24px;pointer-events:none;z-index:5;';
+            m.innerHTML = '🚀<br><span style="font-size:16px;">Savida Story Engine</span>';
             cw.appendChild(m);
         }
     },
@@ -2646,33 +3443,60 @@ var ProjectManager = {
         if (cw) { var m = cw.querySelector('.welcome-msg'); if (m) m.remove(); }
     },
 
-    _reopenFolder: async function(session) {
+    startNewProject: function() {
+        this.createProject('My First Story');
+        this._hideWelcomeMessage();
+        App.loadProjectToEditor();
+        Utils.updateToolbarButtons(true);
+    },
+
+    openRecentSession: async function(index) {
+        var sessions = this._getRecentSessions();
+        if (index < 0 || index >= sessions.length) return;
+        var session = sessions[index];
+        
+        var ok = confirm(
+            '📁 Reopen: ' + session.folderName + '\n\n' +
+            'Projects: ' + (session.projectNames || []).join(', ') + '\n\n' +
+            'Click OK, then click "Select Folder" in the next window.'
+        );
+        if (!ok) return;
+        
         try {
-            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite',
+                startIn: 'documents'
+            });
             await this._loadProjectsFromDirectory(this.saveDirectory);
             this.renderTabs();
-            if (session.activeProjectId) {
-                var found = this.projects.find(function(p) { return p.id === session.activeProjectId; });
-                this.activeProjectId = found ? found.id : (this.projects[0] ? this.projects[0].id : null);
-            } else if (this.projects.length > 0) {
-                this.activeProjectId = this.projects[0].id;
+            
+            if (this.projects.length > 0) {
+                if (session.activeProjectId) {
+                    var found = this.projects.find(function(p) { return p.id === session.activeProjectId; });
+                    this.activeProjectId = found ? found.id : this.projects[0].id;
+                } else {
+                    this.activeProjectId = this.projects[0].id;
+                }
+            } else {
+                this.createProject('My First Story');
             }
-            if (this.projects.length === 0) this.createProject('My First Story');
-            this._saveSession();
+            
+            this._saveRecentSession();
             this._hideWelcomeMessage();
             App.loadProjectToEditor();
             Utils.updateToolbarButtons(true);
         } catch(e) {
             if (e.name !== 'AbortError') console.error(e);
-            this._showWelcomePrompt();
         }
     },
 
-    // ---- FOLDER SELECTION ----
     pickSaveFolder: async function() {
         if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
         try {
-            this.saveDirectory = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'documents' });
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite', 
+                startIn: 'documents'
+            });
             await this._loadProjectsFromDirectory(this.saveDirectory);
             this.renderTabs();
             if (this.projects.length > 0) {
@@ -2680,7 +3504,7 @@ var ProjectManager = {
             } else {
                 this.createProject('My First Story');
             }
-            this._saveSession();
+            this._saveRecentSession();
             this._hideWelcomeMessage();
             App.loadProjectToEditor();
             Utils.updateToolbarButtons(true);
@@ -2688,7 +3512,28 @@ var ProjectManager = {
         } catch(e) { if (e.name !== 'AbortError') console.error(e); }
     },
 
-    // ---- SAVE ----
+    loadFromFolder: async function() {
+        if (!this.hasFileSystem) { alert('Requires Chrome, Edge, or Opera.'); return; }
+        try {
+            this.saveDirectory = await window.showDirectoryPicker({ 
+                mode: 'readwrite', 
+                startIn: 'documents'
+            });
+            await this._loadProjectsFromDirectory(this.saveDirectory);
+            this.renderTabs();
+            if (this.projects.length > 0) {
+                this.activeProjectId = this.projects[0].id;
+            } else {
+                this.createProject('My First Story');
+            }
+            this._saveRecentSession();
+            this._hideWelcomeMessage();
+            App.loadProjectToEditor();
+            Utils.updateToolbarButtons(true);
+            Utils.showSaveIndicator();
+        } catch(e) { if (e.name !== 'AbortError') console.error(e); }
+    },
+
     saveActiveProject: async function() {
         if (!this.saveDirectory) {
             await this.pickSaveFolder();
@@ -2699,7 +3544,6 @@ var ProjectManager = {
         
         App._syncCanvasToProject();
         
-        // EMBED IMAGES INTO PROJECT DATA
         if (typeof ImageManager !== 'undefined') {
             project.images = ImageManager.exportForProject(project.id);
         }
@@ -2707,7 +3551,7 @@ var ProjectManager = {
         project.updatedAt = new Date().toISOString();
         try {
             await this._writeProjectFile(project);
-            this._saveSession();
+            this._saveRecentSession();
             Utils.showSaveIndicator();
         } catch(e) {
             console.error('Save error:', e);
@@ -2725,7 +3569,6 @@ var ProjectManager = {
         await writable.close();
     },
 
-    // ---- DRAG AND DROP ----
     _initDragDrop: function() {
         var self = this;
         var body = document.body;
@@ -2776,7 +3619,6 @@ var ProjectManager = {
                             project.id = 'proj_' + Date.now() + '_' + Math.random().toString(36).substr(2,4);
                             if (project.name) project.name = project.name + ' (Imported)';
                         }
-                        // RESTORE IMAGES FROM DROPPED FILE
                         if (project.images && typeof ImageManager !== 'undefined') {
                             ImageManager.importForProject(project.id, project.images);
                         }
@@ -2840,7 +3682,6 @@ var ProjectManager = {
                     var text = await file.text();
                     var project = JSON.parse(text);
                     if (project.id && project.config && project.scenes !== undefined) {
-                        // RESTORE IMAGES WHEN LOADING FROM FOLDER
                         if (project.images && typeof ImageManager !== 'undefined') {
                             ImageManager.importForProject(project.id, project.images);
                         }
@@ -2857,7 +3698,6 @@ var ProjectManager = {
         try { await this.saveDirectory.removeEntry(this._sanitizeFilename(project.name)+'.story.json'); } catch(e) {}
     },
 
-    // ---- PROJECT CRUD ----
     createProject: function(name) {
         name = name || 'Untitled Story';
         var id = 'proj_' + Date.now();
@@ -2883,7 +3723,7 @@ var ProjectManager = {
         this.projects.push(project);
         this.activeProjectId = project.id;
         this.renderTabs();
-        this._saveSession();
+        this._saveRecentSession();
         if (this.saveDirectory) this._writeProjectFile(project);
         return project;
     },
@@ -2894,9 +3734,14 @@ var ProjectManager = {
             name:name||'Character', role:role||'neutral',
             classPreset:classPreset||'custom', icon:'🧑',
             clothing:['top','bottom'], states:['Normal'], defaultState:'Normal',
-            bodyParts:{oral:{icon:'👄',label:'Oral',enabled:true}}
+            bodyParts:{oral:{icon:'👄',label:'Oral',enabled:true}},
+            poses:['default'],
+            expressions:['neutral'],
+            currentPose:'default',
+            currentExpression:'neutral'
         };
         if (classPreset && classPreset !== 'custom') CharacterClasses.applyPreset(char, classPreset);
+        ImageManager.addPose(char.id, 'default', 'Default');
         return char;
     },
 
@@ -2906,7 +3751,7 @@ var ProjectManager = {
     },
 
     setActive: function(id) {
-        this.activeProjectId = id; this.renderTabs(); this._saveSession();
+        this.activeProjectId = id; this.renderTabs(); this._saveRecentSession();
         if (typeof App !== 'undefined') App.loadProjectToEditor();
     },
 
@@ -2916,7 +3761,7 @@ var ProjectManager = {
         this.projects = this.projects.filter(function(p){return p.id!==id;});
         if (this.activeProjectId === id) this.activeProjectId = this.projects[0] ? this.projects[0].id : null;
         if (this.saveDirectory && project) this._deleteProjectFile(project);
-        this._saveSession(); this.renderTabs();
+        this._saveRecentSession(); this.renderTabs();
         if (this.activeProjectId && typeof App !== 'undefined') App.loadProjectToEditor();
     },
 
@@ -2925,7 +3770,7 @@ var ProjectManager = {
         if (!p) return;
         var oldName = p.name; p.name = newName; p.config.title = newName;
         p.updatedAt = new Date().toISOString();
-        this.renderTabs(); this._saveSession();
+        this.renderTabs(); this._saveRecentSession();
         if (this.saveDirectory) {
             var self = this;
             this._deleteProjectFile({name:oldName}).then(function(){self._writeProjectFile(p);});
@@ -2948,7 +3793,6 @@ var ProjectManager = {
     downloadProjectFile: function() {
         var project = this.getActive(); if (!project) return;
         App._syncCanvasToProject();
-        // Embed images
         if (typeof ImageManager !== 'undefined') {
             project.images = ImageManager.exportForProject(project.id);
         }
@@ -2978,12 +3822,11 @@ var ProjectManager = {
                         self.projects = self.projects.filter(function(p){return p.id!==project.id;});
                     }
                 }
-                // RESTORE IMAGES
                 if (project.images && typeof ImageManager !== 'undefined') {
                     ImageManager.importForProject(project.id, project.images);
                 }
                 self.projects.push(project); self.activeProjectId = project.id;
-                self.renderTabs(); self._saveSession();
+                self.renderTabs(); self._saveRecentSession();
                 App.loadProjectToEditor();
                 if (self.saveDirectory) self._writeProjectFile(project);
                 Utils.showSaveIndicator();
@@ -3037,7 +3880,8 @@ var Sidebar = {
         if (node.type === 'scene') {
             html += '<label>Subtitle</label><input value="' + Utils.escHtml(node.subtitle || '') + '" onchange="NodeEditor.updateNodeProp(\'subtitle\',this.value)">';
             html += '<label>Text</label><textarea onchange="NodeEditor.updateNodeProp(\'text\',this.value)">' + Utils.escHtml(node.text || '') + '</textarea>';
-            // Character visibility toggle for this scene
+
+            // Character visibility toggle
             html += '<h3>👁️ Visible Characters</h3>';
             html += '<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:4px;">';
             var hiddenChars = node.hiddenChars ? node.hiddenChars.split(',') : [];
@@ -3049,10 +3893,32 @@ var Sidebar = {
                 html += '</label>';
             });
             html += '</div>';
+
+            // Scene default pose/expression per character
+            html += '<h3>🎭 Pose & Expression</h3>';
+            html += '<div style="font-size:8px;color:var(--dim);margin-bottom:4px;">Set pose/expression for this scene, or follow previous scene.</div>';
+            chars.forEach(function(c) {
+                html += '<div style="display:flex;gap:4px;align-items:center;margin:2px 0;font-size:9px;background:rgba(0,0,0,0.2);padding:4px 6px;border-radius:4px;">';
+                html += '<span style="min-width:45px;font-weight:700;">' + Utils.escHtml(c.name) + '</span>';
+                
+                html += '<select onchange="NodeEditor.updateNodeProp(\'pose_' + c.id + '\',this.value)" style="font-size:9px;flex:1;">';
+                html += '<option value=""' + (!node['pose_'+c.id]?' selected':'') + '>↻ follow prev</option>';
+                (c.poses||['default']).forEach(function(p) {
+                    html += '<option value="' + p + '"' + (node['pose_'+c.id]===p?' selected':'') + '>' + p + '</option>';
+                });
+                html += '</select>';
+                
+                html += '<select onchange="NodeEditor.updateNodeProp(\'expr_' + c.id + '\',this.value)" style="font-size:9px;flex:1;">';
+                html += '<option value=""' + (!node['expr_'+c.id]?' selected':'') + '>↻ follow prev</option>';
+                (c.expressions||['neutral']).forEach(function(e) {
+                    html += '<option value="' + e + '"' + (node['expr_'+c.id]===e?' selected':'') + '>' + e + '</option>';
+                });
+                html += '</select>';
+                
+                html += '</div>';
+            });
+
             html += '<h3>Choices <button class="btn-sm-add" onclick="NodeEditor.addChoice(\'' + node.id + '\');Sidebar.render();">+</button></h3>';
-            
-            
-            
 
             if (node.choices) {
                 node.choices.forEach(function(ch, i) {
@@ -3107,12 +3973,10 @@ var Sidebar = {
                             html += '<div style="display:flex;align-items:center;gap:3px;background:rgba(0,0,0,0.25);padding:3px 6px;border-radius:4px;">';
                             html += '<span style="font-size:9px;min-width:40px;">' + l + '</span>';
 
-                            // Strip button
                             html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'strip\')" ';
                             html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isStripped ? '#ff3050' : '#3a3a55') + ';background:' + (isStripped ? 'rgba(255,48,80,0.3)' : 'transparent') + ';color:' + (isStripped ? '#ff6080' : 'var(--dim)') + ';" ';
                             html += 'title="Remove this clothing">− Strip</button>';
 
-                            // Wear button
                             html += '<button onclick="Sidebar.toggleClothingAction(\'' + node.id + '\',' + i + ',\'' + c.id + '\',\'' + l + '\',\'wear\')" ';
                             html += 'style="padding:2px 6px;border-radius:3px;font-size:8px;font-weight:700;cursor:pointer;border:1px solid ' + (isWorn ? '#2ecc71' : '#3a3a55') + ';background:' + (isWorn ? 'rgba(46,204,113,0.3)' : 'transparent') + ';color:' + (isWorn ? '#2ecc71' : 'var(--dim)') + ';" ';
                             html += 'title="Put this clothing back on">+ Wear</button>';
@@ -3193,10 +4057,9 @@ var Sidebar = {
         Canvas.renderNode(node);
         Canvas.drawConnections();
         Canvas.saveState();
-        
-        // Re-render sidebar immediately for real-time button color update
         this.render();
     },
+
     toggleCharVisibility: function(nodeId, charId, visible) {
         var node = Canvas.getNode(nodeId);
         if (!node) return;
@@ -3210,9 +4073,8 @@ var Sidebar = {
         Canvas.renderNode(node);
         Canvas.drawConnections();
         Canvas.saveState();
-        // Update the sidebar to reflect changes
         this.render();
-    },
+    }
 };
 
 js\Utils.js:
@@ -3238,6 +4100,17 @@ var Utils = {
             if (btn) btn.disabled = !hasProject;
         });
     },
+    timeAgo: function(date) {
+        var seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 60) return 'just now';
+        var minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return minutes + 'm ago';
+        var hours = Math.floor(minutes / 60);
+        if (hours < 24) return hours + 'h ago';
+        var days = Math.floor(hours / 24);
+        if (days < 30) return days + 'd ago';
+        return date.toLocaleDateString();
+    }
 };
 
 js\app.js:
@@ -3255,34 +4128,19 @@ var UI = {
         this.modalContent = content;
         this.modalFilename = filename || 'export.js';
         this.modalType = type || 'text/javascript';
-        
         var dlBtn = document.getElementById('modal-dl-btn');
-        if (dlBtn) {
-            dlBtn.style.display = 'inline-block';
-            dlBtn.textContent = '📥 Download ' + (filename || 'file');
-        }
+        if (dlBtn) { dlBtn.style.display = 'inline-block'; dlBtn.textContent = '📥 Download ' + (filename || 'file'); }
     },
-
-    closeModal: function() {
-        document.getElementById('modal-overlay').classList.remove('show');
-    },
-
+    closeModal: function() { document.getElementById('modal-overlay').classList.remove('show'); },
     downloadModal: function() {
-        if (!this.modalContent) {
-            alert('Nothing to download.');
-            return;
-        }
+        if (!this.modalContent) { alert('Nothing to download.'); return; }
         var blob = new Blob([this.modalContent], { type: this.modalType });
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
-        a.href = url;
-        a.download = this.modalFilename;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = url; a.download = this.modalFilename;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         setTimeout(function() { URL.revokeObjectURL(url); }, 100);
     },
-
     toggleDropdown: function(ddId) {
         var dd = document.getElementById(ddId); if (!dd) return;
         var isOpen = dd.classList.contains('open');
@@ -3304,9 +4162,8 @@ var App = {
         Canvas.init();
         this.bindKeyboard();
         this.bindModalClose();
-        LeftPanel.render();
-        Sidebar.render();
-        Utils.updateToolbarButtons(false);
+        // Don't call LeftPanel.render() or Sidebar.render() here —
+        // ProjectManager.init() handles the startup flow
     },
 
     loadProjectToEditor: function() {
@@ -3351,15 +4208,35 @@ var App = {
                 Canvas.renderNode(Canvas.nodes[0]); Canvas.drawConnections();
             }
         }
+        Canvas.nodes = (p.scenes || []).map(function(s) {
+            var node = {
+                id: s.id, type: 'scene', x: s.x || 200, y: s.y || 200,
+                title: s.title || s.id, subtitle: s.subtitle || '', text: s.text || '',
+                choices: s.choices || [], hiddenChars: s.hiddenChars || null, extraTags: s.extraTags || {}
+            };
+            // Restore pose_ and expr_ properties
+            Object.keys(s).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    node[key] = s[key];
+                }
+            });
+            return node;
+        });
     },
 
     _syncCanvasToProject: function() {
         var p = ProjectManager.getActive(); if (!p) return;
         p.scenes = Canvas.nodes.filter(function(n){return n.type==='scene';}).map(function(n){
-            return {
+            var scene = {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
                 text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
+            Object.keys(n).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    scene[key] = n[key];
+                }
+            });
+            return scene;
         });
         p.endings = {};
         Canvas.nodes.filter(function(n){return n.type==='ending';}).forEach(function(n){
@@ -3389,16 +4266,13 @@ var App = {
         var self = this;
         window.addEventListener('keydown', function(e) {
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 's') {
-                e.preventDefault();
-                self.save();
+                e.preventDefault(); self.save();
             }
             if ((e.ctrlKey || e.metaKey) && (e.key === '=' || e.key === '+')) { e.preventDefault(); Canvas.zoomIn(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '-') { e.preventDefault(); Canvas.zoomOut(); }
             if ((e.ctrlKey || e.metaKey) && e.key === '0') { e.preventDefault(); Canvas.setZoom(1); }
             if ((e.ctrlKey || e.metaKey) && !e.altKey && !e.shiftKey && e.key === 'p') {
-                e.preventDefault();
-                Export.previewHTML();
-                return;
+                e.preventDefault(); Export.previewHTML();
             }
         });
     },

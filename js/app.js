@@ -90,15 +90,35 @@ var App = {
                 Canvas.renderNode(Canvas.nodes[0]); Canvas.drawConnections();
             }
         }
+        Canvas.nodes = (p.scenes || []).map(function(s) {
+            var node = {
+                id: s.id, type: 'scene', x: s.x || 200, y: s.y || 200,
+                title: s.title || s.id, subtitle: s.subtitle || '', text: s.text || '',
+                choices: s.choices || [], hiddenChars: s.hiddenChars || null, extraTags: s.extraTags || {}
+            };
+            // Restore pose_ and expr_ properties
+            Object.keys(s).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    node[key] = s[key];
+                }
+            });
+            return node;
+        });
     },
 
     _syncCanvasToProject: function() {
         var p = ProjectManager.getActive(); if (!p) return;
         p.scenes = Canvas.nodes.filter(function(n){return n.type==='scene';}).map(function(n){
-            return {
+            var scene = {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
                 text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
+            Object.keys(n).forEach(function(key) {
+                if (key.startsWith('pose_') || key.startsWith('expr_')) {
+                    scene[key] = n[key];
+                }
+            });
+            return scene;
         });
         p.endings = {};
         Canvas.nodes.filter(function(n){return n.type==='ending';}).forEach(function(n){

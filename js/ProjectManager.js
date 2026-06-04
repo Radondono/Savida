@@ -408,9 +408,14 @@ var ProjectManager = {
             name:name||'Character', role:role||'neutral',
             classPreset:classPreset||'custom', icon:'🧑',
             clothing:['top','bottom'], states:['Normal'], defaultState:'Normal',
-            bodyParts:{oral:{icon:'👄',label:'Oral',enabled:true}}
+            bodyParts:{oral:{icon:'👄',label:'Oral',enabled:true}},
+            poses:['default'],
+            expressions:['neutral'],
+            currentPose:'default',
+            currentExpression:'neutral'
         };
         if (classPreset && classPreset !== 'custom') CharacterClasses.applyPreset(char, classPreset);
+        ImageManager.addPose(char.id, 'default', 'Default');
         return char;
     },
 
