@@ -180,6 +180,30 @@ var Canvas = {
         return node;
     },
 
+    duplicateNode: function(nodeId) {
+        var original = this.getNode(nodeId);
+        if (!original) return;
+        
+        var newId = 'node_' + (this.nodeIdCounter++);
+        var clone = JSON.parse(JSON.stringify(original));
+        clone.id = newId;
+        clone.title = original.title + ' (Copy)';
+        clone.x = original.x + 50;
+        clone.y = original.y + 50;
+        
+        if (clone.choices) {
+            clone.choices.forEach(function(ch) {
+                ch.next = '';
+            });
+        }
+        
+        this.nodes.push(clone);
+        this.renderNode(clone);
+        this.drawConnections();
+        this.selectNode(newId);
+        this.saveState();
+    },
+
     makeDefaultChoice: function() {
         var ch = {
             text: 'Option A',
@@ -275,6 +299,7 @@ var Canvas = {
 
         el.innerHTML = '<div class="node-header"><span>' + (node.type === 'scene' ? '🎬' : '🏁') + ' ' + Utils.escHtml(node.title) +
             '</span><span style="font-size:8px;color:var(--dim);">' + connCount + '🔗' + hiddenBadge + '</span>' +
+            '<button class="btn-del" style="margin-right:2px;" onclick="event.stopPropagation();Canvas.duplicateNode(\'' + node.id + '\')" title="Duplicate">📋</button>' +
             '<button class="btn-del" onclick="event.stopPropagation();Canvas.deleteNode(\'' + node.id + '\')">✕</button></div>' +
             '<div class="node-body">' + (node.type === 'ending' ? '<div style="font-size:18px;">' + (node.emoji || '⭐') + '</div>' : '') +
             '<div class="preview-text">' + Utils.escHtml(preview) + '</div>' + choicesHTML + '</div>';
@@ -434,7 +459,6 @@ var Canvas = {
                 id: n.id, x: n.x, y: n.y, title: n.title, subtitle: n.subtitle,
                 text: n.text, choices: n.choices, hiddenChars: n.hiddenChars, extraTags: n.extraTags
             };
-            // Copy all pose_ and expr_ properties
             Object.keys(n).forEach(function(key) {
                 if (key.startsWith('pose_') || key.startsWith('expr_')) {
                     scene[key] = n[key];
